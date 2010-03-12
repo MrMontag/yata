@@ -11,6 +11,8 @@ class MainWindow: public QMainWindow {
 	Q_OBJECT
 public:
 	MainWindow();
+
+	void setFile(const QString & filename);
 signals:
     void fileOpened(const QString &);
 private slots:

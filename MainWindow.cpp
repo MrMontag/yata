@@ -14,15 +14,20 @@ MainWindow::MainWindow()
 	connect(this, SIGNAL(fileOpened(const QString &)), m_tailView, SLOT(onFileChanged(const QString &)));
 }
 
-void MainWindow::on_action_Open_triggered()
+void MainWindow::setFile(const QString & filename)
 {
-	QString filename = QFileDialog::getOpenFileName(this);
-	qDebug("\"%s\"", filename.toStdString().c_str());
 	if(!filename.isEmpty()) {
 		m_watcher->removePaths(m_watcher->files());
 		m_watcher->addPath(filename);
 		emit fileOpened(filename);
 	}	
+}
+
+
+void MainWindow::on_action_Open_triggered()
+{
+	QString filename = QFileDialog::getOpenFileName(this);
+	setFile(filename);
 }
 
 void MainWindow::on_action_Exit_triggered()
