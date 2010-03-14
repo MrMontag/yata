@@ -13,6 +13,8 @@ public:
 public slots:
 	void onFileChanged(const QString & path);
 private:
+	QString getFileContents(const QString & filename);
+private:
 	QTextEdit * m_textView;
 };
 
