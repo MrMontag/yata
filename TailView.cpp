@@ -38,11 +38,6 @@ void TailView::onFileChanged(const QString & path)
 	const QString line_format = getFileContents(":/TailViewLine.html");
 
 	QString lines;
-	/*content +=
-		"<html><head><style type \"text/css\">"
-		"body { font-family:\"Monospace\"; }"
-		"span.linenumber { font-family:\"Monospace\"; background-color:grey; color:white }"
-		"</style></head><body>";*/
 	while(!instream.atEnd()) {
 		QString file_line = instream.readLine();
 		QString line = line_format;
