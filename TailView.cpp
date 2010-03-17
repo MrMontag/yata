@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QString>
+#include "HtmlConverter.h"
 
 TailView::TailView(QWidget * parent)
 	: QWidget(parent)
@@ -15,16 +16,6 @@ TailView::TailView(QWidget * parent)
 	setLayout(layout);
 }
 
-QString TailView::getFileContents(const QString & filename)
-{
-	QFile file(filename);
-	if(file.open(QFile::ReadOnly | QIODevice::Text)) {
-		QTextStream in(&file);
-		return in.readAll();
-	}
-	return QString();
-}
-
 void TailView::onFileChanged(const QString & path)
 {
 	QFile file(path);
@@ -32,22 +23,9 @@ void TailView::onFileChanged(const QString & path)
 		return;
 	}
 	QTextStream instream(&file);
-	int line_number = 0;
-
-	const QString format = getFileContents(":/TailViewFormat.html");
-	const QString line_format = getFileContents(":/TailViewLine.html");
-
-	QString lines;
-	while(!instream.atEnd()) {
-		QString file_line = instream.readLine();
-		QString line = line_format;
-		line.replace("__LINE_NUMBER__", QString::number(++line_number));
-		line.replace("__LINE__", file_line);
-		lines += line;
-	}
-	QString content = format;
-	content.replace("__CONTENT__", lines);
-
-	m_textView->setHtml(content);
+	
+	HtmlConverter converter;
+	QString html = converter.toHtml(instream);
+	m_textView->setHtml(html);
 }
 

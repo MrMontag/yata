@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/" >
-        <file>TailViewFormat.html</file>
-        <file>TailViewLine.html</file>
+        <file>HtmlFormat.html</file>
     </qresource>
 </RCC>

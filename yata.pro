@@ -8,7 +8,7 @@ DEPENDPATH += .
 INCLUDEPATH += .
 
 # Input
-HEADERS += MainWindow.h TailView.h
+HEADERS += MainWindow.h TailView.h HtmlConverter.h
 FORMS += MainWindow.ui
-SOURCES += main.cpp MainWindow.cpp TailView.cpp
+SOURCES += main.cpp MainWindow.cpp TailView.cpp HtmlConverter.cpp
 RESOURCES += TailViewResources.qrc
