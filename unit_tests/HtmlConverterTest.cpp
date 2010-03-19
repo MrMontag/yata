@@ -4,9 +4,6 @@
 class HtmlConverterTest: public QObject {
 	Q_OBJECT
 private slots:
-	void convertLineTest_data();
-	void convertLineTest();
-
 	void toHtmlTest_data();
 	void toHtmlTest();
 private:
@@ -14,29 +11,6 @@ private:
 private:
 	QString m_format;
 };
-
-void HtmlConverterTest::convertLineTest_data()
-{
-	QTest::addColumn<QString>("str");
-	QTest::addColumn<QString>("result");
-
-	QTest::newRow("plain text") << "abcd" << "abcd";
-	QTest::newRow("open angle bracket") << "<" << "&lt;";
-	QTest::newRow("two <'s") << "<<" << "&lt;&lt;";
-	QTest::newRow("close angle bracket") << ">" << "&gt;";
-	QTest::newRow("two >'s") << ">>" << "&gt;&gt;";
-	QTest::newRow("ampersand") << "&" << "&amp;";
-}
-
-void HtmlConverterTest::convertLineTest()
-{
-	QFETCH(QString, str);
-	QFETCH(QString, result);
-
-	HtmlConverter converter;
-	
-	QVERIFY(converter.convertLine(str) == result);
-}
 
 void HtmlConverterTest::toHtmlTest_data()
 {
@@ -51,8 +25,13 @@ void HtmlConverterTest::toHtmlTest_data()
 	QTextStream in(&format_file);
 	m_format = in.readAll();
 
-	QTest::newRow("asdf") << "asdf" << getData("asdf");
-	QTest::newRow("<") << "<" << getData("&lt;");
+	QTest::newRow("plain text") << "abcd" << getData("abcd");
+	QTest::newRow("open angle bracket") << "<" << getData("&lt;");
+	QTest::newRow("two <'s") << "<<" << getData("&lt;&lt;");
+	QTest::newRow("close angle bracket") << ">" << getData("&gt;");
+	QTest::newRow("two >'s") << ">>" << getData("&gt;&gt;");
+	QTest::newRow("ampersand") << "&" << getData("&amp;");
+
 }
 
 void HtmlConverterTest::toHtmlTest()

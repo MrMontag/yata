@@ -6,9 +6,10 @@ class QTextStream;
 
 class HtmlConverter {
 public:
+	QString toHtml(QTextStream & stream);
+private:
 	QString getFileContents(const QString & filename);
 	QString convertLine(const QString & s);
-	QString toHtml(QTextStream & stream);
 };
 
 #endif
