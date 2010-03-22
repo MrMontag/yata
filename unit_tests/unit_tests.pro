@@ -9,6 +9,19 @@ DEPENDPATH += .
 INCLUDEPATH += . ..
 
 # Input
-HEADERS += ../HtmlConverter.h
-SOURCES += HtmlConverterTest.cpp ../HtmlConverter.cpp
-RESOURCES += ../TailViewResources.qrc
+HEADERS += \
+	HtmlConverterTest.h \
+    TailViewTest.h \
+	../HtmlConverter.h \
+    ../TailView.h \
+
+SOURCES += \
+	HtmlConverterTest.cpp \
+    TailViewTest.cpp \
+	../HtmlConverter.cpp \
+    ../TailView.cpp \
+	testmain.cpp \
+
+RESOURCES += \
+	UnitTestResources.qrc \
+	../TailViewResources.qrc \

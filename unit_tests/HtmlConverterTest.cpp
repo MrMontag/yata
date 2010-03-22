@@ -1,16 +1,6 @@
 #include <QtTest/QtTest>
 #include "HtmlConverter.h"
-
-class HtmlConverterTest: public QObject {
-	Q_OBJECT
-private slots:
-	void toHtmlTest_data();
-	void toHtmlTest();
-private:
-	QString getData(const QString & input);
-private:
-	QString m_format;
-};
+#include "HtmlConverterTest.h"
 
 void HtmlConverterTest::toHtmlTest_data()
 {
@@ -52,5 +42,3 @@ QString HtmlConverterTest::getData(const QString & input)
 	return output;
 }
 
-QTEST_MAIN(HtmlConverterTest)
-#include "HtmlConverterTest.moc"
