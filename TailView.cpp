@@ -20,6 +20,7 @@ void TailView::onFileChanged(const QString & path)
 {
 	QFile file(path);
 	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		m_textView->setPlainText("");
 		return;
 	}
 	QTextStream instream(&file);
