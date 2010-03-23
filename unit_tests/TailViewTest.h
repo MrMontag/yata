@@ -5,6 +5,8 @@
 
 class TailViewTest: public QObject {
 	Q_OBJECT
+signals:
+	void fileChangedTestSignal(const QString &);
 private slots:
 	void onFileChangedTest();
 	

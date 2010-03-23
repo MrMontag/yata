@@ -7,6 +7,8 @@ void TailViewTest::onFileChangedTest()
 {
 	TailView tailView(0);
 
+	connect(this, SIGNAL(fileChangedTestSignal(const QString &)), &tailView, SLOT(onFileChanged(const QString &)));
+
 	// In order to avoid making TailView::m_textView a public
 	// variable, use Qt's introspection to get the TextEdit
 	// variable needed for this test.
@@ -21,7 +23,7 @@ void TailViewTest::onFileChangedTest()
 
 	QVERIFY(!data.isEmpty());
 
-	tailView.onFileChanged(":/unit_test/TailViewTestData.txt");
+	emit fileChangedTestSignal(":/unit_test/TailViewTestData.txt");
 	QVERIFY(textEdit->toPlainText() == data);
 }
 
