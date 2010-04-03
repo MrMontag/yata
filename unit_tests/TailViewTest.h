@@ -1,9 +1,9 @@
 #ifndef TAIL_VIEW_TEST_H
 #define TAIL_VIEW_TEST_H
 
-#include <QObject>
+#include "TestObject.h"
 
-class TailViewTest: public QObject {
+class TailViewTest: public TestObject {
 	Q_OBJECT
 signals:
 	void fileChangedTestSignal(const QString &);

@@ -1,6 +1,9 @@
 #include <QtTest/QtTest>
 #include "HtmlConverter.h"
 #include "HtmlConverterTest.h"
+#include "TestRegister.h"
+
+REGISTER_TEST(HtmlConverterTest)
 
 void HtmlConverterTest::toHtmlTest_data()
 {

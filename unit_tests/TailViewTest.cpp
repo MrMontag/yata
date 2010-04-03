@@ -1,7 +1,10 @@
 #include <QtTest/QtTest>
 #include "TailView.h"
 #include "TailViewTest.h"
+#include "TestRegister.h"
 #include <QTextEdit>
+
+REGISTER_TEST(TailViewTest)
 
 void TailViewTest::onFileChangedTest()
 {

@@ -1,10 +1,10 @@
 #ifndef HTML_CONVERTER_TEST_H
 #define HTML_CONVERTER_TEST_H
 
-#include <QObject>
+#include "TestObject.h"
 #include <QString>
 
-class HtmlConverterTest: public QObject {
+class HtmlConverterTest: public TestObject {
 	Q_OBJECT
 private slots:
 	void toHtmlTest_data();
