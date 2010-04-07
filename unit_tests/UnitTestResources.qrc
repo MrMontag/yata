@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/unit_test" >
         <file>TailViewTestData.txt</file>
+		<file>FileBlockReaderTest.txt</file>
     </qresource>
 </RCC>
