@@ -28,3 +28,8 @@ std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start
 	}
 	return std::pair<qint64,qint64>(start_pos,reader.pos());
 }
+
+qint64 FileBlockReader::size() const
+{
+	return m_file.size();
+}

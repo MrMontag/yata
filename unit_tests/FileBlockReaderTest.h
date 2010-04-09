@@ -8,5 +8,7 @@ class FileBlockReaderTest: public TestObject {
 private slots:
 	void readChunkTest_data();
 	void readChunkTest();
+
+	void sizeTest();
 };
 #endif

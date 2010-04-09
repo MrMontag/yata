@@ -37,3 +37,9 @@ void FileBlockReaderTest::readChunkTest()
 	QVERIFY(result_pos.second == res_end_pos);
 	QVERIFY(line == res_string);
 }
+
+void FileBlockReaderTest::sizeTest()
+{
+	FileBlockReader reader(":/unit_test/FileBlockReaderTest.txt");
+	QVERIFY(reader.size() == 30);
+}
