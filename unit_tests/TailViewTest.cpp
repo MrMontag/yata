@@ -15,7 +15,7 @@ void TailViewTest::onFileChangedTest()
 	// In order to avoid making TailView::m_textView a public
 	// variable, use Qt's introspection to get the TextEdit
 	// variable needed for this test.
-	QTextEdit * textEdit = tailView.findChild<QTextEdit*>();
+	QTextDocument * textEdit = tailView.findChild<QTextDocument*>();
 	QVERIFY(textEdit);
 
 	QString filename(":/unit_test/TailViewTestData.txt");

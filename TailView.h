@@ -1,19 +1,21 @@
 #ifndef TAIL_VIEW_H
 #define TAIL_VIEW_H
 
-#include <QWidget>
+#include <QAbstractScrollArea>
 
-class QTextEdit;
+class QTextDocument;
 class QString;
 
-class TailView: public QWidget {
+class TailView: public QAbstractScrollArea {
 	Q_OBJECT
 public:
 	TailView(QWidget * parent);
 public slots:
 	void onFileChanged(const QString & path);
+protected:
+	void paintEvent(QPaintEvent * event); 
 private:
-	QTextEdit * m_textView;
+	QTextDocument * m_document;
 };
 
 #endif
