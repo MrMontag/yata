@@ -14,6 +14,10 @@ public slots:
 	void onFileChanged(const QString & path);
 protected:
 	void paintEvent(QPaintEvent * event); 
+private slots:
+    void vScrollBarAction(int action);
+private:
+    int numLinesOnScreen() const;
 private:
 	QTextDocument * m_document;
 };

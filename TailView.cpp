@@ -11,11 +11,13 @@
 #include <QTextLayout>
 #include <QTextStream>
 
+#include <cmath>
+
 TailView::TailView(QWidget * parent)
 	: QAbstractScrollArea(parent)
 	, m_document(new QTextDocument(this))
 {
-	
+    connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
 
 void TailView::onFileChanged(const QString & path)
@@ -29,47 +31,63 @@ void TailView::onFileChanged(const QString & path)
 	
 	HtmlConverter converter;
 	QString html = converter.toHtml(instream);
-	m_document->setHtml(html);
+    m_document->setHtml(html);
 	viewport()->update();
 }
 
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
 {
-	static int i = 0;
-	qDebug() << __FUNCTION__ << i++; 
 	QPainter painter(viewport());
 
 	QTextLayout & layout(*m_document->firstBlock().layout());
 	QFont font = layout.font();
 	QFontMetrics fontMetrics(font);
 
-	int leading = fontMetrics.leading();
+    const int leading = fontMetrics.leading();
 
 	qreal height = 0;
 	qreal widthUsed = 0;
 	layout.beginLayout();
-	int singleStep = 1;
+    int numLines = 0;
 	while(true) {
 		QTextLine line = layout.createLine();
 		if(!line.isValid()) break;
-		line.setLineWidth(viewport()->size().width());
+        numLines++;
+        line.setLineWidth(viewport()->size().width());
 		height += leading;
 		line.setPosition(QPointF(0, height));
 		height += line.height();
-		singleStep = line.height();
 		widthUsed = qMax(widthUsed, line.naturalTextWidth());
 	}
 
-	if(height != verticalScrollBar()->maximum() + viewport()->height()) {
+    int visibleLines = numLinesOnScreen();
+    if(numLines != verticalScrollBar()->maximum() + visibleLines) {
 		QScrollBar * vsb = verticalScrollBar();
-		vsb->setRange(0, height - viewport()->height());
-		vsb->setPageStep(viewport()->height());
-		vsb->setSingleStep(singleStep);
+        vsb->setRange(0, numLines - visibleLines);
+        vsb->setPageStep(visibleLines);
+        vsb->setSingleStep(1);
 	}
 
 	layout.endLayout();
 
-	layout.draw(&painter, QPoint(0, -verticalScrollBar()->value()));
+    layout.draw(&painter, QPoint(0, -(verticalScrollBar()->value() * fontMetrics.lineSpacing())));
 
 } 
+
+void TailView::vScrollBarAction(int action)
+{
+    qDebug("%d", action);
+}
+
+int TailView::numLinesOnScreen() const
+{
+    QFont font = m_document->firstBlock().layout()->font();
+    QFontMetrics fontMetrics(font);
+    double lineHeight = fontMetrics.lineSpacing();
+    double windowHeight = viewport()->height();
+
+    int result = std::ceil(windowHeight / lineHeight);
+    qDebug("%s: %d float: %f", __FUNCTION__, result, windowHeight / lineHeight);
+    return result;
+}
