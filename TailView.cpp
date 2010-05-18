@@ -18,6 +18,7 @@ TailView::TailView(QWidget * parent)
 	, m_document(new QTextDocument(this))
     , m_fileChanged(false)
     , m_lastSize(0,0)
+    , m_numFileLines(0)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
@@ -49,15 +50,15 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
     const int leading = fontMetrics.leading();
 
-    if(m_fileChanged || viewport()->size() != m_lastSize) {
+    if(m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth()) {
         qreal height = 0;
         qreal widthUsed = 0;
         layout.beginLayout();
-        int numLines = 0;
+        m_numFileLines = 0;
         while(true) {
             QTextLine line = layout.createLine();
             if(!line.isValid()) break;
-            numLines++;
+            m_numFileLines++;
             line.setLineWidth(viewport()->size().width());
             height += leading;
             line.setPosition(QPointF(0, height));
@@ -65,24 +66,25 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
             widthUsed = qMax(widthUsed, line.naturalTextWidth());
         }
 
-        int visibleLines = numLinesOnScreen();
-        if(numLines != verticalScrollBar()->maximum() + visibleLines) {
-            QScrollBar * vsb = verticalScrollBar();
-            vsb->setRange(0, numLines - visibleLines);
-            vsb->setPageStep(visibleLines);
-            vsb->setSingleStep(1);
-        }
-
         layout.endLayout();
-        m_fileChanged = false;
-        m_lastSize = viewport()->size();
     }
+
+    m_fileChanged = false;
+    m_lastSize = viewport()->size();
+
+    int visibleLines = numLinesOnScreen();
+    if(m_numFileLines != verticalScrollBar()->maximum() + visibleLines) {
+        QScrollBar * vsb = verticalScrollBar();
+        vsb->setRange(0, m_numFileLines - visibleLines);
+        vsb->setPageStep(visibleLines);
+        vsb->setSingleStep(1);
+    }
+
     layout.draw(
         &painter,
         QPoint(0, -(verticalScrollBar()->value() * fontMetrics.lineSpacing())),
         QVector<QTextLayout::FormatRange>(),
         QRectF(QPointF(0,0), viewport()->size()));
-
 } 
 
 void TailView::vScrollBarAction(int /*action*/)
