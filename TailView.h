@@ -20,6 +20,8 @@ private:
     int numLinesOnScreen() const;
 private:
 	QTextDocument * m_document;
+    bool m_fileChanged;
+    QSize m_lastSize;
 };
 
 #endif

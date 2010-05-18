@@ -16,6 +16,8 @@
 TailView::TailView(QWidget * parent)
 	: QAbstractScrollArea(parent)
 	, m_document(new QTextDocument(this))
+    , m_fileChanged(false)
+    , m_lastSize(0,0)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
@@ -32,7 +34,8 @@ void TailView::onFileChanged(const QString & path)
 	HtmlConverter converter;
 	QString html = converter.toHtml(instream);
     m_document->setHtml(html);
-	viewport()->update();
+    viewport()->update();
+    m_fileChanged = true;
 }
 
 
@@ -46,38 +49,44 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
     const int leading = fontMetrics.leading();
 
-	qreal height = 0;
-	qreal widthUsed = 0;
-	layout.beginLayout();
-    int numLines = 0;
-	while(true) {
-		QTextLine line = layout.createLine();
-		if(!line.isValid()) break;
-        numLines++;
-        line.setLineWidth(viewport()->size().width());
-		height += leading;
-		line.setPosition(QPointF(0, height));
-		height += line.height();
-		widthUsed = qMax(widthUsed, line.naturalTextWidth());
-	}
+    if(m_fileChanged || viewport()->size() != m_lastSize) {
+        qreal height = 0;
+        qreal widthUsed = 0;
+        layout.beginLayout();
+        int numLines = 0;
+        while(true) {
+            QTextLine line = layout.createLine();
+            if(!line.isValid()) break;
+            numLines++;
+            line.setLineWidth(viewport()->size().width());
+            height += leading;
+            line.setPosition(QPointF(0, height));
+            height += line.height();
+            widthUsed = qMax(widthUsed, line.naturalTextWidth());
+        }
 
-    int visibleLines = numLinesOnScreen();
-    if(numLines != verticalScrollBar()->maximum() + visibleLines) {
-		QScrollBar * vsb = verticalScrollBar();
-        vsb->setRange(0, numLines - visibleLines);
-        vsb->setPageStep(visibleLines);
-        vsb->setSingleStep(1);
-	}
+        int visibleLines = numLinesOnScreen();
+        if(numLines != verticalScrollBar()->maximum() + visibleLines) {
+            QScrollBar * vsb = verticalScrollBar();
+            vsb->setRange(0, numLines - visibleLines);
+            vsb->setPageStep(visibleLines);
+            vsb->setSingleStep(1);
+        }
 
-	layout.endLayout();
-
-    layout.draw(&painter, QPoint(0, -(verticalScrollBar()->value() * fontMetrics.lineSpacing())));
+        layout.endLayout();
+        m_fileChanged = false;
+        m_lastSize = viewport()->size();
+    }
+    layout.draw(
+        &painter,
+        QPoint(0, -(verticalScrollBar()->value() * fontMetrics.lineSpacing())),
+        QVector<QTextLayout::FormatRange>(),
+        QRectF(QPointF(0,0), viewport()->size()));
 
 } 
 
-void TailView::vScrollBarAction(int action)
+void TailView::vScrollBarAction(int /*action*/)
 {
-    qDebug("%d", action);
 }
 
 int TailView::numLinesOnScreen() const
@@ -88,6 +97,5 @@ int TailView::numLinesOnScreen() const
     double windowHeight = viewport()->height();
 
     int result = std::ceil(windowHeight / lineHeight);
-    qDebug("%s: %d float: %f", __FUNCTION__, result, windowHeight / lineHeight);
     return result;
 }
