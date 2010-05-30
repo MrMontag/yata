@@ -18,11 +18,14 @@ private slots:
     void vScrollBarAction(int action);
 private:
     int numLinesOnScreen() const;
+    void setScrollBars(int lines);
 private:
+    QString m_filename;
 	QTextDocument * m_document;
     bool m_fileChanged;
     QSize m_lastSize;
     int m_numFileLines;
+    bool m_fullLayout;
 };
 
 #endif
