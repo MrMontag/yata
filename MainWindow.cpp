@@ -17,9 +17,12 @@ MainWindow::MainWindow()
 void MainWindow::setFile(const QString & filename)
 {
 	if(!filename.isEmpty()) {
-		m_watcher->removePaths(m_watcher->files());
+        if(m_watcher->files().size() != 0) {
+            m_watcher->removePaths(m_watcher->files());
+        }
+
 		m_watcher->addPath(filename);
-		setWindowTitle("Yata -- " + filename);
+        setWindowTitle(filename + " -- Yata");
 		emit fileOpened(filename);
 	}	
 }

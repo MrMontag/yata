@@ -22,7 +22,7 @@ TailView::TailView(QWidget * parent)
     , m_fileChanged(false)
     , m_lastSize(0,0)
     , m_numFileLines(0)
-    , m_fullLayout(false)
+    , m_fullLayout(true)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
@@ -42,6 +42,8 @@ void TailView::onFileChanged(const QString & path)
         QString html = converter.toHtml(instream);
         m_document->setHtml(html);
     }
+    verticalScrollBar()->setValue(0);
+    horizontalScrollBar()->setValue(0);
     m_fileChanged = true;
     viewport()->update();
 }
