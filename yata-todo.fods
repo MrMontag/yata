@@ -40,14 +40,15 @@
       <meta:editing-duration>PT00H13M43S</meta:editing-duration>
       <meta:editing-cycles>1</meta:editing-cycles>
       <meta:generator>OpenOffice.org/3.2$Unix OpenOffice.org_project/320m12$Build-9483</meta:generator>
-      <meta:document-statistic meta:table-count="3" meta:cell-count="23" meta:object-count="0"/>
+      
+      <meta:document-statistic meta:table-count="3" meta:cell-count="25" meta:object-count="0"/>
    </office:meta>
    <office:settings>
       <config:config-item-set config:name="ooo:view-settings">
          <config:config-item config:name="VisibleAreaTop" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaLeft" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaWidth" config:type="int">15655</config:config-item>
-         <config:config-item config:name="VisibleAreaHeight" config:type="int">4948</config:config-item>
+         <config:config-item config:name="VisibleAreaHeight" config:type="int">5398</config:config-item>
          <config:config-item-map-indexed config:name="Views">
             <config:config-item-map-entry>
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
@@ -183,11 +184,11 @@
       </style:style>
    </office:styles>
    <office:automatic-styles>
-      <style:style style:name="co1" style:family="table-column">
-         <style:table-column-properties fo:break-before="auto" style:column-width="4.402in"/>
-      </style:style>
       <style:style style:name="co2" style:family="table-column">
          <style:table-column-properties fo:break-before="auto" style:column-width="0.8925in"/>
+      </style:style>
+      <style:style style:name="co3" style:family="table-column">
+         <style:table-column-properties fo:break-before="auto" style:column-width="4.402in"/>
       </style:style>
       <style:style style:name="ro1" style:family="table-row">
          <style:table-row-properties style:row-height="0.178in" fo:break-before="auto"
@@ -240,12 +241,12 @@
       <style:master-page style:name="Default" style:page-layout-name="pm1">
          <style:header>
             <text:p>
-               <text:sheet-name>???</text:sheet-name>
+               <text:sheet-name>???</text:sheet-name> 
             </text:p>
          </style:header>
          <style:header-left style:display="false"/>
          <style:footer>
-            <text:p>Page <text:page-number>1</text:page-number>
+            <text:p>Page <text:page-number>1</text:page-number> 
             </text:p>
          </style:footer>
          <style:footer-left style:display="false"/>
@@ -258,13 +259,13 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-05-29">05/29/2010</text:date>, <text:time>22:52:29</text:time>
+                  <text:date style:data-style-name="N2" text:date-value="2010-05-30">05/30/2010</text:date>, <text:time>14:38:39</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
          <style:header-left style:display="false"/>
          <style:footer>
-            <text:p>Page <text:page-number>1</text:page-number> / <text:page-count>99</text:page-count>
+            <text:p>Page <text:page-number>1</text:page-number> / <text:page-count>99</text:page-count> 
             </text:p>
          </style:footer>
          <style:footer-left style:display="false"/>
@@ -273,7 +274,7 @@
    <office:body>
       <office:spreadsheet>
          <table:table table:name="Sheet1" table:style-name="ta1" table:print="false">
-            <table:table-column table:style-name="co1" table:default-cell-style-name="Default"/>
+            <table:table-column table:style-name="co3" table:default-cell-style-name="Default"/>
             <table:table-column table:style-name="co2" table:number-columns-repeated="1023"
                                 table:default-cell-style-name="Default"/>
             <table:table-row table:style-name="ro1">
@@ -372,6 +373,15 @@
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
                   <text:p>fonts</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1022"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>windows installer</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
