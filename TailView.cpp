@@ -49,47 +49,7 @@ void TailView::onFileChanged(const QString & path)
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
 {
-    QPainter painter(viewport());
-    if(m_fullLayout) {
-
-        QTextLayout & layout(*m_document->firstBlock().layout());
-        QFont font = layout.font();
-        QFontMetrics fontMetrics(font);
-
-        const int leading = fontMetrics.leading();
-
-        if(m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth()) {
-            qreal height = 0;
-            qreal widthUsed = 0;
-            layout.beginLayout();
-            m_numFileLines = 0;
-            while(true) {
-                QTextLine line = layout.createLine();
-                if(!line.isValid()) break;
-                m_numFileLines++;
-                line.setLineWidth(viewport()->size().width());
-                height += leading;
-                line.setPosition(QPointF(0, height));
-                height += line.height();
-                widthUsed = qMax(widthUsed, line.naturalTextWidth());
-            }
-
-            layout.endLayout();
-        }
-
-        m_fileChanged = false;
-        m_lastSize = viewport()->size();
-
-        qDebug("numFileLines: %d lineCount(): %d", m_numFileLines, m_document->lineCount());
-
-        setScrollBars(m_numFileLines);
-
-        layout.draw(
-            &painter,
-            QPoint(0, -(verticalScrollBar()->value() * fontMetrics.lineSpacing())),
-            QVector<QTextLayout::FormatRange>(),
-            QRectF(QPointF(0,0), viewport()->size()));
-    } else {
+    if(!m_fullLayout) {
         FileBlockReader reader(m_filename);
         int approx_lines = static_cast<int>(reader.size() / APPROXIMATE_CHARS_PER_LINE);
         setScrollBars(approx_lines);
@@ -99,49 +59,52 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         QString data;
         int visible_lines = numLinesOnScreen();
         reader.readChunk(&data, file_pos, visible_lines);
-        HtmlConverter converter;
         QTextStream textStream(&data);
+        HtmlConverter converter;
         QString html = converter.toHtml(textStream);
-        QTextDocument doc(this);
-        doc.setHtml(html);
-        QTextLayout & layout(*doc.firstBlock().layout());
-        QFont font = layout.font();
-        QFontMetrics fontMetrics(font);
-
-        const int leading = fontMetrics.leading();
-
-        /*if(m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth())*/ {
-            qreal height = 0;
-            qreal widthUsed = 0;
-            layout.beginLayout();
-            m_numFileLines = 0;
-            while(true) {
-                QTextLine line = layout.createLine();
-                if(!line.isValid()) break;
-                m_numFileLines++;
-                line.setLineWidth(viewport()->size().width());
-                height += leading;
-                line.setPosition(QPointF(0, height));
-                height += line.height();
-                widthUsed = qMax(widthUsed, line.naturalTextWidth());
-            }
-
-            layout.endLayout();
-        }
-
-        m_fileChanged = false;
-        m_lastSize = viewport()->size();
-
-
-        layout.draw(
-            &painter,
-            QPoint(0, 0),
-            QVector<QTextLayout::FormatRange>(),
-            QRectF(QPointF(0,0), viewport()->size()));
-
-
+        m_document->setHtml(html);
     }
-} 
+
+    QTextLayout & layout(*m_document->firstBlock().layout());
+    QFont font = layout.font();
+    QFontMetrics fontMetrics(font);
+
+    const int leading = fontMetrics.leading();
+
+    if(!m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth()) {
+       qreal height = 0;
+       qreal widthUsed = 0;
+       layout.beginLayout();
+       m_numFileLines = 0;
+       while(true) {
+           QTextLine line = layout.createLine();
+           if(!line.isValid()) break;
+           m_numFileLines++;
+           line.setLineWidth(viewport()->size().width());
+           height += leading;
+           line.setPosition(QPointF(0, height));
+           height += line.height();
+           widthUsed = qMax(widthUsed, line.naturalTextWidth());
+       }
+
+       layout.endLayout();
+    }
+
+    m_fileChanged = false;
+    m_lastSize = viewport()->size();
+
+    if(m_fullLayout) {
+        setScrollBars(m_numFileLines);
+    }
+
+    QPainter painter(viewport());
+    QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->value() * fontMetrics.lineSpacing()) : 0));
+    layout.draw(
+        &painter,
+        start,
+        QVector<QTextLayout::FormatRange>(),
+        QRectF(QPointF(0,0), viewport()->size()));
+}
 
 void TailView::setScrollBars(int lines)
 {
