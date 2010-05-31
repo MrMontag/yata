@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QFileSystemWatcher>
 #include <QPainter>
 #include <QScrollBar>
 #include <QString>
@@ -19,13 +20,29 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
 TailView::TailView(QWidget * parent)
 	: QAbstractScrollArea(parent)
 	, m_document(new QTextDocument(this))
+    , m_watcher(new QFileSystemWatcher(this))
     , m_fileChanged(false)
     , m_lastSize(0,0)
     , m_numFileLines(0)
     , m_fullLayout(true)
 {
+    connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
+
+
+void TailView::setFile(const QString & filename)
+{
+    if(!filename.isEmpty()) {
+        if(m_watcher->files().size() != 0) {
+            m_watcher->removePaths(m_watcher->files());
+        }
+    }
+    m_watcher->addPath(filename);
+
+    onFileChanged(filename);
+}
+
 
 void TailView::onFileChanged(const QString & path)
 {
