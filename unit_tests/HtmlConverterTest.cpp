@@ -35,13 +35,13 @@ void HtmlConverterTest::toHtmlTest()
 	HtmlConverter converter;
 
 	QTextStream stream(&input);
-	QVERIFY(converter.toHtml(stream) == result);
+    QCOMPARE(converter.toHtml(stream), result);
 }
 
 QString HtmlConverterTest::getData(const QString & input)
 {
 	QString output = m_format;
-	output.replace("__CONTENT__", input + "<br>");
+    output.replace("__CONTENT__", "<p>" + input + "</p>");
 	return output;
 }
 

@@ -15,10 +15,15 @@ QString HtmlConverter::getFileContents(const QString & filename)
 
 QString HtmlConverter::convertLine(const QString & s)
 {
+    if(s.isEmpty()) {
+        return "&nbsp;";
+    }
+
 	QString new_str(s);
 	new_str.replace('&', "&amp;"); // Needs to be before others
 	new_str.replace('<', "&lt;");
 	new_str.replace('>', "&gt;");
+
 	return new_str;
 }
 
@@ -28,7 +33,7 @@ QString HtmlConverter::toHtml(QTextStream & instream)
 
 	QString lines;
 	while(!instream.atEnd()) {
-		lines += convertLine(instream.readLine()) + "<br>";
+        lines += "<p>" + convertLine(instream.readLine()) + "</p>";
 	}
 	QString content = format;
 	content.replace("__CONTENT__", lines);

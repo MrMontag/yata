@@ -27,9 +27,9 @@ void TailViewTest::onFileChangedTest()
 	QVERIFY(!data.isEmpty());
 
 	emit fileChangedTestSignal(":/unit_test/TailViewTestData.txt");
-	QVERIFY(textEdit->toPlainText() == data);
+    QCOMPARE(textEdit->toPlainText().trimmed(), data.trimmed());
 
 	emit fileChangedTestSignal(":/unit_test/does not exist");
-	QVERIFY(textEdit->toPlainText() == QString());
+    QCOMPARE(textEdit->toPlainText(), QString());
 }
 
