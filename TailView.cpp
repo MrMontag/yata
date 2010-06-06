@@ -84,45 +84,61 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         m_document->setHtml(html);
     }
 
-    QTextLayout & layout(*m_document->firstBlock().layout());
-    QFont font = layout.font();
-    QFontMetrics fontMetrics(font);
+    bool needs_layout = !m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth();
 
-    const int leading = fontMetrics.leading();
-
-    if(!m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth()) {
-       qreal height = 0;
-       qreal widthUsed = 0;
-       layout.beginLayout();
-       m_numFileLines = 0;
-       while(true) {
-           QTextLine line = layout.createLine();
-           if(!line.isValid()) break;
-           m_numFileLines++;
-           line.setLineWidth(viewport()->size().width());
-           height += leading;
-           line.setPosition(QPointF(0, height));
-           height += line.height();
-           widthUsed = qMax(widthUsed, line.naturalTextWidth());
-       }
-
-       layout.endLayout();
+    if(needs_layout) {
+        m_numFileLines = 0;
     }
+    qreal widthUsed = 0;
+    qreal dy = 0;
 
-    m_fileChanged = false;
-    m_lastSize = viewport()->size();
+    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
+        QTextLayout & layout(*block.layout());
+        QFont font = layout.font();
+        QFontMetrics fontMetrics(font);
+        const int leading = fontMetrics.leading();
+
+        qreal height = 0;
+
+        if(needs_layout) {
+           layout.beginLayout();
+           while(true) {
+               QTextLine line = layout.createLine();
+               if(!line.isValid()) { break; }
+               m_numFileLines++;
+               line.setLineWidth(viewport()->size().width());
+               height += leading;
+               line.setPosition(QPointF(0, height));
+               height += line.height();
+               widthUsed = qMax(widthUsed, line.naturalTextWidth());
+           }
+
+           layout.endLayout();
+        } else {
+            height += fontMetrics.lineSpacing() * layout.lineCount();
+        }
+
+        QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->value() * fontMetrics.lineSpacing()) + dy : dy));
+        QRectF layoutRect(layout.boundingRect());
+        layoutRect.moveTo(start);
+        QRectF viewrect(viewport()->rect());
+        if(viewrect.intersects(layoutRect)) {
+            QPainter painter(viewport());
+            layout.draw(
+                &painter,
+                start,
+                QVector<QTextLayout::FormatRange>(),
+                QRectF(QPointF(0,0), viewport()->size()));
+        }
+        dy += height;
+    }
 
     if(m_fullLayout) {
         setScrollBars(m_numFileLines);
     }
 
-    QPainter painter(viewport());
-    QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->value() * fontMetrics.lineSpacing()) : 0));
-    layout.draw(
-        &painter,
-        start,
-        QVector<QTextLayout::FormatRange>(),
-        QRectF(QPointF(0,0), viewport()->size()));
+    m_fileChanged = false;
+    m_lastSize = viewport()->size();
 }
 
 void TailView::setScrollBars(int lines)
@@ -144,9 +160,9 @@ int TailView::numLinesOnScreen() const
 {
     QFont font = m_document->firstBlock().layout()->font();
     QFontMetrics fontMetrics(font);
-    double lineHeight = fontMetrics.lineSpacing();
-    double windowHeight = viewport()->height();
+    int lineHeight = fontMetrics.lineSpacing();
+    int windowHeight = viewport()->height();
 
-    int result = std::ceil(windowHeight / lineHeight);
+    int result = windowHeight / lineHeight;
     return result;
 }
