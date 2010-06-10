@@ -9,15 +9,14 @@ FileBlockReader::FileBlockReader(const QString & filename)
 	m_file.open(QIODevice::ReadOnly);
 }
 
-std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 num_lines)
+std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 lines_before_start, qint64 num_lines)
 {
-	while(start_pos > 0) {
-		m_file.seek(start_pos - 1);
-		char c = 0;
-		m_file.peek(&c, 1);
-		if(c == '\n') { break; }
-		--start_pos;
-	}
+    start_pos = beginningOfLine(start_pos);
+
+    while(lines_before_start > 0 && start_pos > 0) {
+        start_pos = beginningOfLine(start_pos - 1);
+        --lines_before_start;
+    }
 
 	m_file.seek(start_pos);
 
@@ -32,4 +31,16 @@ std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start
 qint64 FileBlockReader::size() const
 {
 	return m_file.size();
+}
+
+qint64 FileBlockReader::beginningOfLine(qint64 start_pos)
+{
+    while(start_pos > 0) {
+        m_file.seek(start_pos - 1);
+        char c = 0;
+        m_file.peek(&c, 1);
+        if(c == '\n') { break; }
+        --start_pos;
+    }
+    return start_pos;
 }

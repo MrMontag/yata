@@ -41,21 +41,22 @@
       <meta:editing-cycles>1</meta:editing-cycles>
       <meta:generator>OpenOffice.org/3.2$Unix OpenOffice.org_project/320m12$Build-9483</meta:generator>
       
-      <meta:document-statistic meta:table-count="3" meta:cell-count="25" meta:object-count="0"/>
+      
+      <meta:document-statistic meta:table-count="3" meta:cell-count="27" meta:object-count="0"/>
    </office:meta>
    <office:settings>
       <config:config-item-set config:name="ooo:view-settings">
          <config:config-item config:name="VisibleAreaTop" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaLeft" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaWidth" config:type="int">15655</config:config-item>
-         <config:config-item config:name="VisibleAreaHeight" config:type="int">5398</config:config-item>
+         <config:config-item config:name="VisibleAreaHeight" config:type="int">5848</config:config-item>
          <config:config-item-map-indexed config:name="Views">
             <config:config-item-map-entry>
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
                <config:config-item-map-named config:name="Tables">
                   <config:config-item-map-entry config:name="Sheet1">
                      <config:config-item config:name="CursorPositionX" config:type="int">0</config:config-item>
-                     <config:config-item config:name="CursorPositionY" config:type="int">11</config:config-item>
+                     <config:config-item config:name="CursorPositionY" config:type="int">13</config:config-item>
                      <config:config-item config:name="HorizontalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="HorizontalSplitPosition" config:type="int">0</config:config-item>
@@ -259,7 +260,7 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-05-30">05/30/2010</text:date>, <text:time>14:38:39</text:time> 
+                  <text:date style:data-style-name="N2" text:date-value="2010-06-06">06/06/2010</text:date>, <text:time>14:57:37</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
@@ -382,6 +383,15 @@
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
                   <text:p>windows installer</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1022"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>vertical scrollbar stays put when file changes</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>

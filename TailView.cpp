@@ -25,6 +25,7 @@ TailView::TailView(QWidget * parent)
     , m_lastSize(0,0)
     , m_numFileLines(0)
     , m_fullLayout(true)
+    , m_topLayoutLine(0)
 {
     connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
@@ -77,7 +78,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
         QString data;
         int visible_lines = numLinesOnScreen();
-        reader.readChunk(&data, file_pos, visible_lines);
+        reader.readChunk(&data, file_pos, 0, visible_lines);
         QTextStream textStream(&data);
         HtmlConverter converter;
         QString html = converter.toHtml(textStream);
@@ -94,9 +95,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
         QTextLayout & layout(*block.layout());
-        QFont font = layout.font();
-        QFontMetrics fontMetrics(font);
-        const int leading = fontMetrics.leading();
+        QFontMetrics fontMetrics(layout.font());
 
         qreal height = 0;
 
@@ -107,7 +106,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
                if(!line.isValid()) { break; }
                m_numFileLines++;
                line.setLineWidth(viewport()->size().width());
-               height += leading;
+               height += fontMetrics.leading();
                line.setPosition(QPointF(0, height));
                height += line.height();
                widthUsed = qMax(widthUsed, line.naturalTextWidth());
@@ -152,8 +151,18 @@ void TailView::setScrollBars(int lines)
     }
 }
 
-void TailView::vScrollBarAction(int /*action*/)
+void TailView::vScrollBarAction(int action)
 {
+    if(m_fullLayout) { return; }
+
+    switch(action) {
+    case QAbstractSlider::SliderSingleStepAdd:
+        break;
+    case QAbstractSlider::SliderSingleStepSub:
+        break;
+    default:
+        break;
+    }
 }
 
 int TailView::numLinesOnScreen() const
