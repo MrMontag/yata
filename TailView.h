@@ -16,6 +16,7 @@ public:
 
 protected:
     void paintEvent(QPaintEvent * event);
+    void resizeEvent(QResizeEvent *);
 
 private slots:
     void onFileChanged(const QString & path);
@@ -23,7 +24,8 @@ private slots:
 
 private:
     int numLinesOnScreen() const;
-    void setScrollBars(int lines);
+    void updateScrollBars(int lines);
+    void updateDocumentForPartialLayout(int line_change = 0);
 
 private:
     QString m_filename;
@@ -35,6 +37,7 @@ private:
     int m_numFileLines;
     bool m_fullLayout;
     int m_topLayoutLine;
+    qint64 m_lastFilePos;
 };
 
 #endif

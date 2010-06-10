@@ -9,18 +9,23 @@ FileBlockReader::FileBlockReader(const QString & filename)
 	m_file.open(QIODevice::ReadOnly);
 }
 
-std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 lines_before_start, qint64 num_lines)
+std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
 {
     start_pos = beginningOfLine(start_pos);
 
-    while(lines_before_start > 0 && start_pos > 0) {
+    while(lines_after_start < 0 && start_pos > 0) {
         start_pos = beginningOfLine(start_pos - 1);
-        --lines_before_start;
+        ++lines_after_start;
     }
 
-	m_file.seek(start_pos);
+    while(lines_after_start > 0 && start_pos < size()) {
+        start_pos = nextLine(start_pos);
+        --lines_after_start;
+    }
 
-	QTextStream reader(&m_file);
+    m_file.seek(start_pos);
+
+    QTextStream reader(&m_file);
 	for(int i = 0; i < num_lines; i++) {
 		*data += reader.readLine();
 		if(i + 1 < num_lines) *data += "\n";
@@ -41,6 +46,20 @@ qint64 FileBlockReader::beginningOfLine(qint64 start_pos)
         m_file.peek(&c, 1);
         if(c == '\n') { break; }
         --start_pos;
+    }
+    return start_pos;
+}
+
+qint64 FileBlockReader::nextLine(qint64 start_pos)
+{
+    while(start_pos < size()) {
+        ++start_pos;
+        m_file.seek(start_pos - 1);
+        char c;
+        m_file.peek(&c, 1);
+        if(c == '\n') {
+            break;
+        }
     }
     return start_pos;
 }

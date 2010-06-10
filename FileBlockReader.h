@@ -15,6 +15,7 @@ public:
 	qint64 size() const;
 private:
     qint64 beginningOfLine(qint64 start_pos);
+    qint64 nextLine(qint64 start_pos);
 
 private:
 	QFile m_file;

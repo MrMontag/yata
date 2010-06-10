@@ -16,6 +16,7 @@
 #include <cmath>
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
+const int PAGE_STEP_OVERLAP = 2;
 
 TailView::TailView(QWidget * parent)
 	: QAbstractScrollArea(parent)
@@ -24,8 +25,9 @@ TailView::TailView(QWidget * parent)
     , m_fileChanged(false)
     , m_lastSize(0,0)
     , m_numFileLines(0)
-    , m_fullLayout(true)
+    , m_fullLayout(false)
     , m_topLayoutLine(0)
+    , m_lastFilePos(0)
 {
     connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
@@ -40,6 +42,9 @@ void TailView::setFile(const QString & filename)
         }
     }
     m_watcher->addPath(filename);
+
+    verticalScrollBar()->setValue(0);
+    horizontalScrollBar()->setValue(0);
 
     onFileChanged(filename);
 }
@@ -59,9 +64,10 @@ void TailView::onFileChanged(const QString & path)
         HtmlConverter converter;
         QString html = converter.toHtml(instream);
         m_document->setHtml(html);
+    } else {
+        updateDocumentForPartialLayout();
     }
-    verticalScrollBar()->setValue(0);
-    horizontalScrollBar()->setValue(0);
+
     m_fileChanged = true;
     viewport()->update();
 }
@@ -69,22 +75,6 @@ void TailView::onFileChanged(const QString & path)
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
 {
-    if(!m_fullLayout) {
-        FileBlockReader reader(m_filename);
-        int approx_lines = static_cast<int>(reader.size() / APPROXIMATE_CHARS_PER_LINE);
-        setScrollBars(approx_lines);
-
-        qint64 file_pos = static_cast<qint64>(verticalScrollBar()->value()) * APPROXIMATE_CHARS_PER_LINE;
-
-        QString data;
-        int visible_lines = numLinesOnScreen();
-        reader.readChunk(&data, file_pos, 0, visible_lines);
-        QTextStream textStream(&data);
-        HtmlConverter converter;
-        QString html = converter.toHtml(textStream);
-        m_document->setHtml(html);
-    }
-
     bool needs_layout = !m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth();
 
     if(needs_layout) {
@@ -133,20 +123,56 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
     }
 
     if(m_fullLayout) {
-        setScrollBars(m_numFileLines);
+        updateScrollBars(m_numFileLines);
     }
 
     m_fileChanged = false;
     m_lastSize = viewport()->size();
 }
 
-void TailView::setScrollBars(int lines)
+void TailView::resizeEvent(QResizeEvent *)
+{
+    if(!m_fullLayout) {
+        updateDocumentForPartialLayout();
+    }
+}
+
+
+void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
+{
+    if(m_fullLayout) { return; }
+
+    FileBlockReader reader(m_filename);
+    int approx_lines = static_cast<int>(reader.size() / APPROXIMATE_CHARS_PER_LINE);
+    updateScrollBars(approx_lines);
+
+    qint64 file_pos =
+        (0 == line_change
+         ? static_cast<qint64>(verticalScrollBar()->value()) * APPROXIMATE_CHARS_PER_LINE
+         : m_lastFilePos);
+
+    QString data;
+    int visible_lines = numLinesOnScreen() + 1;
+    m_lastFilePos = reader.readChunk(&data, file_pos, line_change, visible_lines).first;
+
+    if(line_change != 0) {
+        verticalScrollBar()->setValue(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
+    }
+
+    QTextStream textStream(&data);
+    HtmlConverter converter;
+    QString html = converter.toHtml(textStream);
+    m_document->setHtml(html);
+
+}
+
+void TailView::updateScrollBars(int lines)
 {
     int visibleLines = numLinesOnScreen();
     if(lines != verticalScrollBar()->maximum() + visibleLines) {
         QScrollBar * vsb = verticalScrollBar();
         vsb->setRange(0, lines - visibleLines);
-        vsb->setPageStep(visibleLines);
+        vsb->setPageStep(visibleLines - PAGE_STEP_OVERLAP);
         vsb->setSingleStep(1);
     }
 }
@@ -155,14 +181,26 @@ void TailView::vScrollBarAction(int action)
 {
     if(m_fullLayout) { return; }
 
+    int line_change = 0;
+    int page_step = numLinesOnScreen() - PAGE_STEP_OVERLAP;
+
     switch(action) {
     case QAbstractSlider::SliderSingleStepAdd:
+        line_change = 1;
         break;
     case QAbstractSlider::SliderSingleStepSub:
+        line_change = -1;
         break;
+    case QAbstractSlider::SliderPageStepAdd:
+        line_change = page_step;
+        break;
+    case QAbstractSlider::SliderPageStepSub:
+        line_change = -page_step;
     default:
         break;
     }
+
+    updateDocumentForPartialLayout(line_change);
 }
 
 int TailView::numLinesOnScreen() const

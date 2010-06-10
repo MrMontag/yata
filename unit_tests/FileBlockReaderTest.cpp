@@ -19,7 +19,8 @@ void FileBlockReaderTest::readChunkTest_data()
     QTest::newRow("line 2") << qint64(15) << qint64(0) << qint64(1) << qint64(15) << qint64(30) << "This is line 2";
     QTest::newRow("beginning of line 1") << qint64(3) << qint64(0) << qint64(1) << qint64(0) << qint64(15) << "This is line 1";
     QTest::newRow("beginning of line 2") << qint64(17) << qint64(0) << qint64(1) << qint64(15) << qint64(30) << "This is line 2";
-    QTest::newRow("2 lines, lines_before_start") << qint64(17) << qint64(1) << qint64(2) << qint64(0) << qint64(30) << "This is line 1\nThis is line 2";
+    QTest::newRow("2 lines, negative lines_after_start") << qint64(17) << qint64(-1) << qint64(2) << qint64(0) << qint64(30) << "This is line 1\nThis is line 2";
+    QTest::newRow("1 line, positive lines_after_start") << qint64(0) << qint64(1) << qint64(1) << qint64(15) << qint64(30) << "This is line 2";
 
 }
 
