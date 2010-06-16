@@ -25,7 +25,7 @@ TailView::TailView(QWidget * parent)
     , m_fileChanged(false)
     , m_lastSize(0,0)
     , m_numFileLines(0)
-    , m_fullLayout(false)
+    , m_fullLayout(true)
     , m_topLayoutLine(0)
     , m_lastFilePos(0)
 {
