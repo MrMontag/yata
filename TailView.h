@@ -8,12 +8,14 @@ class QString;
 class QFileSystemWatcher;
 
 class TailView: public QAbstractScrollArea {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	TailView(QWidget * parent);
+    TailView(QWidget * parent);
     void setFile(const QString & filename);
 
+    void setFullLayout(bool fullLayout);
+    bool isFullLayout() const;
 protected:
     void paintEvent(QPaintEvent * event);
     void resizeEvent(QResizeEvent *);
@@ -29,7 +31,7 @@ private:
 
 private:
     QString m_filename;
-	QTextDocument * m_document;
+    QTextDocument * m_document;
     QFileSystemWatcher * m_watcher;
     bool m_fileChanged;
 

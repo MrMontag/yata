@@ -17,6 +17,7 @@ signals:
 private slots:
 	void on_action_Open_triggered();
 	void on_action_Exit_triggered();
+        void on_action_FullLayout_triggered(bool isChecked);
 private:
     TailView * m_tailView;
 	Ui::MainWindow ui;

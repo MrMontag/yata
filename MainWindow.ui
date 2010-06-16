@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -30,7 +30,14 @@
     <addaction name="action_Open"/>
     <addaction name="action_Exit"/>
    </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>&amp;Debug</string>
+    </property>
+    <addaction name="action_FullLayout"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -47,6 +54,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_FullLayout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Full Layout</string>
    </property>
   </action>
  </widget>

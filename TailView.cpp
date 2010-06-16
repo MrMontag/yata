@@ -19,8 +19,8 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
 const int PAGE_STEP_OVERLAP = 2;
 
 TailView::TailView(QWidget * parent)
-	: QAbstractScrollArea(parent)
-	, m_document(new QTextDocument(this))
+    : QAbstractScrollArea(parent)
+    , m_document(new QTextDocument(this))
     , m_watcher(new QFileSystemWatcher(this))
     , m_fileChanged(false)
     , m_lastSize(0,0)
@@ -49,6 +49,16 @@ void TailView::setFile(const QString & filename)
     onFileChanged(filename);
 }
 
+void TailView::setFullLayout(bool fullLayout)
+{
+    m_fullLayout = fullLayout;
+    onFileChanged(m_filename);
+}
+
+bool TailView::isFullLayout() const
+{
+    return m_fullLayout;
+}
 
 void TailView::onFileChanged(const QString & path)
 {
