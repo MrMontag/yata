@@ -43,8 +43,8 @@ void TailView::setFile(const QString & filename)
     }
     m_watcher->addPath(filename);
 
-    verticalScrollBar()->setValue(0);
-    horizontalScrollBar()->setValue(0);
+    verticalScrollBar()->setSliderPosition(0);
+    horizontalScrollBar()->setSliderPosition(0);
 
     onFileChanged(filename);
 }
@@ -117,7 +117,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
             height += fontMetrics.lineSpacing() * layout.lineCount();
         }
 
-        QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->value() * fontMetrics.lineSpacing()) + dy : dy));
+        QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->sliderPosition() * fontMetrics.lineSpacing()) + dy : dy));
         QRectF layoutRect(layout.boundingRect());
         layoutRect.moveTo(start);
         QRectF viewrect(viewport()->rect());
@@ -153,20 +153,27 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
     if(m_fullLayout) { return; }
 
     FileBlockReader reader(m_filename);
-    int approx_lines = static_cast<int>(reader.size() / APPROXIMATE_CHARS_PER_LINE);
+    QString temp;
+    int lines_on_screen = numLinesOnScreen();
+
+    qint64 last_screen_pos = reader.readChunk(&temp, reader.size(), -lines_on_screen, 0).first;
+
+    int approx_lines = static_cast<int>(last_screen_pos / APPROXIMATE_CHARS_PER_LINE);
     updateScrollBars(approx_lines);
 
-    qint64 file_pos =
-        (0 == line_change
-         ? static_cast<qint64>(verticalScrollBar()->value()) * APPROXIMATE_CHARS_PER_LINE
-         : m_lastFilePos);
+    qint64 file_pos = m_lastFilePos;
+    if(verticalScrollBar()->sliderPosition() == verticalScrollBar()->maximum()) {
+        file_pos = last_screen_pos;
+    } else if(0 == line_change) {
+        file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
+    }
 
     QString data;
-    int visible_lines = numLinesOnScreen() + 1;
+    int visible_lines = lines_on_screen + 1;
     m_lastFilePos = reader.readChunk(&data, file_pos, line_change, visible_lines).first;
 
     if(line_change != 0) {
-        verticalScrollBar()->setValue(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
+        verticalScrollBar()->setSliderPosition(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
     }
 
     QTextStream textStream(&data);
@@ -178,7 +185,11 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
 
 void TailView::updateScrollBars(int lines)
 {
-    int visibleLines = numLinesOnScreen();
+    int visibleLines = 0;
+    if(m_fullLayout) {
+        visibleLines = numLinesOnScreen();
+    }
+
     if(lines != verticalScrollBar()->maximum() + visibleLines) {
         QScrollBar * vsb = verticalScrollBar();
         vsb->setRange(0, lines - visibleLines);
@@ -189,6 +200,14 @@ void TailView::updateScrollBars(int lines)
 
 void TailView::vScrollBarAction(int action)
 {
+    if(verticalScrollBar()->sliderPosition() > verticalScrollBar()->maximum()) {
+        verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+    }
+
+    if(verticalScrollBar()->sliderPosition() < verticalScrollBar()->minimum()) {
+        verticalScrollBar()->setSliderPosition(verticalScrollBar()->minimum());
+    }
+
     if(m_fullLayout) { return; }
 
     int line_change = 0;
@@ -206,6 +225,7 @@ void TailView::vScrollBarAction(int action)
         break;
     case QAbstractSlider::SliderPageStepSub:
         line_change = -page_step;
+        break;
     default:
         break;
     }
