@@ -44,21 +44,22 @@
       
       
       
-      <meta:document-statistic meta:table-count="3" meta:cell-count="31" meta:object-count="0"/>
+      
+      <meta:document-statistic meta:table-count="3" meta:cell-count="33" meta:object-count="0"/>
    </office:meta>
    <office:settings>
       <config:config-item-set config:name="ooo:view-settings">
          <config:config-item config:name="VisibleAreaTop" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaLeft" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaWidth" config:type="int">15655</config:config-item>
-         <config:config-item config:name="VisibleAreaHeight" config:type="int">6958</config:config-item>
+         <config:config-item config:name="VisibleAreaHeight" config:type="int">7422</config:config-item>
          <config:config-item-map-indexed config:name="Views">
             <config:config-item-map-entry>
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
                <config:config-item-map-named config:name="Tables">
                   <config:config-item-map-entry config:name="Sheet1">
                      <config:config-item config:name="CursorPositionX" config:type="int">0</config:config-item>
-                     <config:config-item config:name="CursorPositionY" config:type="int">15</config:config-item>
+                     <config:config-item config:name="CursorPositionY" config:type="int">16</config:config-item>
                      <config:config-item config:name="HorizontalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="HorizontalSplitPosition" config:type="int">0</config:config-item>
@@ -266,7 +267,7 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-06-15">06/15/2010</text:date>, <text:time>20:39:00</text:time> 
+                  <text:date style:data-style-name="N2" text:date-value="2010-06-18">06/18/2010</text:date>, <text:time>21:13:49</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
@@ -416,6 +417,15 @@
             <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>vertical scrollbar: mousewheel? (investigate)</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1022"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro2">
+               <table:table-cell office:value-type="string">
+                  <text:p>Fix first line rendering too close to top of widget</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
