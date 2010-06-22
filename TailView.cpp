@@ -71,9 +71,7 @@ void TailView::onFileChanged(const QString & path)
         }
         QTextStream instream(&file);
 
-        HtmlConverter converter;
-        QString html = converter.toHtml(instream);
-        m_document->setHtml(html);
+        m_document->setPlainText(instream.readAll());
     } else {
         updateDocumentForPartialLayout();
     }
@@ -90,6 +88,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
     if(needs_layout) {
         m_numFileLines = 0;
     }
+
     qreal widthUsed = 0;
     qreal dy = 0;
 
@@ -176,10 +175,9 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         verticalScrollBar()->setSliderPosition(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
     }
 
-    QTextStream textStream(&data);
-    HtmlConverter converter;
-    QString html = converter.toHtml(textStream);
-    m_document->setHtml(html);
+    m_document->setPlainText(data);
+
+    viewport()->update();
 
 }
 
