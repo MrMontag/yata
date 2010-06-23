@@ -11,6 +11,8 @@ FileBlockReader::FileBlockReader(const QString & filename)
 
 std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
 {
+    data->clear();
+
     start_pos = beginningOfLine(start_pos);
 
     while(lines_after_start < 0 && start_pos > 0) {

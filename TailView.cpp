@@ -155,21 +155,29 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
     QString temp;
     int lines_on_screen = numLinesOnScreen();
 
-    qint64 last_screen_pos = reader.readChunk(&temp, reader.size(), -lines_on_screen, 0).first;
+    qint64 bottom_screen_pos = reader.readChunk(&temp, reader.size(), -lines_on_screen, 0).first;
 
-    int approx_lines = static_cast<int>(last_screen_pos / APPROXIMATE_CHARS_PER_LINE);
+    int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
     updateScrollBars(approx_lines);
 
-    qint64 file_pos = m_lastFilePos;
-    if(verticalScrollBar()->sliderPosition() == verticalScrollBar()->maximum()) {
-        file_pos = last_screen_pos;
-    } else if(0 == line_change) {
-        file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
+    qint64 file_pos = 0;
+    if(0 == line_change) {
+        if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
+            file_pos = bottom_screen_pos;
+        } else {
+            file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
+        }
+    } else {
+        file_pos = m_lastFilePos;
     }
 
     QString data;
     int visible_lines = lines_on_screen + 1;
     m_lastFilePos = reader.readChunk(&data, file_pos, line_change, visible_lines).first;
+
+    if(m_lastFilePos > bottom_screen_pos) {
+        m_lastFilePos = reader.readChunk(&data, bottom_screen_pos, 0, visible_lines).first;
+    }
 
     if(line_change != 0) {
         verticalScrollBar()->setSliderPosition(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
