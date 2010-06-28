@@ -29,6 +29,7 @@ TailView::TailView(QWidget * parent)
     , m_topLayoutLine(0)
     , m_lastFilePos(0)
 {
+    m_document->setUndoRedoEnabled(false);
     connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
@@ -80,16 +81,15 @@ void TailView::onFileChanged(const QString & path)
     viewport()->update();
 }
 
-
-void TailView::paintEvent(QPaintEvent * /*event*/)
+void TailView::performLayout()
 {
     bool needs_layout = !m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth();
 
-    if(needs_layout) {
-        m_numFileLines = 0;
+    if(!needs_layout) {
+        return;
     }
 
-    qreal widthUsed = 0;
+    m_numFileLines = 0;
     qreal dy = 0;
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
@@ -108,13 +108,27 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
                height += fontMetrics.leading();
                line.setPosition(QPointF(0, height));
                height += line.height();
-               widthUsed = qMax(widthUsed, line.naturalTextWidth());
            }
 
            layout.endLayout();
-        } else {
-            height += fontMetrics.lineSpacing() * layout.lineCount();
         }
+        dy += height;
+    }
+
+    m_fileChanged = false;
+}
+
+void TailView::paintEvent(QPaintEvent * /*event*/)
+{
+    performLayout();
+
+    qreal dy = 0;
+
+    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
+        QTextLayout & layout(*block.layout());
+        QFontMetrics fontMetrics(layout.font());
+
+        qreal height = fontMetrics.lineSpacing() * layout.lineCount();
 
         QPoint start(0, (m_fullLayout ? -(verticalScrollBar()->sliderPosition() * fontMetrics.lineSpacing()) + dy : dy));
         QRectF layoutRect(layout.boundingRect());
@@ -135,7 +149,6 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         updateScrollBars(m_numFileLines);
     }
 
-    m_fileChanged = false;
     m_lastSize = viewport()->size();
 }
 

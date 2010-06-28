@@ -28,6 +28,7 @@ private:
     int numLinesOnScreen() const;
     void updateScrollBars(int lines);
     void updateDocumentForPartialLayout(int line_change = 0);
+    void performLayout();
 
 private:
     QString m_filename;

@@ -47,6 +47,7 @@
       
       
       
+      
       <meta:document-statistic meta:table-count="3" meta:cell-count="57" meta:object-count="0"/>
    </office:meta>
    <office:settings>
@@ -60,8 +61,8 @@
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
                <config:config-item-map-named config:name="Tables">
                   <config:config-item-map-entry config:name="Sheet1">
-                     <config:config-item config:name="CursorPositionX" config:type="int">5</config:config-item>
-                     <config:config-item config:name="CursorPositionY" config:type="int">18</config:config-item>
+                     <config:config-item config:name="CursorPositionX" config:type="int">0</config:config-item>
+                     <config:config-item config:name="CursorPositionY" config:type="int">8</config:config-item>
                      <config:config-item config:name="HorizontalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="HorizontalSplitPosition" config:type="int">0</config:config-item>
@@ -277,7 +278,7 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-06-22">06/22/2010</text:date>, <text:time>20:00:48</text:time> 
+                  <text:date style:data-style-name="N2" text:date-value="2010-06-22">06/22/2010</text:date>, <text:time>20:52:05</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
@@ -311,7 +312,19 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>vertical scrollbar: mousewheel? (investigate)</text:p>
+                  <text:p>Fix for bottom screen with wrapped lines (bottom line rendering beyond edge of view)</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="1">
+                  <text:p>1</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>ability to display other than first wrapped line at top of widget</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
@@ -328,20 +341,8 @@
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
                </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="1">
-                  <text:p>1</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>Fix for bottom screen with wrapped lines (bottom line rendering beyond edge of view)</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="1">
-                  <text:p>1</text:p>
+               <table:table-cell office:value-type="float" office:value="2">
+                  <text:p>2</text:p>
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
