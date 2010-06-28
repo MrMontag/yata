@@ -67,7 +67,7 @@ void TailView::onFileChanged(const QString & path)
     if(m_fullLayout) {
         QFile file(m_filename);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_document->setHtml(QString());
+            m_document->setPlainText(QString());
             return;
         }
         QTextStream instream(&file);
@@ -204,6 +204,11 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
 
 void TailView::updateScrollBars(int lines)
 {
+    // Since partial layout handles the scrollbars
+    // differently, the visible lines should not
+    // be taken into account. (Note: candidate for
+    // possible refactoring; should this be
+    // decided here?)
     int visibleLines = 0;
     if(m_fullLayout) {
         visibleLines = numLinesOnScreen();

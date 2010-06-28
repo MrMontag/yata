@@ -48,21 +48,22 @@
       
       
       
-      <meta:document-statistic meta:table-count="3" meta:cell-count="57" meta:object-count="0"/>
+      
+      <meta:document-statistic meta:table-count="3" meta:cell-count="60" meta:object-count="0"/>
    </office:meta>
    <office:settings>
       <config:config-item-set config:name="ooo:view-settings">
          <config:config-item config:name="VisibleAreaTop" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaLeft" config:type="int">0</config:config-item>
          <config:config-item config:name="VisibleAreaWidth" config:type="int">17824</config:config-item>
-         <config:config-item config:name="VisibleAreaHeight" config:type="int">8814</config:config-item>
+         <config:config-item config:name="VisibleAreaHeight" config:type="int">8997</config:config-item>
          <config:config-item-map-indexed config:name="Views">
             <config:config-item-map-entry>
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
                <config:config-item-map-named config:name="Tables">
                   <config:config-item-map-entry config:name="Sheet1">
                      <config:config-item config:name="CursorPositionX" config:type="int">0</config:config-item>
-                     <config:config-item config:name="CursorPositionY" config:type="int">8</config:config-item>
+                     <config:config-item config:name="CursorPositionY" config:type="int">19</config:config-item>
                      <config:config-item config:name="HorizontalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="HorizontalSplitPosition" config:type="int">0</config:config-item>
@@ -193,21 +194,17 @@
       </style:style>
    </office:styles>
    <office:automatic-styles>
-      <style:style style:name="co1" style:family="table-column">
-         <style:table-column-properties fo:break-before="auto" style:column-width="5.8665in"/>
-      </style:style>
-      <style:style style:name="co2" style:family="table-column">
-         <style:table-column-properties fo:break-before="auto" style:column-width="0.5693in"/>
-      </style:style>
-      <style:style style:name="co3" style:family="table-column">
-         <style:table-column-properties fo:break-before="auto" style:column-width="0.6075in"/>
-      </style:style>
       <style:style style:name="co4" style:family="table-column">
          <style:table-column-properties fo:break-before="auto" style:column-width="0.8925in"/>
       </style:style>
-      <style:style style:name="ro1" style:family="table-row">
-         <style:table-row-properties style:row-height="0.1835in" fo:break-before="auto"
-                                     style:use-optimal-row-height="true"/>
+      <style:style style:name="co2" style:family="table-column">
+         <style:table-column-properties fo:break-before="auto" style:column-width="5.8665in"/>
+      </style:style>
+      <style:style style:name="co3" style:family="table-column">
+         <style:table-column-properties fo:break-before="auto" style:column-width="0.5693in"/>
+      </style:style>
+      <style:style style:name="co5" style:family="table-column">
+         <style:table-column-properties fo:break-before="auto" style:column-width="0.6075in"/>
       </style:style>
       <style:style style:name="ro2" style:family="table-row">
          <style:table-row-properties style:row-height="0.178in" fo:break-before="auto"
@@ -278,7 +275,7 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-06-22">06/22/2010</text:date>, <text:time>20:52:05</text:time> 
+                  <text:date style:data-style-name="N2" text:date-value="2010-06-27">06/27/2010</text:date>, <text:time>23:03:43</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
@@ -293,12 +290,12 @@
    <office:body>
       <office:spreadsheet>
          <table:table table:name="Sheet1" table:style-name="ta1" table:print="false">
-            <table:table-column table:style-name="co1" table:default-cell-style-name="Default"/>
             <table:table-column table:style-name="co2" table:default-cell-style-name="Default"/>
             <table:table-column table:style-name="co3" table:default-cell-style-name="Default"/>
+            <table:table-column table:style-name="co5" table:default-cell-style-name="Default"/>
             <table:table-column table:style-name="co4" table:number-columns-repeated="1021"
                                 table:default-cell-style-name="Default"/>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell table:style-name="ce1" office:value-type="string">
                   <text:p>Task</text:p>
                </table:table-cell>
@@ -310,7 +307,7 @@
                </table:table-cell>
                <table:table-cell table:style-name="ce1" table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Fix for bottom screen with wrapped lines (bottom line rendering beyond edge of view)</text:p>
                </table:table-cell>
@@ -322,7 +319,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>ability to display other than first wrapped line at top of widget</text:p>
                </table:table-cell>
@@ -334,7 +331,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Fix first line rendering too close to top of widget</text:p>
                </table:table-cell>
@@ -346,7 +343,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>vertical scrollbar stays put when file changes</text:p>
                </table:table-cell>
@@ -358,7 +355,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Detection of file deletion</text:p>
                </table:table-cell>
@@ -370,7 +367,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Detection of file creation</text:p>
                </table:table-cell>
@@ -382,7 +379,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>horizontal scrollbar implementation</text:p>
                </table:table-cell>
@@ -394,7 +391,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>regex searching</text:p>
                </table:table-cell>
@@ -406,7 +403,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>text highlighting</text:p>
                </table:table-cell>
@@ -418,7 +415,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Follow tail</text:p>
                </table:table-cell>
@@ -430,7 +427,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>line numbers</text:p>
                </table:table-cell>
@@ -442,7 +439,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>tabs for multiple files open</text:p>
                </table:table-cell>
@@ -454,7 +451,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>preferences (saving, editing, UI, etc.)</text:p>
                </table:table-cell>
@@ -466,7 +463,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>fonts</text:p>
                </table:table-cell>
@@ -478,7 +475,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>windows installer</text:p>
                </table:table-cell>
@@ -490,7 +487,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>Fix for page up/down and arrow up/down and bottom screen of file</text:p>
                </table:table-cell>
@@ -502,7 +499,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>vertical scrollbar: bottom of file is at bottom of screen when vscrollbar's value is at maximum</text:p>
                </table:table-cell>
@@ -514,7 +511,7 @@
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
-            <table:table-row table:style-name="ro1">
+            <table:table-row table:style-name="ro2">
                <table:table-cell office:value-type="string">
                   <text:p>vertical scrollbar fixes for incremental up/down</text:p>
                </table:table-cell>
@@ -523,6 +520,18 @@
                </table:table-cell>
                <table:table-cell office:value-type="float" office:value="1">
                   <text:p>1</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro2">
+               <table:table-cell office:value-type="string">
+                  <text:p>Investigate why QFileSystemWatcher fails when vim saves file (possibly will be fixed when file deletion/creation is done)</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
