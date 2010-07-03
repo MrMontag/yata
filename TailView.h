@@ -6,6 +6,7 @@
 class QTextDocument;
 class QString;
 class QFileSystemWatcher;
+class QTextBlock;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
@@ -29,6 +30,7 @@ private:
     void updateScrollBars(int lines);
     void updateDocumentForPartialLayout(int line_change = 0);
     void performLayout();
+    int layoutBlock(QTextBlock * textBlock);
 
 private:
     QString m_filename;
