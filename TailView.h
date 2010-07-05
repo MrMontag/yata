@@ -41,7 +41,9 @@ private:
     QSize m_lastSize;
     int m_numFileLines;
     bool m_fullLayout;
-    int m_topLayoutLine;
+    int m_lineOffset;
+    int m_firstVisibleBlock;
+    int m_firstVisibleLine;
     qint64 m_lastFilePos;
 };
 

@@ -27,7 +27,9 @@ TailView::TailView(QWidget * parent)
     , m_lastSize(0,0)
     , m_numFileLines(0)
     , m_fullLayout(true)
-    , m_topLayoutLine(0)
+    , m_lineOffset(0)
+    , m_firstVisibleBlock(0)
+    , m_firstVisibleLine(0)
     , m_lastFilePos(0)
 {
     m_document->setUndoRedoEnabled(false);
@@ -134,7 +136,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
         qreal height = fontMetrics.lineSpacing() * layout.lineCount();
 
-        int scrollValue = m_fullLayout ? verticalScrollBar()->sliderPosition() : m_topLayoutLine;
+        int scrollValue = m_fullLayout ? verticalScrollBar()->sliderPosition() : m_lineOffset;
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout.boundingRect());
         layoutRect.moveTo(start);
@@ -180,7 +182,9 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
 
     qint64 file_pos = 0;
     if(0 == line_change) {
-        m_topLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
+        m_lineOffset = 0; // TODO: don't reset if scrollbar didn't move
+        m_firstVisibleBlock = 0;
+        m_firstVisibleLine = 0;
         if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
             file_pos = bottom_screen_pos;
         } else {
@@ -194,59 +198,57 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         }
 
         m_document->setPlainText(data);
+        performLayout();
 
     } else {
         file_pos = m_lastFilePos;
         if(line_change < 0) {
-            while(line_change + m_topLayoutLine < 0 && file_pos > 0) {
-                line_change += m_topLayoutLine;
-                QString line;
-                file_pos = reader.readChunk(&line, file_pos, -1, 1).first;
-                QTextCursor cursor(m_document);
-                cursor.insertText(line);
-                QTextBlock block = m_document->firstBlock();
-                layoutBlock(&block);
-                m_topLayoutLine = block.layout()->lineCount();
-                cursor.movePosition(QTextCursor::End);
-                cursor.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
-                cursor.removeSelectedText();
+            QString data;
+            file_pos = reader.readChunk(&data, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
+            m_document->setPlainText(data);
+            performLayout();
+
+            QTextBlock block = m_document->findBlockByNumber(-line_change);
+            while(m_firstVisibleLine + line_change < 0) {
+                line_change += m_firstVisibleLine + 1;
+                block = block.previous();
+                m_firstVisibleLine = block.layout()->lineCount() - 1;
             }
-            m_topLayoutLine += line_change;
-            if(m_topLayoutLine < 0) {
-                m_topLayoutLine = 0;
+
+            m_firstVisibleBlock = block.blockNumber();
+            m_firstVisibleLine += line_change;
+
+            m_lineOffset = m_firstVisibleLine;
+            for(QTextBlock block = m_document->firstBlock(); block.blockNumber() < m_firstVisibleBlock; block = block.next()) {
+                m_lineOffset += block.layout()->lineCount();
             }
+
         } else {
-            line_change += m_topLayoutLine;
-            qint64 bottom_of_screen_pos = reader.getStartPosition(file_pos, visible_lines - 1);
-            while(bottom_of_screen_pos < reader.size()) {
-                QTextBlock block = m_document->firstBlock();
-                int line_count = block.layout()->lineCount();
-                if(line_change < line_count) {
-                    break;
-                }
-                line_change -= line_count;
-                QString line;
-                bottom_of_screen_pos = reader.readChunk(&line, bottom_of_screen_pos, 1, 1).first;
-                QTextCursor cursor(m_document);
-                cursor.movePosition(QTextCursor::End);
-                cursor.insertText(line);
-                block = m_document->lastBlock();
-                layoutBlock(&block);
-                cursor.movePosition(QTextCursor::Start);
-                cursor.movePosition(QTextCursor::NextBlock, QTextCursor::KeepAnchor);
-                cursor.removeSelectedText();
-                file_pos = reader.getStartPosition(file_pos, 1);
+            line_change += m_firstVisibleLine;
+            int wrapped_line_count = 0;
+            int real_line_count = 0;
+            QTextBlock block = m_document->findBlockByNumber(m_firstVisibleBlock);
+            while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
+                wrapped_line_count += block.layout()->lineCount();
+                block = block.next();
+                real_line_count++;
             }
-            m_topLayoutLine = line_change;
+
+            m_firstVisibleLine = line_change - wrapped_line_count;
+            m_lineOffset = m_firstVisibleLine;
+            m_firstVisibleBlock = 0;
+
+            QString data;
+            file_pos = reader.readChunk(&data, file_pos, real_line_count, visible_lines).first;
+            m_document->setPlainText(data);
+            performLayout();
+
         }
         m_lastFilePos = file_pos;
         verticalScrollBar()->setSliderPosition(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
     }
 
-    performLayout();
-
     viewport()->update();
-
 }
 
 void TailView::updateScrollBars(int lines)
