@@ -98,6 +98,10 @@ void TailView::performLayout()
         m_numFileLines += layoutBlock(&block);
     }
 
+    if(m_fullLayout) {
+        updateScrollBars(m_numFileLines);
+    }
+
     m_fileChanged = false;
 }
 
@@ -152,16 +156,14 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         dy += height;
     }
 
-    if(m_fullLayout) {
-        updateScrollBars(m_numFileLines);
-    }
-
     m_lastSize = viewport()->size();
 }
 
 void TailView::resizeEvent(QResizeEvent *)
 {
-    if(!m_fullLayout) {
+    if(m_fullLayout) {
+        updateScrollBars(m_numFileLines);
+    } else {
         updateDocumentForPartialLayout();
     }
 }
@@ -175,6 +177,7 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
     int lines_on_screen = numLinesOnScreen();
     int visible_lines = lines_on_screen + 1;
 
+    // TODO: account for wrapped lines when computing bottom_screen_pos
     qint64 bottom_screen_pos = reader.getStartPosition(reader.size(), -lines_on_screen);
 
     int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
@@ -190,12 +193,12 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         } else {
             file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
         }
-        QString data;
-        m_lastFilePos = reader.readChunk(&data, file_pos, line_change, visible_lines).first;
 
-        if(m_lastFilePos > bottom_screen_pos) {
-            m_lastFilePos = reader.readChunk(&data, bottom_screen_pos, 0, visible_lines).first;
-        }
+        file_pos = reader.getStartPosition(file_pos, line_change);
+        file_pos = std::min(file_pos, bottom_screen_pos);
+
+        QString data;
+        m_lastFilePos = reader.readChunk(&data, file_pos, 0, visible_lines).first;
 
         m_document->setPlainText(data);
         performLayout();
@@ -238,8 +241,10 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             m_lineOffset = m_firstVisibleLine;
             m_firstVisibleBlock = 0;
 
+            file_pos = reader.getStartPosition(file_pos, real_line_count);
+            file_pos = std::min(file_pos, bottom_screen_pos);
             QString data;
-            file_pos = reader.readChunk(&data, file_pos, real_line_count, visible_lines).first;
+            file_pos = reader.readChunk(&data, file_pos, 0, visible_lines).first;
             m_document->setPlainText(data);
             performLayout();
 
