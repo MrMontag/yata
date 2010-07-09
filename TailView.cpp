@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QFileSystemWatcher>
+#include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
 #include <QString>
@@ -31,6 +32,7 @@ TailView::TailView(QWidget * parent)
     , m_firstVisibleBlock(0)
     , m_firstVisibleLine(0)
     , m_lastFilePos(0)
+    , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
     connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
@@ -67,12 +69,39 @@ bool TailView::isFullLayout() const
 void TailView::onFileChanged(const QString & path)
 {
     m_filename = path;
+
+    // Temporary stopgap until better file watching is
+    // implemented -- prompt user to reload the file
+    // if it gets deleted.
+    bool needs_reconnect = false;
+
+    while(!QFile::exists(path)) {
+        if(m_isInDialog) { return; }
+        needs_reconnect = true;
+        m_isInDialog = true;
+        QString msg = QString("%1 not found.  Click OK to try again.").arg(m_filename);
+        int button = QMessageBox::critical(this, "yata", msg, QMessageBox::Ok, QMessageBox::Cancel);
+        m_isInDialog = false;
+        if(button == QMessageBox::Cancel) {
+            break;
+        }
+    }
+
+    if(needs_reconnect) {
+        m_watcher->removePath(path);
+        m_watcher->addPath(path);
+    }
+    // End stopgap
+
+    m_fileChanged = true;
     if(m_fullLayout) {
         QFile file(m_filename);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             m_document->setPlainText(QString());
+            viewport()->update();
             return;
         }
+
         QTextStream instream(&file);
 
         m_document->setPlainText(instream.readAll());
@@ -80,7 +109,6 @@ void TailView::onFileChanged(const QString & path)
         updateDocumentForPartialLayout();
     }
 
-    m_fileChanged = true;
     viewport()->update();
 }
 

@@ -45,6 +45,8 @@ private:
     int m_firstVisibleBlock;
     int m_firstVisibleLine;
     qint64 m_lastFilePos;
+
+    bool m_isInDialog; // ugh. Let's remove this variable as soon as we can!
 };
 
 #endif
