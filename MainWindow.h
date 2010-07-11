@@ -15,7 +15,10 @@ public:
 signals:
     void fileOpened(const QString &);
 private slots:
-	void on_action_Open_triggered();
+    void on_actionFind_previous_triggered();
+    void on_actionFind_next_triggered();
+    void on_action_Find_triggered();
+ void on_action_Open_triggered();
 	void on_action_Exit_triggered();
         void on_action_FullLayout_triggered(bool isChecked);
 private:

@@ -10,11 +10,14 @@ INCLUDEPATH += .
 HEADERS += MainWindow.h \
     TailView.h \
     HtmlConverter.h \
-    FileBlockReader.h
-FORMS += MainWindow.ui
+    FileBlockReader.h \
+    SearchWidget.h
+FORMS += MainWindow.ui \
+    SearchWidget.ui
 SOURCES += main.cpp \
     MainWindow.cpp \
     TailView.cpp \
     HtmlConverter.cpp \
-    FileBlockReader.cpp
+    FileBlockReader.cpp \
+    SearchWidget.cpp
 RESOURCES += TailViewResources.qrc

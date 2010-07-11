@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -36,7 +36,16 @@
     </property>
     <addaction name="action_FullLayout"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Find"/>
+    <addaction name="actionFind_next"/>
+    <addaction name="actionFind_previous"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
    <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -62,6 +71,30 @@
    </property>
    <property name="text">
     <string>&amp;Full Layout</string>
+   </property>
+  </action>
+  <action name="action_Find">
+   <property name="text">
+    <string>&amp;Find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionFind_next">
+   <property name="text">
+    <string>Find &amp;next</string>
+   </property>
+   <property name="shortcut">
+    <string>F3</string>
+   </property>
+  </action>
+  <action name="actionFind_previous">
+   <property name="text">
+    <string>Find &amp;previous</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+F3</string>
    </property>
   </action>
  </widget>

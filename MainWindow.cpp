@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "TailView.h"
+#include "SearchWidget.h"
 #include <QFileDialog>
 
 MainWindow::MainWindow()
@@ -33,4 +34,21 @@ void MainWindow::on_action_Exit_triggered()
 void MainWindow::on_action_FullLayout_triggered(bool isChecked)
 {
     m_tailView->setFullLayout(isChecked);
+}
+
+void MainWindow::on_action_Find_triggered()
+{
+    SearchWidget widget(m_tailView->lastSearchString(), m_tailView->searchWasRegex(), m_tailView->searchWasCaseSensitive(), this);
+    connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), m_tailView, SLOT(search(const QString &,bool,bool)));
+    widget.exec();
+}
+
+void MainWindow::on_actionFind_next_triggered()
+{
+    m_tailView->searchForward();
+}
+
+void MainWindow::on_actionFind_previous_triggered()
+{
+    m_tailView->searchBackward();
 }

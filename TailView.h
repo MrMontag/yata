@@ -17,6 +17,16 @@ public:
 
     void setFullLayout(bool fullLayout);
     bool isFullLayout() const;
+
+    const QString & lastSearchString() const;
+    bool searchWasRegex() const;
+    bool searchWasCaseSensitive() const;
+
+public slots:
+    void search(const QString & searchString, bool isRegex, bool caseSensitive);
+    void searchForward();
+    void searchBackward();
+
 protected:
     void paintEvent(QPaintEvent * event);
     void resizeEvent(QResizeEvent *);
@@ -45,6 +55,10 @@ private:
     int m_firstVisibleBlock;
     int m_firstVisibleLine;
     qint64 m_lastFilePos;
+
+    QString m_lastSearchString;
+    bool m_isSearchRegex;
+    bool m_isSearchCaseSensitive;
 
     bool m_isInDialog; // ugh. Let's remove this variable as soon as we can!
 };

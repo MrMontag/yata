@@ -32,6 +32,8 @@ TailView::TailView(QWidget * parent)
     , m_firstVisibleBlock(0)
     , m_firstVisibleLine(0)
     , m_lastFilePos(0)
+    , m_isSearchRegex(false)
+    , m_isSearchCaseSensitive(true)
     , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
@@ -64,6 +66,36 @@ void TailView::setFullLayout(bool fullLayout)
 bool TailView::isFullLayout() const
 {
     return m_fullLayout;
+}
+
+const QString & TailView::lastSearchString() const
+{
+    return m_lastSearchString;
+}
+
+bool TailView::searchWasRegex() const
+{
+    return m_isSearchRegex;
+}
+
+bool TailView::searchWasCaseSensitive() const
+{
+    return m_isSearchCaseSensitive;
+}
+
+void TailView::search(const QString & searchString, bool isRegex, bool caseSensitive)
+{
+    m_lastSearchString = searchString;
+    m_isSearchRegex = isRegex;
+    m_isSearchCaseSensitive = caseSensitive;
+}
+
+void TailView::searchForward()
+{
+}
+
+void TailView::searchBackward()
+{
 }
 
 void TailView::onFileChanged(const QString & path)
