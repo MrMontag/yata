@@ -39,7 +39,7 @@ void MainWindow::on_action_FullLayout_triggered(bool isChecked)
 void MainWindow::on_action_Find_triggered()
 {
     SearchWidget widget(m_tailView->lastSearchString(), m_tailView->searchWasRegex(), m_tailView->searchWasCaseSensitive(), this);
-    connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), m_tailView, SLOT(search(const QString &,bool,bool)));
+    connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), m_tailView, SLOT(newSearch(const QString &,bool,bool)));
     widget.exec();
 }
 

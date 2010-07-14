@@ -2,6 +2,7 @@
 #include "HtmlConverter.h"
 #include "FileBlockReader.h"
 
+#include <QApplication>
 #include <QDebug>
 #include <QFile>
 #include <QFileSystemWatcher>
@@ -34,6 +35,7 @@ TailView::TailView(QWidget * parent)
     , m_lastFilePos(0)
     , m_isSearchRegex(false)
     , m_isSearchCaseSensitive(true)
+    , m_textCursor(new QTextCursor())
     , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
@@ -41,6 +43,10 @@ TailView::TailView(QWidget * parent)
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
 
+TailView::~TailView()
+{
+    delete m_textCursor;
+}
 
 void TailView::setFile(const QString & filename)
 {
@@ -83,19 +89,66 @@ bool TailView::searchWasCaseSensitive() const
     return m_isSearchCaseSensitive;
 }
 
-void TailView::search(const QString & searchString, bool isRegex, bool caseSensitive)
+void TailView::newSearch(const QString & searchString, bool isRegex, bool caseSensitive)
 {
     m_lastSearchString = searchString;
     m_isSearchRegex = isRegex;
     m_isSearchCaseSensitive = caseSensitive;
+    searchForward();
 }
 
 void TailView::searchForward()
 {
+    search(true);
 }
 
 void TailView::searchBackward()
 {
+    search(false);
+}
+
+void TailView::search(bool isForward)
+{
+    if(m_textCursor->isNull()) {
+        resetCursor(isForward);
+    } else {
+        QTextCharFormat clear;
+        m_textCursor->setCharFormat(clear);
+    }
+
+    QRegExp regex(m_lastSearchString,
+        m_isSearchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive,
+        m_isSearchRegex ? QRegExp::RegExp2 : QRegExp::FixedString);
+
+    QTextDocument::FindFlags flags = 0;
+    if(!isForward) {
+        flags |= QTextDocument::FindBackward;
+    }
+    QTextCursor match = m_document->find(regex, *m_textCursor, flags);
+
+    if(match.isNull()) {
+        resetCursor(isForward);
+        match = m_document->find(regex, *m_textCursor, flags);
+    }
+
+    if(!match.isNull()) {
+        QTextCharFormat format;
+
+        // TODO: make the palette customizable (for now use the system palette)
+        QPalette palette = QApplication::palette();
+        format.setBackground(palette.highlight());
+        format.setForeground(palette.highlightedText());
+        match.setCharFormat(format);
+        *m_textCursor = match;
+    }
+
+    viewport()->update();
+}
+
+void TailView::resetCursor(bool isTop)
+{
+    *m_textCursor = QTextCursor(m_document);
+    m_textCursor->movePosition(isTop ? QTextCursor::Start : QTextCursor::End);
 }
 
 void TailView::onFileChanged(const QString & path)

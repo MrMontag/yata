@@ -7,12 +7,14 @@ class QTextDocument;
 class QString;
 class QFileSystemWatcher;
 class QTextBlock;
+class QTextCursor;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
 
 public:
     TailView(QWidget * parent);
+    ~TailView();
     void setFile(const QString & filename);
 
     void setFullLayout(bool fullLayout);
@@ -23,7 +25,7 @@ public:
     bool searchWasCaseSensitive() const;
 
 public slots:
-    void search(const QString & searchString, bool isRegex, bool caseSensitive);
+    void newSearch(const QString & searchString, bool isRegex, bool caseSensitive);
     void searchForward();
     void searchBackward();
 
@@ -41,6 +43,8 @@ private:
     void updateDocumentForPartialLayout(int line_change = 0);
     void performLayout();
     int layoutBlock(QTextBlock * textBlock);
+    void search(bool isForward);
+    void resetCursor(bool isTop);
 
 private:
     QString m_filename;
@@ -59,6 +63,7 @@ private:
     QString m_lastSearchString;
     bool m_isSearchRegex;
     bool m_isSearchCaseSensitive;
+    QTextCursor * m_textCursor;
 
     bool m_isInDialog; // ugh. Let's remove this variable as soon as we can!
 };
