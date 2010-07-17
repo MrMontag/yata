@@ -2,6 +2,7 @@
 #define TAIL_VIEW_H
 
 #include <QAbstractScrollArea>
+#include <vector>
 
 class QTextDocument;
 class QString;
@@ -44,7 +45,8 @@ private:
     void performLayout();
     int layoutBlock(QTextBlock * textBlock);
     void search(bool isForward);
-    void resetCursor(bool isTop);
+    void resetSearchCursor(bool isTop);
+    void scrollToIfNecessary(const QTextCursor & cursor) const;
 
 private:
     QString m_filename;
@@ -53,8 +55,11 @@ private:
     bool m_fileChanged;
 
     QSize m_lastSize;
-    int m_numFileLines;
+    int m_numLayoutLines;
+    std::vector<int> m_layoutPositions;
+
     bool m_fullLayout;
+
     int m_lineOffset;
     int m_firstVisibleBlock;
     int m_firstVisibleLine;

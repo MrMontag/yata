@@ -17,6 +17,7 @@
 #include <QTextStream>
 
 #include <cmath>
+#include <algorithm>
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
 const int PAGE_STEP_OVERLAP = 2;
@@ -27,7 +28,7 @@ TailView::TailView(QWidget * parent)
     , m_watcher(new QFileSystemWatcher(this))
     , m_fileChanged(false)
     , m_lastSize(0,0)
-    , m_numFileLines(0)
+    , m_numLayoutLines(0)
     , m_fullLayout(true)
     , m_lineOffset(0)
     , m_firstVisibleBlock(0)
@@ -110,7 +111,7 @@ void TailView::searchBackward()
 void TailView::search(bool isForward)
 {
     if(m_textCursor->isNull()) {
-        resetCursor(isForward);
+        resetSearchCursor(isForward);
     } else {
         QTextCharFormat clear;
         m_textCursor->setCharFormat(clear);
@@ -127,7 +128,7 @@ void TailView::search(bool isForward)
     QTextCursor match = m_document->find(regex, *m_textCursor, flags);
 
     if(match.isNull()) {
-        resetCursor(isForward);
+        resetSearchCursor(isForward);
         match = m_document->find(regex, *m_textCursor, flags);
     }
 
@@ -140,12 +141,40 @@ void TailView::search(bool isForward)
         format.setForeground(palette.highlightedText());
         match.setCharFormat(format);
         *m_textCursor = match;
+
+        scrollToIfNecessary(*m_textCursor);
     }
 
     viewport()->update();
 }
 
-void TailView::resetCursor(bool isTop)
+void TailView::scrollToIfNecessary(const QTextCursor & cursor) const
+{
+    QTextBlock cursorBlock = cursor.block();
+    int blockNumber = cursorBlock.blockNumber();
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_layoutPositions.size()) { return; }
+    int cursorLineNumber = m_layoutPositions[blockNumber];
+
+    int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
+
+    cursorLineNumber += blockLine;
+
+    int topScreenLine = verticalScrollBar()->value();
+
+    int numReadableLines = numLinesOnScreen();
+
+    if(topScreenLine <= cursorLineNumber && cursorLineNumber <= topScreenLine + numReadableLines - 1) {
+        // No scrolling needed -- return
+        return;
+    }
+
+    int newTopLine = cursorLineNumber - numReadableLines / 2;
+
+    verticalScrollBar()->setValue(newTopLine);
+
+}
+
+void TailView::resetSearchCursor(bool isTop)
 {
     *m_textCursor = QTextCursor(m_document);
     m_textCursor->movePosition(isTop ? QTextCursor::Start : QTextCursor::End);
@@ -155,7 +184,7 @@ void TailView::onFileChanged(const QString & path)
 {
     m_filename = path;
 
-    // Temporary stopgap until better file watching is
+    // TODO: Temporary stopgap until better file watching is
     // implemented -- prompt user to reload the file
     // if it gets deleted.
     bool needs_reconnect = false;
@@ -205,14 +234,16 @@ void TailView::performLayout()
         return;
     }
 
-    m_numFileLines = 0;
+    m_numLayoutLines = 0;
+    m_layoutPositions.clear();
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
-        m_numFileLines += layoutBlock(&block);
+        m_layoutPositions.push_back(m_numLayoutLines);
+        m_numLayoutLines += layoutBlock(&block);
     }
 
     if(m_fullLayout) {
-        updateScrollBars(m_numFileLines);
+        updateScrollBars(m_numLayoutLines);
     }
 
     m_fileChanged = false;
@@ -275,7 +306,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 void TailView::resizeEvent(QResizeEvent *)
 {
     if(m_fullLayout) {
-        updateScrollBars(m_numFileLines);
+        updateScrollBars(m_numLayoutLines);
     } else {
         updateDocumentForPartialLayout();
     }
