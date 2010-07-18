@@ -111,7 +111,21 @@ void TailView::searchBackward()
 void TailView::search(bool isForward)
 {
     if(m_textCursor->isNull()) {
-        resetSearchCursor(isForward);
+        int topLine = verticalScrollBar()->value();
+        std::vector<int>::const_iterator blockitr = std::upper_bound(
+            m_layoutPositions.begin(),
+            m_layoutPositions.end(),
+            topLine);
+        if(blockitr != m_layoutPositions.begin()) { --blockitr; }
+        if(blockitr != m_layoutPositions.end()) {
+            int blockNumber = blockitr - m_layoutPositions.begin();
+            QTextBlock block = m_document->findBlockByNumber(blockNumber);
+            int blockLine = topLine - *blockitr;
+            *m_textCursor = QTextCursor(block);
+            m_textCursor->movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
+        } else {
+            *m_textCursor = QTextCursor(m_document);
+        }
     } else {
         QTextCharFormat clear;
         m_textCursor->setCharFormat(clear);
