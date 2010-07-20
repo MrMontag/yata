@@ -46,7 +46,6 @@ TailView::TailView(QWidget * parent)
 
 TailView::~TailView()
 {
-    delete m_textCursor;
 }
 
 void TailView::setFile(const QString & filename)
@@ -100,15 +99,23 @@ void TailView::newSearch(const QString & searchString, bool isRegex, bool caseSe
 
 void TailView::searchForward()
 {
-    search(true);
+    searchFile(true);
 }
 
 void TailView::searchBackward()
 {
-    search(false);
+    searchFile(false);
 }
 
-void TailView::search(bool isForward)
+void TailView::searchFile(bool isForward)
+{
+    if(m_fullLayout) {
+        searchDocument(isForward);
+        return;
+    }
+}
+
+void TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(m_textCursor->isNull()) {
         int topLine = verticalScrollBar()->value();
@@ -141,7 +148,7 @@ void TailView::search(bool isForward)
     }
     QTextCursor match = m_document->find(regex, *m_textCursor, flags);
 
-    if(match.isNull()) {
+    if(wrapAround && match.isNull()) {
         resetSearchCursor(isForward);
         match = m_document->find(regex, *m_textCursor, flags);
     }

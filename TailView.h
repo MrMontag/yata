@@ -2,6 +2,7 @@
 #define TAIL_VIEW_H
 
 #include <QAbstractScrollArea>
+#include <QScopedPointer>
 #include <vector>
 
 class QTextDocument;
@@ -44,7 +45,9 @@ private:
     void updateDocumentForPartialLayout(int line_change = 0);
     void performLayout();
     int layoutBlock(QTextBlock * textBlock);
-    void search(bool isForward);
+
+    void searchFile(bool isForward);
+    void searchDocument(bool isForward, bool wrapAround = true);
     void resetSearchCursor(bool isTop);
     void scrollToIfNecessary(const QTextCursor & cursor) const;
 
@@ -68,9 +71,9 @@ private:
     QString m_lastSearchString;
     bool m_isSearchRegex;
     bool m_isSearchCaseSensitive;
-    QTextCursor * m_textCursor;
+    QScopedPointer<QTextCursor> m_textCursor;
 
-    bool m_isInDialog; // ugh. Let's remove this variable as soon as we can!
+    bool m_isInDialog; // TODO: Ugh. Let's remove this variable as soon as we can!
 };
 
 #endif
