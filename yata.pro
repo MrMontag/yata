@@ -9,15 +9,15 @@ INCLUDEPATH += .
 # Input
 HEADERS += MainWindow.h \
     TailView.h \
-    HtmlConverter.h \
     FileBlockReader.h \
-    SearchWidget.h
+    SearchWidget.h \
+    DocumentSearch.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
     MainWindow.cpp \
     TailView.cpp \
-    HtmlConverter.cpp \
     FileBlockReader.cpp \
-    SearchWidget.cpp
+    SearchWidget.cpp \
+    DocumentSearch.cpp
 RESOURCES += TailViewResources.qrc

@@ -10,6 +10,7 @@ class QString;
 class QFileSystemWatcher;
 class QTextBlock;
 class QTextCursor;
+class DocumentSearch;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
@@ -48,7 +49,6 @@ private:
 
     void searchFile(bool isForward);
     void searchDocument(bool isForward, bool wrapAround = true);
-    void resetSearchCursor(bool isTop);
     void scrollToIfNecessary(const QTextCursor & cursor) const;
 
 private:
@@ -68,10 +68,7 @@ private:
     int m_firstVisibleLine;
     qint64 m_lastFilePos;
 
-    QString m_lastSearchString;
-    bool m_isSearchRegex;
-    bool m_isSearchCaseSensitive;
-    QScopedPointer<QTextCursor> m_textCursor;
+    QScopedPointer<DocumentSearch> m_documentSearch;
 
     bool m_isInDialog; // TODO: Ugh. Let's remove this variable as soon as we can!
 };

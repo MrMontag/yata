@@ -1,6 +1,6 @@
 #include "TailView.h"
-#include "HtmlConverter.h"
 #include "FileBlockReader.h"
+#include "DocumentSearch.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -34,9 +34,7 @@ TailView::TailView(QWidget * parent)
     , m_firstVisibleBlock(0)
     , m_firstVisibleLine(0)
     , m_lastFilePos(0)
-    , m_isSearchRegex(false)
-    , m_isSearchCaseSensitive(true)
-    , m_textCursor(new QTextCursor())
+    , m_documentSearch(new DocumentSearch(m_document))
     , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
@@ -76,25 +74,23 @@ bool TailView::isFullLayout() const
 
 const QString & TailView::lastSearchString() const
 {
-    return m_lastSearchString;
+    return m_documentSearch->lastSearchString();
 }
 
 bool TailView::searchWasRegex() const
 {
-    return m_isSearchRegex;
+    return m_documentSearch->searchWasRegex();
 }
 
 bool TailView::searchWasCaseSensitive() const
 {
-    return m_isSearchCaseSensitive;
+    return m_documentSearch->searchWasCaseSensitive();
 }
 
 void TailView::newSearch(const QString & searchString, bool isRegex, bool caseSensitive)
 {
-    m_lastSearchString = searchString;
-    m_isSearchRegex = isRegex;
-    m_isSearchCaseSensitive = caseSensitive;
-    searchForward();
+    m_documentSearch->setSearchCriteria(searchString, isRegex, caseSensitive);
+    searchDocument(true);
 }
 
 void TailView::searchForward()
@@ -117,7 +113,7 @@ void TailView::searchFile(bool isForward)
 
 void TailView::searchDocument(bool isForward, bool wrapAround)
 {
-    if(m_textCursor->isNull()) {
+    if(m_documentSearch->cursor().isNull()) {
         int topLine = verticalScrollBar()->value();
         std::vector<int>::const_iterator blockitr = std::upper_bound(
             m_layoutPositions.begin(),
@@ -128,42 +124,18 @@ void TailView::searchDocument(bool isForward, bool wrapAround)
             int blockNumber = blockitr - m_layoutPositions.begin();
             QTextBlock block = m_document->findBlockByNumber(blockNumber);
             int blockLine = topLine - *blockitr;
-            *m_textCursor = QTextCursor(block);
-            m_textCursor->movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
+            QTextCursor cursor(block);
+            cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
+            m_documentSearch->setCursor(cursor);
         } else {
-            *m_textCursor = QTextCursor(m_document);
+            m_documentSearch->setCursor(QTextCursor(m_document));
         }
-    } else {
-        QTextCharFormat clear;
-        m_textCursor->setCharFormat(clear);
     }
 
-    QRegExp regex(m_lastSearchString,
-        m_isSearchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive,
-        m_isSearchRegex ? QRegExp::RegExp2 : QRegExp::FixedString);
+    bool hasMatch = m_documentSearch->searchDocument(isForward, wrapAround);
 
-    QTextDocument::FindFlags flags = 0;
-    if(!isForward) {
-        flags |= QTextDocument::FindBackward;
-    }
-    QTextCursor match = m_document->find(regex, *m_textCursor, flags);
-
-    if(wrapAround && match.isNull()) {
-        resetSearchCursor(isForward);
-        match = m_document->find(regex, *m_textCursor, flags);
-    }
-
-    if(!match.isNull()) {
-        QTextCharFormat format;
-
-        // TODO: make the palette customizable (for now use the system palette)
-        QPalette palette = QApplication::palette();
-        format.setBackground(palette.highlight());
-        format.setForeground(palette.highlightedText());
-        match.setCharFormat(format);
-        *m_textCursor = match;
-
-        scrollToIfNecessary(*m_textCursor);
+    if(hasMatch) {
+        scrollToIfNecessary(m_documentSearch->cursor());
     }
 
     viewport()->update();
@@ -193,12 +165,6 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor) const
 
     verticalScrollBar()->setValue(newTopLine);
 
-}
-
-void TailView::resetSearchCursor(bool isTop)
-{
-    *m_textCursor = QTextCursor(m_document);
-    m_textCursor->movePosition(isTop ? QTextCursor::Start : QTextCursor::End);
 }
 
 void TailView::onFileChanged(const QString & path)
