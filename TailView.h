@@ -42,14 +42,15 @@ private slots:
 
 private:
     int numLinesOnScreen() const;
+    void setDocumentText(const QString & data);
     void updateScrollBars(int lines);
     void updateDocumentForPartialLayout(int line_change = 0);
     void performLayout();
     int layoutBlock(QTextBlock * textBlock);
 
     void searchFile(bool isForward);
-    void searchDocument(bool isForward, bool wrapAround = true);
-    void scrollToIfNecessary(const QTextCursor & cursor) const;
+    bool searchDocument(bool isForward, bool wrapAround = true);
+    void scrollToIfNecessary(const QTextCursor & cursor);
 
 private:
     QString m_filename;
@@ -60,6 +61,7 @@ private:
     QSize m_lastSize;
     int m_numLayoutLines;
     std::vector<int> m_layoutPositions;
+    std::vector<qint64> m_filePositions;
 
     bool m_fullLayout;
 
@@ -69,6 +71,10 @@ private:
     qint64 m_lastFilePos;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
+    qint64 m_cursorLinePos;
+    int m_cursorLineOffset;
+    int m_cursorLength;
+
 
     bool m_isInDialog; // TODO: Ugh. Let's remove this variable as soon as we can!
 };

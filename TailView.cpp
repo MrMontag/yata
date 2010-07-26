@@ -35,6 +35,9 @@ TailView::TailView(QWidget * parent)
     , m_firstVisibleLine(0)
     , m_lastFilePos(0)
     , m_documentSearch(new DocumentSearch(m_document))
+    , m_cursorLinePos(-1)
+    , m_cursorLineOffset(-1)
+    , m_cursorLength(-1)
     , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
@@ -90,7 +93,7 @@ bool TailView::searchWasCaseSensitive() const
 void TailView::newSearch(const QString & searchString, bool isRegex, bool caseSensitive)
 {
     m_documentSearch->setSearchCriteria(searchString, isRegex, caseSensitive);
-    searchDocument(true);
+    searchFile(true);
 }
 
 void TailView::searchForward()
@@ -105,13 +108,20 @@ void TailView::searchBackward()
 
 void TailView::searchFile(bool isForward)
 {
-    if(m_fullLayout) {
-        searchDocument(isForward);
-        return;
+    bool wrapAround = m_fullLayout;
+    bool matchFound = searchDocument(isForward, wrapAround);
+    if(matchFound) {
+        scrollToIfNecessary(m_documentSearch->cursor());
     }
+
+    if(!m_fullLayout && !matchFound) {
+
+    }
+
+    viewport()->update();
 }
 
-void TailView::searchDocument(bool isForward, bool wrapAround)
+bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(m_documentSearch->cursor().isNull()) {
         int topLine = verticalScrollBar()->value();
@@ -132,16 +142,21 @@ void TailView::searchDocument(bool isForward, bool wrapAround)
         }
     }
 
-    bool hasMatch = m_documentSearch->searchDocument(isForward, wrapAround);
+    bool foundMatch = m_documentSearch->searchDocument(isForward, wrapAround);
 
-    if(hasMatch) {
-        scrollToIfNecessary(m_documentSearch->cursor());
+    if(foundMatch) {
+        const QTextCursor & searchCursor = m_documentSearch->cursor();
+        int blockNum = searchCursor.block().blockNumber();
+        m_cursorLinePos = m_filePositions[blockNum];
+        int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
+        m_cursorLineOffset = cursorBeginPos - searchCursor.block().position();
+        m_cursorLength = std::abs(searchCursor.anchor() - searchCursor.position());
     }
 
-    viewport()->update();
+    return foundMatch;
 }
 
-void TailView::scrollToIfNecessary(const QTextCursor & cursor) const
+void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 {
     QTextBlock cursorBlock = cursor.block();
     int blockNumber = cursorBlock.blockNumber();
@@ -152,7 +167,7 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor) const
 
     cursorLineNumber += blockLine;
 
-    int topScreenLine = verticalScrollBar()->value();
+    int topScreenLine = m_fullLayout ? verticalScrollBar()->value() : m_lineOffset;
 
     int numReadableLines = numLinesOnScreen();
 
@@ -163,8 +178,12 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor) const
 
     int newTopLine = cursorLineNumber - numReadableLines / 2;
 
-    verticalScrollBar()->setValue(newTopLine);
-
+    if(m_fullLayout) {
+        verticalScrollBar()->setValue(newTopLine);
+    } else {
+        int lineChange = newTopLine - topScreenLine;
+        updateDocumentForPartialLayout(lineChange);
+    }
 }
 
 void TailView::onFileChanged(const QString & path)
@@ -198,19 +217,42 @@ void TailView::onFileChanged(const QString & path)
     if(m_fullLayout) {
         QFile file(m_filename);
         if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            m_document->setPlainText(QString());
+            setDocumentText(QString());
             viewport()->update();
             return;
         }
 
-        QTextStream instream(&file);
-
-        m_document->setPlainText(instream.readAll());
+        FileBlockReader reader(m_filename);
+        QString data;
+        reader.readAll(&data, &m_filePositions);
+        setDocumentText(data);
     } else {
         updateDocumentForPartialLayout();
     }
 
     viewport()->update();
+}
+
+void TailView::setDocumentText(const QString & data)
+{
+    m_document->setPlainText(data);
+
+    std::vector<qint64>::const_iterator itr = std::lower_bound(m_filePositions.begin(), m_filePositions.end(), m_cursorLinePos);
+
+    if(itr == m_filePositions.end() || *itr != m_cursorLinePos) {
+        m_documentSearch->setCursor(QTextCursor());
+        return;
+    }
+
+    int blockNum = itr - m_filePositions.begin();
+
+    QTextCursor cursor(m_document->findBlockByNumber(blockNum));
+
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_cursorLineOffset);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_cursorLength);
+
+    m_documentSearch->setCursor(cursor);
+
 }
 
 void TailView::performLayout()
@@ -329,17 +371,17 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         file_pos = std::min(file_pos, bottom_screen_pos);
 
         QString data;
-        m_lastFilePos = reader.readChunk(&data, file_pos, 0, visible_lines).first;
+        m_lastFilePos = reader.readChunk(&data, &m_filePositions, file_pos, 0, visible_lines).first;
 
-        m_document->setPlainText(data);
+        setDocumentText(data);
         performLayout();
 
     } else {
         file_pos = m_lastFilePos;
         if(line_change < 0) {
             QString data;
-            file_pos = reader.readChunk(&data, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
-            m_document->setPlainText(data);
+            file_pos = reader.readChunk(&data, &m_filePositions, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
+            setDocumentText(data);
             performLayout();
 
             QTextBlock block = m_document->findBlockByNumber(-line_change);
@@ -375,8 +417,8 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             file_pos = reader.getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
             QString data;
-            file_pos = reader.readChunk(&data, file_pos, 0, visible_lines).first;
-            m_document->setPlainText(data);
+            file_pos = reader.readChunk(&data, &m_filePositions, file_pos, 0, visible_lines).first;
+            setDocumentText(data);
             performLayout();
 
         }
