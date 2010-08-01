@@ -6,32 +6,8 @@
 
 DocumentSearch::DocumentSearch(QTextDocument * document)
     : m_document(document)
-    , m_isSearchRegex(false)
-    , m_isSearchCaseSensitive(false)
     , m_textCursor(new QTextCursor)
 {
-}
-
-const QString & DocumentSearch::lastSearchString() const
-{
-    return m_lastSearchString;
-}
-
-bool DocumentSearch::searchWasRegex() const
-{
-    return m_isSearchRegex;
-}
-
-bool DocumentSearch::searchWasCaseSensitive() const
-{
-    return m_isSearchCaseSensitive;
-}
-
-void DocumentSearch::setSearchCriteria(const QString & searchString, bool isRegex, bool caseSensitive)
-{
-    m_lastSearchString = searchString;
-    m_isSearchRegex = isRegex;
-    m_isSearchCaseSensitive = caseSensitive;
 }
 
 void DocumentSearch::setCursor(const QTextCursor & cursor)
@@ -73,9 +49,7 @@ bool DocumentSearch::searchDocument(bool isForward, bool wrapAround)
         m_textCursor->setCharFormat(clear);
     }
 
-    QRegExp regex(m_lastSearchString,
-        m_isSearchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive,
-        m_isSearchRegex ? QRegExp::RegExp2 : QRegExp::FixedString);
+    QRegExp regex(getRegex());
 
     QTextDocument::FindFlags flags = 0;
     if(!isForward) {

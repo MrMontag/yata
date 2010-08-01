@@ -3,18 +3,15 @@
 
 #include <QScopedPointer>
 #include <QString>
+#include "BaseSearch.h"
 
 class QTextDocument;
 class QTextCursor;
 
-class DocumentSearch {
+class DocumentSearch: public BaseSearch {
 public:
     DocumentSearch(QTextDocument * document);
 
-    const QString & lastSearchString() const;
-    bool searchWasRegex() const;
-    bool searchWasCaseSensitive() const;
-    void setSearchCriteria(const QString & searchString, bool isRegex, bool caseSensitive);
     bool searchDocument(bool isForward, bool wrapAround = true);
 
     void setCursor(const QTextCursor & cursor);
@@ -26,9 +23,6 @@ private:
 private:
     QTextDocument * m_document;
 
-    QString m_lastSearchString;
-    bool m_isSearchRegex;
-    bool m_isSearchCaseSensitive;
     QScopedPointer<QTextCursor> m_textCursor;
 
 };

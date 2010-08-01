@@ -1,6 +1,7 @@
 #include "TailView.h"
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
+#include "FileSearch.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -57,6 +58,7 @@ void TailView::setFile(const QString & filename)
         }
     }
     m_watcher->addPath(filename);
+
 
     verticalScrollBar()->setSliderPosition(0);
     horizontalScrollBar()->setSliderPosition(0);
@@ -115,7 +117,34 @@ void TailView::searchFile(bool isForward)
     }
 
     if(!m_fullLayout && !matchFound) {
+        FileSearch fileSearch(m_filename);
+        fileSearch.setCursor(FileCursor(m_cursorLinePos, m_cursorLineOffset, m_cursorLength));
+        fileSearch.setSearchCriteria(
+            m_documentSearch->lastSearchString(),
+            m_documentSearch->searchWasRegex(),
+            m_documentSearch->searchWasCaseSensitive());
+        if(fileSearch.searchFile(isForward, true)) {
+            matchFound = true;
+            FileCursor cursor(fileSearch.cursor());
+            m_cursorLinePos = cursor.m_linePosition;
+            m_cursorLineOffset = cursor.m_lineOffset;
+            m_cursorLength = cursor.m_length;
 
+            // TODO: scroll match to exactly middle of screen (it's sort of
+            // scrolled towards the top currently)
+            int newTopLine = m_cursorLinePos / APPROXIMATE_CHARS_PER_LINE;
+            verticalScrollBar()->setSliderPosition(newTopLine - numLinesOnScreen() / 2);
+            updateDocumentForPartialLayout(0);
+        }
+    }
+
+    if(!matchFound) {
+        QString message;
+        QTextStream(&message)
+            << tr("Pattern \"")
+            << m_documentSearch->lastSearchString()
+            << tr("\" not found");
+        QMessageBox::information(this, "yata", message);
     }
 
     viewport()->update();

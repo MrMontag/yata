@@ -11,7 +11,9 @@ HEADERS += MainWindow.h \
     TailView.h \
     FileBlockReader.h \
     SearchWidget.h \
-    DocumentSearch.h
+    DocumentSearch.h \
+    FileSearch.h \
+    BaseSearch.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
@@ -19,5 +21,7 @@ SOURCES += main.cpp \
     TailView.cpp \
     FileBlockReader.cpp \
     SearchWidget.cpp \
-    DocumentSearch.cpp
+    DocumentSearch.cpp \
+    FileSearch.cpp \
+    BaseSearch.cpp
 RESOURCES += TailViewResources.qrc
