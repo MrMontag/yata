@@ -4,6 +4,7 @@
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/smiley.png"));
 	MainWindow * win = new MainWindow;
 	if(argc > 1) {
 		win->setFile(argv[1]);

@@ -23,6 +23,7 @@ private slots:
         void on_action_FullLayout_triggered(bool isChecked);
 private:
     TailView * m_tailView;
+    QString m_currentOpenDir;
 	Ui::MainWindow ui;
 };
 #endif

@@ -2,6 +2,7 @@
 #include "TailView.h"
 #include "SearchWidget.h"
 #include <QFileDialog>
+#include <QFileInfo>
 
 MainWindow::MainWindow()
 {
@@ -13,16 +14,17 @@ MainWindow::MainWindow()
 
 void MainWindow::setFile(const QString & filename)
 {
-    setWindowTitle(filename + " -- Yata");
+    setWindowTitle(QDir::toNativeSeparators(filename) + " -- Yata");
     m_tailView->setFile(filename);
 }
 
 
 void MainWindow::on_action_Open_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this);
+    QString filename = QFileDialog::getOpenFileName(this, QString(), m_currentOpenDir);
     if(!filename.isEmpty()) {
         setFile(filename);
+        m_currentOpenDir = QFileInfo(filename).path();
     }
 }
 
