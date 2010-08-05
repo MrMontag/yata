@@ -2,6 +2,7 @@
 #define YFILESYSTEMWATCHER_H
 
 #include <QThread>
+#include <QScopedPointer>
 
 class QFileSystemWatcher;
 class QTimer;
@@ -26,8 +27,8 @@ private slots:
     void on_timer_timeout();
     void on_watcher_fileChanged(const QString & filepath);
 private:
-    QFileSystemWatcher * m_watcher;
-    QTimer * m_timer;
+    QScopedPointer<QFileSystemWatcher> m_watcher;
+    QScopedPointer<QTimer> m_timer;
 
     enum Status {
         NoActivity,

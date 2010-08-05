@@ -7,8 +7,6 @@
 
 YFileSystemWatcher::YFileSystemWatcher(const QString & filename, QObject *parent) :
     QThread(parent),
-    m_watcher(new QFileSystemWatcher(this)),
-    m_timer(new QTimer(this)),
     m_status(NoActivity),
     m_filename(filename)
 {
@@ -28,8 +26,10 @@ void YFileSystemWatcher::stop()
 
 void YFileSystemWatcher::run()
 {
-    connect(m_watcher, SIGNAL(fileChanged(QString)), SLOT(on_watcher_fileChanged(const QString &)));
-    connect(m_timer, SIGNAL(timeout()), SLOT(on_timer_timeout()));
+    m_watcher.reset(new QFileSystemWatcher());
+    m_timer.reset(new QTimer());
+    connect(m_watcher.data(), SIGNAL(fileChanged(QString)), SLOT(on_watcher_fileChanged(const QString &)));
+    connect(m_timer.data(), SIGNAL(timeout()), SLOT(on_timer_timeout()));
 
     m_watcher->addPath(m_filename);
     m_timer->start(250);
