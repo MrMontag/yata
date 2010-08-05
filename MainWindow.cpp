@@ -12,6 +12,7 @@ MainWindow::MainWindow()
     ui.action_FullLayout->setChecked(m_tailView->isFullLayout());
 }
 
+// TODO: drag and drop files! :-)
 void MainWindow::setFile(const QString & filename)
 {
     setWindowTitle(QDir::toNativeSeparators(filename) + " -- Yata");
@@ -21,6 +22,7 @@ void MainWindow::setFile(const QString & filename)
 
 void MainWindow::on_action_Open_triggered()
 {
+    // TODO: allow to open non-existant file
     QString filename = QFileDialog::getOpenFileName(this, QString(), m_currentOpenDir);
     if(!filename.isEmpty()) {
         setFile(filename);

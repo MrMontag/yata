@@ -13,7 +13,8 @@ HEADERS += MainWindow.h \
     SearchWidget.h \
     DocumentSearch.h \
     FileSearch.h \
-    BaseSearch.h
+    BaseSearch.h \
+    YFileSystemWatcher.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
@@ -23,5 +24,6 @@ SOURCES += main.cpp \
     SearchWidget.cpp \
     DocumentSearch.cpp \
     FileSearch.cpp \
-    BaseSearch.cpp
+    BaseSearch.cpp \
+    YFileSystemWatcher.cpp
 RESOURCES += TailViewResources.qrc

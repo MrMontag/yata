@@ -2,11 +2,11 @@
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
 #include "FileSearch.h"
+#include "YFileSystemWatcher.h"
 
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
-#include <QFileSystemWatcher>
 #include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
@@ -26,7 +26,6 @@ const int PAGE_STEP_OVERLAP = 2;
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new QTextDocument(this))
-    , m_watcher(new QFileSystemWatcher(this))
     , m_fileChanged(false)
     , m_lastSize(0,0)
     , m_numLayoutLines(0)
@@ -39,10 +38,8 @@ TailView::TailView(QWidget * parent)
     , m_cursorLinePos(-1)
     , m_cursorLineOffset(-1)
     , m_cursorLength(-1)
-    , m_isInDialog(false)
 {
     m_document->setUndoRedoEnabled(false);
-    connect(m_watcher, SIGNAL(fileChanged(const QString &)), SLOT(onFileChanged(const QString &)));
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
 
@@ -52,24 +49,26 @@ TailView::~TailView()
 
 void TailView::setFile(const QString & filename)
 {
-    if(!filename.isEmpty()) {
-        if(m_watcher->files().size() != 0) {
-            m_watcher->removePaths(m_watcher->files());
-        }
-    }
-    m_watcher->addPath(filename);
+    m_filename = filename;
 
+    if(!filename.isEmpty()) {
+        m_watcher.reset(new YFileSystemWatcher(filename, this));
+        connect(m_watcher.data(), SIGNAL(fileChanged()), SLOT(onFileChanged()));
+        connect(m_watcher.data(), SIGNAL(fileDeleted()), SLOT(onFileDeleted()));
+    } else {
+        m_watcher.reset();
+    }
 
     verticalScrollBar()->setSliderPosition(0);
     horizontalScrollBar()->setSliderPosition(0);
 
-    onFileChanged(filename);
+    onFileChanged();
 }
 
 void TailView::setFullLayout(bool fullLayout)
 {
     m_fullLayout = fullLayout;
-    onFileChanged(m_filename);
+    onFileChanged();
 }
 
 bool TailView::isFullLayout() const
@@ -215,42 +214,10 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
     }
 }
 
-void TailView::onFileChanged(const QString & path)
+void TailView::onFileChanged()
 {
-    m_filename = path;
-
-    // TODO: Temporary stopgap until better file watching is
-    // implemented -- prompt user to reload the file
-    // if it gets deleted.
-    bool needs_reconnect = false;
-
-    while(!QFile::exists(path)) {
-        if(m_isInDialog) { return; }
-        needs_reconnect = true;
-        m_isInDialog = true;
-        QString msg = QString("%1 not found.  Click OK to try again.").arg(m_filename);
-        int button = QMessageBox::critical(this, "yata", msg, QMessageBox::Ok, QMessageBox::Cancel);
-        m_isInDialog = false;
-        if(button == QMessageBox::Cancel) {
-            break;
-        }
-    }
-
-    if(needs_reconnect) {
-        m_watcher->removePath(path);
-        m_watcher->addPath(path);
-    }
-    // End stopgap
-
     m_fileChanged = true;
     if(m_fullLayout) {
-        QFile file(m_filename);
-        if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            setDocumentText(QString());
-            viewport()->update();
-            return;
-        }
-
         FileBlockReader reader(m_filename);
         QString data;
         reader.readAll(&data, &m_filePositions);
@@ -259,6 +226,14 @@ void TailView::onFileChanged(const QString & path)
         updateDocumentForPartialLayout();
     }
 
+    viewport()->update();
+}
+
+void TailView::onFileDeleted()
+{
+    // TODO: display an error message
+    m_filePositions.clear();
+    setDocumentText(QString());
     viewport()->update();
 }
 

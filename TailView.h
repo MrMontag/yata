@@ -7,10 +7,10 @@
 
 class QTextDocument;
 class QString;
-class QFileSystemWatcher;
 class QTextBlock;
 class QTextCursor;
 class DocumentSearch;
+class YFileSystemWatcher;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
@@ -37,7 +37,8 @@ protected:
     void resizeEvent(QResizeEvent *);
 
 private slots:
-    void onFileChanged(const QString & path);
+    void onFileChanged();
+    void onFileDeleted();
     void vScrollBarAction(int action);
 
 private:
@@ -55,7 +56,7 @@ private:
 private:
     QString m_filename;
     QTextDocument * m_document;
-    QFileSystemWatcher * m_watcher;
+    QScopedPointer<YFileSystemWatcher> m_watcher;
     bool m_fileChanged;
 
     QSize m_lastSize;
@@ -75,8 +76,6 @@ private:
     int m_cursorLineOffset;
     int m_cursorLength;
 
-
-    bool m_isInDialog; // TODO: Ugh. Let's remove this variable as soon as we can!
 };
 
 #endif
