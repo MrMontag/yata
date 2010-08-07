@@ -2,6 +2,7 @@
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
 #include "FileSearch.h"
+#include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
 
 #include <QApplication>
@@ -35,9 +36,7 @@ TailView::TailView(QWidget * parent)
     , m_firstVisibleLine(0)
     , m_lastFilePos(0)
     , m_documentSearch(new DocumentSearch(m_document))
-    , m_cursorLinePos(-1)
-    , m_cursorLineOffset(-1)
-    , m_cursorLength(-1)
+    , m_fileCursor(new YFileCursor())
 {
     m_document->setUndoRedoEnabled(false);
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
@@ -117,21 +116,19 @@ void TailView::searchFile(bool isForward)
 
     if(!m_fullLayout && !matchFound) {
         FileSearch fileSearch(m_filename);
-        fileSearch.setCursor(FileCursor(m_cursorLinePos, m_cursorLineOffset, m_cursorLength));
+        fileSearch.setCursor(*m_fileCursor);
         fileSearch.setSearchCriteria(
             m_documentSearch->lastSearchString(),
             m_documentSearch->searchWasRegex(),
             m_documentSearch->searchWasCaseSensitive());
         if(fileSearch.searchFile(isForward, true)) {
             matchFound = true;
-            FileCursor cursor(fileSearch.cursor());
-            m_cursorLinePos = cursor.m_linePosition;
-            m_cursorLineOffset = cursor.m_lineOffset;
-            m_cursorLength = cursor.m_length;
+            YFileCursor cursor(fileSearch.cursor());
+            *m_fileCursor = cursor;
 
             // TODO: scroll match to exactly middle of screen (it's sort of
             // scrolled towards the top currently)
-            int newTopLine = m_cursorLinePos / APPROXIMATE_CHARS_PER_LINE;
+            int newTopLine = m_fileCursor->m_linePosition / APPROXIMATE_CHARS_PER_LINE;
             verticalScrollBar()->setSliderPosition(newTopLine - numLinesOnScreen() / 2);
             updateDocumentForPartialLayout(0);
         }
@@ -175,10 +172,10 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     if(foundMatch) {
         const QTextCursor & searchCursor = m_documentSearch->cursor();
         int blockNum = searchCursor.block().blockNumber();
-        m_cursorLinePos = m_filePositions[blockNum];
+        m_fileCursor->m_linePosition = m_filePositions[blockNum];
         int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
-        m_cursorLineOffset = cursorBeginPos - searchCursor.block().position();
-        m_cursorLength = std::abs(searchCursor.anchor() - searchCursor.position());
+        m_fileCursor->m_lineOffset = cursorBeginPos - searchCursor.block().position();
+        m_fileCursor->m_length = std::abs(searchCursor.anchor() - searchCursor.position());
     }
 
     return foundMatch;
@@ -241,9 +238,9 @@ void TailView::setDocumentText(const QString & data)
 {
     m_document->setPlainText(data);
 
-    std::vector<qint64>::const_iterator itr = std::lower_bound(m_filePositions.begin(), m_filePositions.end(), m_cursorLinePos);
+    std::vector<qint64>::const_iterator itr = std::lower_bound(m_filePositions.begin(), m_filePositions.end(), m_fileCursor->m_linePosition);
 
-    if(itr == m_filePositions.end() || *itr != m_cursorLinePos) {
+    if(itr == m_filePositions.end() || *itr != m_fileCursor->m_linePosition) {
         m_documentSearch->setCursor(QTextCursor());
         return;
     }
@@ -252,8 +249,8 @@ void TailView::setDocumentText(const QString & data)
 
     QTextCursor cursor(m_document->findBlockByNumber(blockNum));
 
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_cursorLineOffset);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_cursorLength);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_fileCursor->m_lineOffset);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_fileCursor->m_length);
 
     m_documentSearch->setCursor(cursor);
 

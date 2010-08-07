@@ -10,6 +10,7 @@ class QString;
 class QTextBlock;
 class QTextCursor;
 class DocumentSearch;
+class YFileCursor;
 class YFileSystemWatcherThread;
 
 class TailView: public QAbstractScrollArea {
@@ -72,10 +73,7 @@ private:
     qint64 m_lastFilePos;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
-    qint64 m_cursorLinePos;
-    int m_cursorLineOffset;
-    int m_cursorLength;
-
+    QScopedPointer<YFileCursor> m_fileCursor;
 };
 
 #endif

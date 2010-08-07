@@ -9,12 +9,12 @@ FileSearch::FileSearch(const QString & filename)
 {
 }
 
-const FileCursor & FileSearch::cursor() const
+const YFileCursor & FileSearch::cursor() const
 {
     return m_fileCursor;
 }
 
-void FileSearch::setCursor(const FileCursor & c)
+void FileSearch::setCursor(const YFileCursor & c)
 {
     m_fileCursor = c;
 }
@@ -29,7 +29,7 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
     }
 
     if(m_fileCursor.isNull()) {
-        m_fileCursor = FileCursor(0,0,0);
+        m_fileCursor = YFileCursor(0,0,0);
     }
 
     qint64 initialLinePosition = m_fileCursor.m_linePosition;
@@ -73,7 +73,7 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
     }
 }
 
-bool FileSearch::isMatch(const QRegExp & regex, FileCursor * cursor, FileBlockReader * reader, int lineOffset, bool isForward)
+bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockReader * reader, int lineOffset, bool isForward)
 {
     std::vector<qint64> linePositions;
     QString data;

@@ -15,7 +15,8 @@ HEADERS += MainWindow.h \
     FileSearch.h \
     BaseSearch.h \
     YFileSystemWatcher.h \
-    YFileSystemWatcherThread.h
+    YFileSystemWatcherThread.h \
+    YFileCursor.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
