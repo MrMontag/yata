@@ -10,7 +10,7 @@ class QString;
 class QTextBlock;
 class QTextCursor;
 class DocumentSearch;
-class YFileSystemWatcher;
+class YFileSystemWatcherThread;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
@@ -56,7 +56,7 @@ private:
 private:
     QString m_filename;
     QTextDocument * m_document;
-    QScopedPointer<YFileSystemWatcher> m_watcher;
+    QScopedPointer<YFileSystemWatcherThread> m_watcher;
     bool m_fileChanged;
 
     QSize m_lastSize;

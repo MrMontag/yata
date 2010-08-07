@@ -2,7 +2,7 @@
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
 #include "FileSearch.h"
-#include "YFileSystemWatcher.h"
+#include "YFileSystemWatcherThread.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -52,7 +52,7 @@ void TailView::setFile(const QString & filename)
     m_filename = filename;
 
     if(!filename.isEmpty()) {
-        m_watcher.reset(new YFileSystemWatcher(filename, this));
+        m_watcher.reset(new YFileSystemWatcherThread(filename, this));
         connect(m_watcher.data(), SIGNAL(fileChanged()), SLOT(onFileChanged()));
         connect(m_watcher.data(), SIGNAL(fileDeleted()), SLOT(onFileDeleted()));
     } else {

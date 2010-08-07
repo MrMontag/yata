@@ -1,23 +1,16 @@
 #ifndef YFILESYSTEMWATCHER_H
 #define YFILESYSTEMWATCHER_H
 
-#include <QThread>
-#include <QScopedPointer>
+#include <QObject>
 
 class QFileSystemWatcher;
 class QTimer;
 
-class YFileSystemWatcher : public QThread
-{
-Q_OBJECT
+class YFileSystemWatcher: public QObject {
+    Q_OBJECT
 public:
-    explicit YFileSystemWatcher(const QString & filename, QObject *parent = 0);
+    YFileSystemWatcher(const QString & filename);
     ~YFileSystemWatcher();
-
-    void stop();
-
-protected:
-    void run();
 
 signals:
     void fileChanged();
@@ -38,6 +31,7 @@ private:
 
     Status m_status;
     QString m_filename;
+
 };
 
 #endif // YFILESYSTEMWATCHER_H
