@@ -5,6 +5,8 @@
 #include <QRegExp>
 #include <QTextStream>
 
+#include "YApplication.h"
+
 SearchWidget::SearchWidget(const QString & searchExpression, bool isRegex, bool caseSensitive, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SearchWidget)
@@ -46,7 +48,7 @@ void SearchWidget::accept()
                 << tr("The pattern \"")
                 << ui->lineEdit_search->text()
                 << tr("\" is invalid.");
-            QMessageBox::critical(this, "yata", message);
+            QMessageBox::critical(this, YApplication::displayAppName(), message);
             ui->lineEdit_search->setFocus();
             return;
         }

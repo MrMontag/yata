@@ -2,6 +2,7 @@
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
 #include "FileSearch.h"
+#include "YApplication.h"
 #include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
 
@@ -140,7 +141,7 @@ void TailView::searchFile(bool isForward)
             << tr("Pattern \"")
             << m_documentSearch->lastSearchString()
             << tr("\" not found");
-        QMessageBox::information(this, "yata", message);
+        QMessageBox::information(this, YApplication::displayAppName(), message);
     }
 
     viewport()->update();
