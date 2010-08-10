@@ -32,3 +32,4 @@ SOURCES += main.cpp \
     YFileSystemWatcherThread.cpp \
     YApplication.cpp
 RESOURCES += TailViewResources.qrc
+RC_FILE = yata_win.rc
