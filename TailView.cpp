@@ -29,12 +29,11 @@ const int PAGE_STEP_OVERLAP = 2;
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
-    , m_lastSize(0,0)
     , m_fullLayout(false)
     , m_firstVisibleLayoutLine(0)
     , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
-    , m_lastFilePos(0)
+    , m_lastFileAddress(0)
     , m_documentSearch(new DocumentSearch(m_document->document()))
     , m_fileCursor(new YFileCursor())
 {
@@ -127,7 +126,7 @@ void TailView::searchFile(bool isForward)
 
             // TODO: scroll match to exactly middle of screen (it's sort of
             // scrolled towards the top currently)
-            int newTopLine = m_fileCursor->m_linePosition / APPROXIMATE_CHARS_PER_LINE;
+            int newTopLine = m_fileCursor->m_lineAddress / APPROXIMATE_CHARS_PER_LINE;
             verticalScrollBar()->setSliderPosition(newTopLine - numLinesOnScreen() / 2);
             updateDocumentForPartialLayout(0);
         }
@@ -166,9 +165,9 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     if(foundMatch) {
         const QTextCursor & searchCursor = m_documentSearch->cursor();
         int blockNum = searchCursor.block().blockNumber();
-        m_fileCursor->m_linePosition = m_filePositions[blockNum];
+        m_fileCursor->m_lineAddress = m_lineAddresses[blockNum];
         int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
-        m_fileCursor->m_lineOffset = cursorBeginPos - searchCursor.block().position();
+        m_fileCursor->m_charPos = cursorBeginPos - searchCursor.block().position();
         m_fileCursor->m_length = std::abs(searchCursor.anchor() - searchCursor.position());
     }
 
@@ -209,7 +208,7 @@ void TailView::onFileChanged()
     if(m_fullLayout) {
         FileBlockReader reader(m_filename);
         QString data;
-        reader.readAll(&data, &m_filePositions);
+        reader.readAll(&data, &m_lineAddresses);
         setDocumentText(data);
     } else {
         updateDocumentForPartialLayout();
@@ -221,7 +220,7 @@ void TailView::onFileChanged()
 void TailView::onFileDeleted()
 {
     // TODO: display an error message
-    m_filePositions.clear();
+    m_lineAddresses.clear();
     setDocumentText(QString());
     viewport()->update();
 }
@@ -230,18 +229,18 @@ void TailView::setDocumentText(const QString & data)
 {
     m_document->setText(data);
 
-    std::vector<qint64>::const_iterator itr = std::lower_bound(m_filePositions.begin(), m_filePositions.end(), m_fileCursor->m_linePosition);
+    std::vector<qint64>::const_iterator itr = std::lower_bound(m_lineAddresses.begin(), m_lineAddresses.end(), m_fileCursor->m_lineAddress);
 
-    if(itr == m_filePositions.end() || *itr != m_fileCursor->m_linePosition) {
+    if(itr == m_lineAddresses.end() || *itr != m_fileCursor->m_lineAddress) {
         m_documentSearch->setCursor(QTextCursor());
         return;
     }
 
-    int blockNum = itr - m_filePositions.begin();
+    int blockNum = itr - m_lineAddresses.begin();
 
     QTextCursor cursor(m_document->document()->findBlockByNumber(blockNum));
 
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_fileCursor->m_lineOffset);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_fileCursor->m_charPos);
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_fileCursor->m_length);
 
     m_documentSearch->setCursor(cursor);
@@ -286,8 +285,6 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         }
         dy += height;
     }
-
-    m_lastSize = viewport()->size();
 }
 
 void TailView::resizeEvent(QResizeEvent *)
@@ -329,16 +326,16 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         file_pos = std::min(file_pos, bottom_screen_pos);
 
         QString data;
-        m_lastFilePos = reader.readChunk(&data, &m_filePositions, file_pos, 0, visible_lines).first;
+        m_lastFileAddress = reader.readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
 
         setDocumentText(data);
         performLayout();
 
     } else {
-        file_pos = m_lastFilePos;
+        file_pos = m_lastFileAddress;
         if(line_change < 0) {
             QString data;
-            file_pos = reader.readChunk(&data, &m_filePositions, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
+            file_pos = reader.readChunk(&data, &m_lineAddresses, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
             setDocumentText(data);
             performLayout();
 
@@ -375,13 +372,13 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             file_pos = reader.getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
             QString data;
-            file_pos = reader.readChunk(&data, &m_filePositions, file_pos, 0, visible_lines).first;
+            file_pos = reader.readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
             setDocumentText(data);
             performLayout();
 
         }
-        m_lastFilePos = file_pos;
-        verticalScrollBar()->setSliderPosition(m_lastFilePos / APPROXIMATE_CHARS_PER_LINE);
+        m_lastFileAddress = file_pos;
+        verticalScrollBar()->setSliderPosition(m_lastFileAddress / APPROXIMATE_CHARS_PER_LINE);
     }
 
     viewport()->update();

@@ -58,15 +58,14 @@ private:
     QScopedPointer<YTextDocument> m_document;
     QScopedPointer<YFileSystemWatcherThread> m_watcher;
 
-    QSize m_lastSize;
-    std::vector<qint64> m_filePositions;
+    std::vector<qint64> m_lineAddresses;
 
     bool m_fullLayout;
 
     int m_firstVisibleLayoutLine;
     int m_firstVisibleBlock;
     int m_firstVisibleBlockLine;
-    qint64 m_lastFilePos;
+    qint64 m_lastFileAddress;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
     QScopedPointer<YFileCursor> m_fileCursor;

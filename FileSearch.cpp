@@ -22,8 +22,8 @@ void FileSearch::setCursor(const YFileCursor & c)
 bool FileSearch::searchFile(bool isForward, bool wrapAround)
 {
     if(lastSearchString().isEmpty()) {
-        m_fileCursor.m_linePosition = -1;
-        m_fileCursor.m_lineOffset = 0;
+        m_fileCursor.m_lineAddress = -1;
+        m_fileCursor.m_charPos = 0;
         m_fileCursor.m_length = 0;
         return false;
     }
@@ -32,7 +32,7 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
         m_fileCursor = YFileCursor(0,0,0);
     }
 
-    qint64 initialLinePosition = m_fileCursor.m_linePosition;
+    qint64 initialLinePosition = m_fileCursor.m_lineAddress;
 
     QRegExp regex(getRegex());
     FileBlockReader reader(m_filename);
@@ -43,29 +43,29 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
 
     while(true) {
         if(isMatch(regex, &m_fileCursor, &reader, lineOffset, isForward)) {
-            qDebug() << m_fileCursor.m_linePosition << m_fileCursor.m_lineOffset << m_fileCursor.m_length;
+            qDebug() << m_fileCursor.m_lineAddress << m_fileCursor.m_charPos << m_fileCursor.m_length;
             return true;
         }
 
         if(isForward) {
             lineOffset = 1;
-            m_fileCursor.m_lineOffset = 0;
-            if(m_fileCursor.m_linePosition >= reader.size() - 1) {
+            m_fileCursor.m_charPos = 0;
+            if(m_fileCursor.m_lineAddress >= reader.size() - 1) {
                 if(!wrapAround) { return false; }
-                m_fileCursor.m_linePosition = 0;
+                m_fileCursor.m_lineAddress = 0;
                 lineOffset = 0;
             }
         } else {
             lineOffset = -1;
-            m_fileCursor.m_lineOffset = -1;
-            if(m_fileCursor.m_linePosition == 0) {
+            m_fileCursor.m_charPos = -1;
+            if(m_fileCursor.m_lineAddress == 0) {
                 if(!wrapAround) { return false; }
-                m_fileCursor.m_linePosition = reader.size();
+                m_fileCursor.m_lineAddress = reader.size();
                 lineOffset = 0;
             }
         }
 
-        if(!initialLoop && m_fileCursor.m_linePosition == initialLinePosition) {
+        if(!initialLoop && m_fileCursor.m_lineAddress == initialLinePosition) {
             return false;
         }
 
@@ -78,10 +78,10 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
     std::vector<qint64> linePositions;
     QString data;
 
-    reader->readChunk(&data, &linePositions, cursor->m_linePosition, lineOffset, 1);
+    reader->readChunk(&data, &linePositions, cursor->m_lineAddress, lineOffset, 1);
 
-    if(cursor->m_lineOffset == -1) {
-        cursor->m_lineOffset = data.length();
+    if(cursor->m_charPos == -1) {
+        cursor->m_charPos = data.length();
     }
 
     if(linePositions.empty()) {
@@ -91,7 +91,7 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
     int startPos = -1;
     int matchLength = 0;
     if(isForward) {
-        startPos = regex.indexIn(data, cursor->m_lineOffset + cursor->m_length);
+        startPos = regex.indexIn(data, cursor->m_charPos + cursor->m_length);
         matchLength = regex.matchedLength();
     } else {
         int pos = 0;
@@ -101,7 +101,7 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
                 break;
             }
 
-            if(pos + regex.matchedLength() < cursor->m_lineOffset) {
+            if(pos + regex.matchedLength() < cursor->m_charPos) {
                 startPos = pos;
                 matchLength = regex.matchedLength();
             } else {
@@ -110,14 +110,14 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
         }
     }
 
-    cursor->m_linePosition = linePositions.front();
+    cursor->m_lineAddress = linePositions.front();
 
     if(startPos != -1) {
-        cursor->m_lineOffset = startPos;
+        cursor->m_charPos = startPos;
         cursor->m_length = matchLength;
         return true;
     } else {
-        cursor->m_lineOffset = -1;
+        cursor->m_charPos = -1;
         cursor->m_length = 0;
         return false;
     }

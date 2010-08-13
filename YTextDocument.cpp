@@ -33,10 +33,10 @@ void YTextDocument::layout(int width)
 
     m_width = width;
     m_numLayoutLines = 0;
-    m_layoutPositions.clear();
+    m_blockLayoutPositions.clear();
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
-        m_layoutPositions.push_back(m_numLayoutLines);
+        m_blockLayoutPositions.push_back(m_numLayoutLines);
         m_numLayoutLines += layoutBlock(&block);
     }
 
@@ -70,15 +70,15 @@ int YTextDocument::layoutBlock(QTextBlock * textBlock)
 QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos /* = 0 */)
 {
     std::vector<int>::const_iterator blockitr = std::upper_bound(
-        m_layoutPositions.begin(),
-        m_layoutPositions.end(),
+        m_blockLayoutPositions.begin(),
+        m_blockLayoutPositions.end(),
         layoutPosition);
-    if(blockitr != m_layoutPositions.begin()) { --blockitr; }
-    if(blockitr != m_layoutPositions.end()) {
+    if(blockitr != m_blockLayoutPositions.begin()) { --blockitr; }
+    if(blockitr != m_blockLayoutPositions.end()) {
         if(closestLayoutPos) {
             *closestLayoutPos = *blockitr;
         }
-        int blockNumber = blockitr - m_layoutPositions.begin();
+        int blockNumber = blockitr - m_blockLayoutPositions.begin();
         return m_document->findBlockByNumber(blockNumber);
     } else {
         return QTextBlock();
@@ -88,8 +88,8 @@ QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * cl
 int YTextDocument::blockLayoutPosition(QTextBlock block)
 {
     int blockNumber = block.blockNumber();
-    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_layoutPositions.size()) { return -1; }
-    return m_layoutPositions[blockNumber];
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutPositions.size()) { return -1; }
+    return m_blockLayoutPositions[blockNumber];
 }
 
 QTextDocument * YTextDocument::document()

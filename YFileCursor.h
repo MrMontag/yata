@@ -4,17 +4,17 @@
 #include <QtGlobal>
 
 struct YFileCursor {
-    qint64 m_linePosition;
-    int m_lineOffset;
+    qint64 m_lineAddress;
+    int m_charPos;
     int m_length;
 
     YFileCursor(qint64 linePosition = -1, int lineOffset = -1, int length = -1)
-        : m_linePosition(linePosition)
-        , m_lineOffset(lineOffset)
+        : m_lineAddress(linePosition)
+        , m_charPos(lineOffset)
         , m_length(length)
     {}
 
-    bool isNull() const { return m_linePosition == -1; }
+    bool isNull() const { return m_lineAddress == -1; }
 };
 
 #endif // YFILECURSOR_H
