@@ -5,13 +5,13 @@
 #include <QScopedPointer>
 #include <vector>
 
-class QTextDocument;
 class QString;
 class QTextBlock;
 class QTextCursor;
 class DocumentSearch;
 class YFileCursor;
 class YFileSystemWatcherThread;
+class YTextDocument;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
@@ -48,7 +48,6 @@ private:
     void updateScrollBars(int lines);
     void updateDocumentForPartialLayout(int line_change = 0);
     void performLayout();
-    int layoutBlock(QTextBlock * textBlock);
 
     void searchFile(bool isForward);
     bool searchDocument(bool isForward, bool wrapAround = true);
@@ -56,20 +55,17 @@ private:
 
 private:
     QString m_filename;
-    QTextDocument * m_document;
+    QScopedPointer<YTextDocument> m_document;
     QScopedPointer<YFileSystemWatcherThread> m_watcher;
-    bool m_fileChanged;
 
     QSize m_lastSize;
-    int m_numLayoutLines;
-    std::vector<int> m_layoutPositions;
     std::vector<qint64> m_filePositions;
 
     bool m_fullLayout;
 
-    int m_lineOffset;
+    int m_firstVisibleLayoutLine;
     int m_firstVisibleBlock;
-    int m_firstVisibleLine;
+    int m_firstVisibleBlockLine;
     qint64 m_lastFilePos;
 
     QScopedPointer<DocumentSearch> m_documentSearch;

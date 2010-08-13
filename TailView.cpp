@@ -5,6 +5,7 @@
 #include "YApplication.h"
 #include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
+#include "YTextDocument.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -27,19 +28,16 @@ const int PAGE_STEP_OVERLAP = 2;
 
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
-    , m_document(new QTextDocument(this))
-    , m_fileChanged(false)
+    , m_document(new YTextDocument)
     , m_lastSize(0,0)
-    , m_numLayoutLines(0)
     , m_fullLayout(false)
-    , m_lineOffset(0)
+    , m_firstVisibleLayoutLine(0)
     , m_firstVisibleBlock(0)
-    , m_firstVisibleLine(0)
+    , m_firstVisibleBlockLine(0)
     , m_lastFilePos(0)
-    , m_documentSearch(new DocumentSearch(m_document))
+    , m_documentSearch(new DocumentSearch(m_document->document()))
     , m_fileCursor(new YFileCursor())
 {
-    m_document->setUndoRedoEnabled(false);
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
 
@@ -150,21 +148,16 @@ void TailView::searchFile(bool isForward)
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(m_documentSearch->cursor().isNull()) {
-        int topLine = verticalScrollBar()->value();
-        std::vector<int>::const_iterator blockitr = std::upper_bound(
-            m_layoutPositions.begin(),
-            m_layoutPositions.end(),
-            topLine);
-        if(blockitr != m_layoutPositions.begin()) { --blockitr; }
-        if(blockitr != m_layoutPositions.end()) {
-            int blockNumber = blockitr - m_layoutPositions.begin();
-            QTextBlock block = m_document->findBlockByNumber(blockNumber);
-            int blockLine = topLine - *blockitr;
+        const int topLine = verticalScrollBar()->value();
+        int layoutLine = 0;
+        QTextBlock block = m_document->findBlockAtLayoutPosition(topLine, &layoutLine);
+        if(block.isValid()) {
+            int blockLine = topLine - layoutLine;
             QTextCursor cursor(block);
             cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
             m_documentSearch->setCursor(cursor);
         } else {
-            m_documentSearch->setCursor(QTextCursor(m_document));
+            m_documentSearch->setCursor(QTextCursor(m_document->document()));
         }
     }
 
@@ -185,15 +178,14 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
 void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 {
     QTextBlock cursorBlock = cursor.block();
-    int blockNumber = cursorBlock.blockNumber();
-    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_layoutPositions.size()) { return; }
-    int cursorLineNumber = m_layoutPositions[blockNumber];
+
+    int cursorLineNumber = m_document->blockLayoutPosition(cursorBlock);
 
     int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
 
     cursorLineNumber += blockLine;
 
-    int topScreenLine = m_fullLayout ? verticalScrollBar()->value() : m_lineOffset;
+    int topScreenLine = m_fullLayout ? verticalScrollBar()->value() : m_firstVisibleLayoutLine;
 
     int numReadableLines = numLinesOnScreen();
 
@@ -214,7 +206,6 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 
 void TailView::onFileChanged()
 {
-    m_fileChanged = true;
     if(m_fullLayout) {
         FileBlockReader reader(m_filename);
         QString data;
@@ -237,7 +228,7 @@ void TailView::onFileDeleted()
 
 void TailView::setDocumentText(const QString & data)
 {
-    m_document->setPlainText(data);
+    m_document->setText(data);
 
     std::vector<qint64>::const_iterator itr = std::lower_bound(m_filePositions.begin(), m_filePositions.end(), m_fileCursor->m_linePosition);
 
@@ -248,7 +239,7 @@ void TailView::setDocumentText(const QString & data)
 
     int blockNum = itr - m_filePositions.begin();
 
-    QTextCursor cursor(m_document->findBlockByNumber(blockNum));
+    QTextCursor cursor(m_document->document()->findBlockByNumber(blockNum));
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_fileCursor->m_lineOffset);
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_fileCursor->m_length);
@@ -259,48 +250,11 @@ void TailView::setDocumentText(const QString & data)
 
 void TailView::performLayout()
 {
-    bool needs_layout = !m_fullLayout || m_fileChanged || viewport()->size().rwidth() != m_lastSize.rwidth();
-
-    if(!needs_layout) {
-        return;
-    }
-
-    m_numLayoutLines = 0;
-    m_layoutPositions.clear();
-
-    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
-        m_layoutPositions.push_back(m_numLayoutLines);
-        m_numLayoutLines += layoutBlock(&block);
-    }
+    m_document->layout(viewport()->width());
 
     if(m_fullLayout) {
-        updateScrollBars(m_numLayoutLines);
+        updateScrollBars(m_document->numLayoutLines());
     }
-
-    m_fileChanged = false;
-}
-
-int TailView::layoutBlock(QTextBlock * textBlock)
-{
-    QTextLayout & layout(*textBlock->layout());
-    QFontMetrics fontMetrics(layout.font());
-
-    qreal height = 0;
-    int numLines = 0;
-
-    layout.beginLayout();
-    while(true) {
-        QTextLine line = layout.createLine();
-        if(!line.isValid()) { break; }
-        numLines++;
-        line.setLineWidth(viewport()->size().width());
-        height += fontMetrics.leading();
-        line.setPosition(QPointF(0, height));
-        height += line.height();
-    }
-
-    layout.endLayout();
-    return numLines;
 }
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
@@ -309,13 +263,15 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
     qreal dy = 0;
 
-    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
+    QTextDocument * document = m_document->document();
+
+    for(QTextBlock block = document->begin(); block != document->end(); block = block.next()) {
         QTextLayout & layout(*block.layout());
         QFontMetrics fontMetrics(layout.font());
 
         qreal height = fontMetrics.lineSpacing() * layout.lineCount();
 
-        int scrollValue = m_fullLayout ? verticalScrollBar()->sliderPosition() : m_lineOffset;
+        int scrollValue = m_fullLayout ? verticalScrollBar()->sliderPosition() : m_firstVisibleLayoutLine;
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout.boundingRect());
         layoutRect.moveTo(start);
@@ -337,7 +293,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 void TailView::resizeEvent(QResizeEvent *)
 {
     if(m_fullLayout) {
-        updateScrollBars(m_numLayoutLines);
+        updateScrollBars(m_document->numLayoutLines());
     } else {
         updateDocumentForPartialLayout();
     }
@@ -349,20 +305,20 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
     if(m_fullLayout) { return; }
 
     FileBlockReader reader(m_filename);
-    int lines_on_screen = numLinesOnScreen();
-    int visible_lines = lines_on_screen + 1;
+    const int lines_on_screen = numLinesOnScreen();
+    const int visible_lines = lines_on_screen + 1;
 
     // TODO: account for wrapped lines when computing bottom_screen_pos
-    qint64 bottom_screen_pos = reader.getStartPosition(reader.size(), -lines_on_screen);
+    const qint64 bottom_screen_pos = reader.getStartPosition(reader.size(), -lines_on_screen);
 
-    int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
+    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
     updateScrollBars(approx_lines);
 
     qint64 file_pos = 0;
     if(0 == line_change) {
-        m_lineOffset = 0; // TODO: don't reset if scrollbar didn't move
+        m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
         m_firstVisibleBlock = 0;
-        m_firstVisibleLine = 0;
+        m_firstVisibleBlockLine = 0;
         if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
             file_pos = bottom_screen_pos;
         } else {
@@ -386,34 +342,34 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             setDocumentText(data);
             performLayout();
 
-            QTextBlock block = m_document->findBlockByNumber(-line_change);
-            while(m_firstVisibleLine + line_change < 0) {
-                line_change += m_firstVisibleLine + 1;
+            QTextBlock block = m_document->document()->findBlockByNumber(-line_change);
+            while(m_firstVisibleBlockLine + line_change < 0) {
+                line_change += m_firstVisibleBlockLine + 1;
                 block = block.previous();
-                m_firstVisibleLine = block.layout()->lineCount() - 1;
+                m_firstVisibleBlockLine = block.layout()->lineCount() - 1;
             }
 
             m_firstVisibleBlock = block.blockNumber();
-            m_firstVisibleLine += line_change;
+            m_firstVisibleBlockLine += line_change;
 
-            m_lineOffset = m_firstVisibleLine;
-            for(QTextBlock block = m_document->firstBlock(); block.blockNumber() < m_firstVisibleBlock; block = block.next()) {
-                m_lineOffset += block.layout()->lineCount();
+            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
+            for(QTextBlock block = m_document->document()->firstBlock(); block.blockNumber() < m_firstVisibleBlock; block = block.next()) {
+                m_firstVisibleLayoutLine += block.layout()->lineCount();
             }
 
         } else {
-            line_change += m_firstVisibleLine;
+            line_change += m_firstVisibleBlockLine;
             int wrapped_line_count = 0;
             int real_line_count = 0;
-            QTextBlock block = m_document->findBlockByNumber(m_firstVisibleBlock);
+            QTextBlock block = m_document->document()->findBlockByNumber(m_firstVisibleBlock);
             while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
                 wrapped_line_count += block.layout()->lineCount();
                 block = block.next();
                 real_line_count++;
             }
 
-            m_firstVisibleLine = line_change - wrapped_line_count;
-            m_lineOffset = m_firstVisibleLine;
+            m_firstVisibleBlockLine = line_change - wrapped_line_count;
+            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
             m_firstVisibleBlock = 0;
 
             file_pos = reader.getStartPosition(file_pos, real_line_count);
@@ -435,7 +391,7 @@ void TailView::updateScrollBars(int lines)
 {
     // Since partial layout handles the scrollbars
     // differently, the visible lines should not
-    // be taken into account. (Note: candidate for
+    // be taken into account. (TODO: candidate for
     // possible refactoring; should this be
     // decided here?)
     int visibleLines = 0;
@@ -488,7 +444,7 @@ void TailView::vScrollBarAction(int action)
 
 int TailView::numLinesOnScreen() const
 {
-    QFont font = m_document->firstBlock().layout()->font();
+    QFont font = m_document->document()->firstBlock().layout()->font();
     QFontMetrics fontMetrics(font);
     int lineHeight = fontMetrics.lineSpacing();
     int windowHeight = viewport()->height();
