@@ -32,13 +32,13 @@ public slots:
     void newSearch(const QString & searchString, bool isRegex, bool caseSensitive);
     void searchForward();
     void searchBackward();
+    void onFileChanged();
 
 protected:
     void paintEvent(QPaintEvent * event);
     void resizeEvent(QResizeEvent *);
 
 private slots:
-    void onFileChanged();
     void onFileDeleted();
     void vScrollBarAction(int action);
 

@@ -15,6 +15,7 @@ public:
 signals:
     void fileOpened(const QString &);
 private slots:
+    void on_actionRefresh_triggered();
     void on_action_About_Yata_triggered();
     void on_actionAbout_Qt_triggered();
     void on_actionFind_previous_triggered();

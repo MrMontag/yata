@@ -79,3 +79,8 @@ void MainWindow::on_action_About_Yata_triggered()
     QTextStream(&message) << YApplication::displayAppName() << tr(": Copyright (c) 2010 James Smith");
     QMessageBox::about(this, title, message);
 }
+
+void MainWindow::on_actionRefresh_triggered()
+{
+    m_tailView->onFileChanged();
+}
