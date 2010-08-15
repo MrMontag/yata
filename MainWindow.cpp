@@ -30,8 +30,13 @@ void MainWindow::setFile(const QString & filename)
 
 void MainWindow::on_action_Open_triggered()
 {
-    // TODO: allow to open non-existant file
-    QString filename = QFileDialog::getOpenFileName(this, QString(), m_currentOpenDir);
+    QString filename = QFileDialog::getSaveFileName(
+        this,
+        tr("Choose File"),
+        m_currentOpenDir,
+        QString(),
+        0,
+        QFileDialog::DontConfirmOverwrite);
     if(!filename.isEmpty()) {
         setFile(filename);
         m_currentOpenDir = QFileInfo(filename).path();
