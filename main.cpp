@@ -7,7 +7,7 @@ int main(int argc, char **argv)
     app.setWindowIcon(QIcon(":/smiley.png"));
 	MainWindow * win = new MainWindow;
 	if(argc > 1) {
-		win->setFile(argv[1]);
+		win->addFile(argv[1]);
 	}
 	win->show();
 	return app.exec();

@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "TailView.h"
+#include "YTabWidget.h"
 #include "SearchWidget.h"
 #include "YApplication.h"
 #include <QFileDialog>
@@ -10,36 +11,41 @@
 MainWindow::MainWindow()
 {
     ui.setupUi(this);
-    m_tailView = new TailView(this);
-    setCentralWidget(m_tailView);
-    ui.action_FullLayout->setChecked(m_tailView->isFullLayout());
+    m_tabWidget = new YTabWidget(this);
+    setCentralWidget(m_tabWidget);
 
     setWindowTitle(YApplication::displayAppName());
     QString aboutYataText = ui.action_About_Yata->text();
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
     ui.action_About_Yata->setText(aboutYataText);
+
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(on_tabWidget_currentChanged(int)));
 }
 
 // TODO: drag and drop files! :-)
-void MainWindow::setFile(const QString & filename)
+void MainWindow::addFile(const QString & filename)
 {
-    setWindowTitle(QDir::toNativeSeparators(filename) + " - " + YApplication::displayAppName());
-    m_tailView->setFile(filename);
+    QString displayFilename = QDir::toNativeSeparators(filename);
+    TailView * tailView = new TailView(this);
+    tailView->setFile(filename);
+    tailView->setFullLayout(ui.action_FullLayout->isChecked());
+    int index = m_tabWidget->addTab(tailView, displayFilename);
+    m_tabWidget->setCurrentIndex(index);
 }
 
 
 void MainWindow::on_action_Open_triggered()
 {
-    QString filename = QFileDialog::getSaveFileName(
+    QStringList filenames = QFileDialog::getOpenFileNames(
         this,
         tr("Choose File"),
-        m_currentOpenDir,
-        QString(),
-        0,
-        QFileDialog::DontConfirmOverwrite);
-    if(!filename.isEmpty()) {
-        setFile(filename);
-        m_currentOpenDir = QFileInfo(filename).path();
+        m_currentOpenDir);
+    if(!filenames.isEmpty()) {
+        QString filename;
+        foreach(filename, filenames) {
+            addFile(filename);
+            m_currentOpenDir = QFileInfo(filename).path();
+        }
     }
 }
 
@@ -50,24 +56,32 @@ void MainWindow::on_action_Exit_triggered()
 
 void MainWindow::on_action_FullLayout_triggered(bool isChecked)
 {
-    m_tailView->setFullLayout(isChecked);
+    if(TailView * tailView = getCurrentView()) {
+        tailView->setFullLayout(isChecked);
+    }
 }
 
 void MainWindow::on_action_Find_triggered()
 {
-    SearchWidget widget(m_tailView->lastSearchString(), m_tailView->searchWasRegex(), m_tailView->searchWasCaseSensitive(), this);
-    connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), m_tailView, SLOT(newSearch(const QString &,bool,bool)));
-    widget.exec();
+    if(TailView * tailView = getCurrentView()) {
+        SearchWidget widget(tailView->lastSearchString(), tailView->searchWasRegex(), tailView->searchWasCaseSensitive(), this);
+        connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), tailView, SLOT(newSearch(const QString &,bool,bool)));
+        widget.exec();
+    }
 }
 
 void MainWindow::on_actionFind_next_triggered()
 {
-    m_tailView->searchForward();
+    if(TailView * tailView = getCurrentView()) {
+        tailView->searchForward();
+    }
 }
 
 void MainWindow::on_actionFind_previous_triggered()
 {
-    m_tailView->searchBackward();
+    if(TailView * tailView = getCurrentView()) {
+        tailView->searchBackward();
+    }
 }
 
 void MainWindow::on_actionAbout_Qt_triggered()
@@ -87,5 +101,18 @@ void MainWindow::on_action_About_Yata_triggered()
 
 void MainWindow::on_actionRefresh_triggered()
 {
-    m_tailView->onFileChanged();
+    if(TailView * tailView = getCurrentView()) {
+        tailView->onFileChanged();
+    }
+}
+
+TailView * MainWindow::getCurrentView()
+{
+    return dynamic_cast<TailView*>(m_tabWidget->currentWidget());
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    QString filename = m_tabWidget->tabText(index);
+    setWindowTitle(filename + " - " + YApplication::displayAppName());
 }
