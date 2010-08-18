@@ -5,6 +5,9 @@
 #include <QToolButton>
 #include <QtDebug>
 
+// TODO: Ctrl+W: close; Ctrl+Shift+W: close all; close all but current
+// TODO: movable tabs
+
 YTabWidget::YTabWidget(QWidget *parent)
     : QTabWidget(parent)
     , m_chooseTabButton(new QToolButton(this))
@@ -25,6 +28,17 @@ void YTabWidget::on_tabCloseRequested(int index)
     removeTab(index);
 }
 
+void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
+{
+    int index = addTab(child, shortName);
+    setTabToolTip(index, fullName);
+
+    QAction * action = m_chooseTabButton->menu()->addAction(fullName);
+    connect(action, SIGNAL(triggered()), SLOT(on_tabChooseMenuTriggered()));
+
+    setCurrentIndex(index);
+}
+
 void YTabWidget::on_tabChooseMenuTriggered()
 {
     QAction * action = dynamic_cast<QAction*>(sender());
@@ -32,12 +46,6 @@ void YTabWidget::on_tabChooseMenuTriggered()
 
     int index = m_chooseTabButton->menu()->actions().indexOf(action);
     setCurrentIndex(index);
-}
-
-void YTabWidget::tabInserted(int index)
-{
-    QAction * action = m_chooseTabButton->menu()->addAction(tabText(index));
-    connect(action, SIGNAL(triggered()), SLOT(on_tabChooseMenuTriggered()));
 }
 
 void YTabWidget::tabRemoved(int index)

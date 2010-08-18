@@ -25,12 +25,14 @@ MainWindow::MainWindow()
 // TODO: drag and drop files! :-)
 void MainWindow::addFile(const QString & filename)
 {
-    QString displayFilename = QDir::toNativeSeparators(filename);
+    QFileInfo info(filename);
+    QString absolute(info.absoluteFilePath());
+    QString displayFilename = QDir::toNativeSeparators(absolute);
+    QString displayBase = info.fileName();
     TailView * tailView = new TailView(this);
-    tailView->setFile(filename);
+    tailView->setFile(absolute);
     tailView->setFullLayout(ui.action_FullLayout->isChecked());
-    int index = m_tabWidget->addTab(tailView, displayFilename);
-    m_tabWidget->setCurrentIndex(index);
+    m_tabWidget->openTab(tailView, displayFilename, displayBase);
 }
 
 
@@ -113,6 +115,11 @@ TailView * MainWindow::getCurrentView()
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
+    if(index == -1) { // No tabs are open
+        setWindowTitle(YApplication::displayAppName());
+        return;
+    }
+
     QString filename = m_tabWidget->tabText(index);
     setWindowTitle(filename + " - " + YApplication::displayAppName());
     if(TailView * tailView = getCurrentView()) {

@@ -26,6 +26,8 @@
 const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
 const int PAGE_STEP_OVERLAP = 2;
 
+
+//TODO: Home and end keys
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
