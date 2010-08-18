@@ -115,6 +115,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
 {
     QString filename = m_tabWidget->tabText(index);
     setWindowTitle(filename + " - " + YApplication::displayAppName());
-    TailView * tailView = getCurrentView();
-    ui.action_FullLayout->setChecked(tailView->isFullLayout());
+    if(TailView * tailView = getCurrentView()) {
+        ui.action_FullLayout->setChecked(tailView->isFullLayout());
+    }
 }
