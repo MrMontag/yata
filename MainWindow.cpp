@@ -97,7 +97,10 @@ void MainWindow::on_action_About_Yata_triggered()
     QTextStream(&title) << tr("About ") << YApplication::displayAppName();
 
     QString message;
-    QTextStream(&message) << YApplication::displayAppName() << tr(": Copyright (c) 2010 James Smith");
+    QTextStream(&message) <<
+        YApplication::displayAppName() <<
+        tr(" (Yet Another Tail Application): a universal log viewer\n") <<
+        tr("Copyright (c) 2010 James Smith");
     QMessageBox::about(this, title, message);
 }
 
