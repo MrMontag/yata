@@ -2,6 +2,7 @@
 #define YFILESYSTEMWATCHER_H
 
 #include <QObject>
+#include <QDateTime>
 
 class QFileSystemWatcher;
 class QTimer;
@@ -31,6 +32,7 @@ private:
 
     Status m_status;
     QString m_filename;
+    QDateTime m_lastModification;
 
 };
 
