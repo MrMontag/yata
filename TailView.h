@@ -37,6 +37,7 @@ public slots:
 protected:
     void paintEvent(QPaintEvent * event);
     void resizeEvent(QResizeEvent *);
+    void keyPressEvent(QKeyEvent * event);
 
 private slots:
     void onFileDeleted();

@@ -31,6 +31,7 @@ void YTabWidget::on_tabCloseRequested(int index)
 void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
 {
     int index = addTab(child, shortName);
+    child->setFocus();
     setTabToolTip(index, fullName);
 
     QAction * action = m_chooseTabButton->menu()->addAction(fullName);

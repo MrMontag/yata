@@ -298,6 +298,28 @@ void TailView::resizeEvent(QResizeEvent *)
     }
 }
 
+void TailView::keyPressEvent(QKeyEvent * event)
+{
+    bool handled = false;
+    switch(event->key()) {
+    case Qt::Key_Home:
+        verticalScrollBar()->setValue(0);
+        handled = true;
+        break;
+    case Qt::Key_End:
+        verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        handled = true;
+        break;
+    default:
+        QAbstractScrollArea::keyPressEvent(event);
+        break;
+    }
+
+    if(handled && !m_fullLayout) {
+        updateDocumentForPartialLayout();
+        viewport()->update();
+    }
+}
 
 void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
 {
