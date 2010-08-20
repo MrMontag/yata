@@ -30,7 +30,11 @@ void YFileSystemWatcher::on_timer_timeout()
     QFileInfo info(m_filename);
 
     if(m_status == NoActivity) {
-        if(!info.exists() || m_lastModification < info.lastModified()) {
+        // On windows, it's possible to have a file with a creation
+        // timestamp that is *after* its modification timestamp.
+        // As a result, both things need to be checked.
+        QDateTime lastRealModification = std::max(info.lastModified(), info.created());
+        if(!info.exists() || m_lastModification < lastRealModification) {
             m_status = FileChanged;
         }
     }
