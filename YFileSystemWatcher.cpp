@@ -9,6 +9,7 @@ YFileSystemWatcher::YFileSystemWatcher(const QString & filename)
     : m_watcher(new QFileSystemWatcher(this))
     , m_timer(new QTimer(this))
     , m_filename(filename)
+    , m_lastSize(0)
 {
     connect(m_watcher.data(), SIGNAL(fileChanged(QString)), SLOT(on_watcher_fileChanged(const QString &)));
     connect(m_timer.data(), SIGNAL(timeout()), SLOT(on_timer_timeout()));
@@ -29,18 +30,26 @@ void YFileSystemWatcher::on_timer_timeout()
 {
     QFileInfo info(m_filename);
 
+    // On windows, it's possible to have a file with a creation
+    // timestamp that is *after* its modification timestamp.
+    // As a result, both things need to be checked.
+    QDateTime lastRealModification = std::max(info.lastModified(), info.created());
+
+    // Using QFileSystemWatcher to monitor file changes is not
+    // very reliable, particularly on Windows.  Even on linux,
+    // there are cases where it's unreliable. So, we need to check
+    // some other file attributes for changes to get more reliable
+    // file monitoring.
     if(m_status == NoActivity) {
-        // On windows, it's possible to have a file with a creation
-        // timestamp that is *after* its modification timestamp.
-        // As a result, both things need to be checked.
-        QDateTime lastRealModification = std::max(info.lastModified(), info.created());
-        if(!info.exists() || m_lastModification < lastRealModification) {
+        if(!info.exists() || m_lastModification < lastRealModification || m_lastSize != info.size()) {
             m_status = FileChanged;
         }
+
     }
 
     if(m_status != NoActivity) {
-        m_lastModification = info.lastModified();
+        m_lastModification = lastRealModification;
+        m_lastSize = info.size();
 
         if(info.exists()) {
             // Check if the file needs to be added to the
