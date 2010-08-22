@@ -8,6 +8,7 @@
 YFileSystemWatcher::YFileSystemWatcher(const QString & filename)
     : m_watcher(new QFileSystemWatcher(this))
     , m_timer(new QTimer(this))
+    , m_status(NoActivity)
     , m_filename(filename)
     , m_lastSize(0)
 {
