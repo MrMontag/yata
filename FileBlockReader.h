@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include "BufferedFile.h"
+
 class QString;
 
 class FileBlockReader {
@@ -28,6 +30,6 @@ private:
         qint64 start_pos, qint64 num_lines);
 
 private:
-	QFile m_file;
+    BufferedFile m_file;
 };
 #endif

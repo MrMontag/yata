@@ -9,6 +9,7 @@ class QString;
 class QTextBlock;
 class QTextCursor;
 class DocumentSearch;
+class FileBlockReader;
 class YFileCursor;
 class YFileSystemWatcherThread;
 class YTextDocument;
@@ -70,6 +71,7 @@ private:
 
     QScopedPointer<DocumentSearch> m_documentSearch;
     QScopedPointer<YFileCursor> m_fileCursor;
+    QScopedPointer<FileBlockReader> m_blockReader;
 };
 
 #endif

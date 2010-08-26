@@ -7,6 +7,7 @@
 
 // TODO: Ctrl+W: close; Ctrl+Shift+W: close all; close all but current
 // TODO: movable tabs
+// TODO: icons
 
 YTabWidget::YTabWidget(QWidget *parent)
     : QTabWidget(parent)

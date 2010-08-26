@@ -26,8 +26,6 @@
 const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
 const int PAGE_STEP_OVERLAP = 2;
 
-
-//TODO: Home and end keys
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
@@ -207,10 +205,10 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 
 void TailView::onFileChanged()
 {
+    m_blockReader.reset(new FileBlockReader(m_filename));
     if(m_fullLayout) {
-        FileBlockReader reader(m_filename);
         QString data;
-        reader.readAll(&data, &m_lineAddresses);
+        m_blockReader->readAll(&data, &m_lineAddresses);
         setDocumentText(data);
     } else {
         updateDocumentForPartialLayout();
@@ -324,13 +322,13 @@ void TailView::keyPressEvent(QKeyEvent * event)
 void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
 {
     if(m_fullLayout) { return; }
+    if(m_blockReader.isNull()) { return; }
 
-    FileBlockReader reader(m_filename);
     const int lines_on_screen = numLinesOnScreen();
     const int visible_lines = lines_on_screen + 1;
 
     // TODO: account for wrapped lines when computing bottom_screen_pos
-    const qint64 bottom_screen_pos = reader.getStartPosition(reader.size(), -lines_on_screen);
+    const qint64 bottom_screen_pos = m_blockReader->getStartPosition(m_blockReader->size(), -lines_on_screen);
 
     const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
     updateScrollBars(approx_lines);
@@ -346,11 +344,11 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
         }
 
-        file_pos = reader.getStartPosition(file_pos, line_change);
+        file_pos = m_blockReader->getStartPosition(file_pos, line_change);
         file_pos = std::min(file_pos, bottom_screen_pos);
 
         QString data;
-        m_lastFileAddress = reader.readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
+        m_lastFileAddress = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
 
         setDocumentText(data);
         performLayout();
@@ -359,7 +357,7 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         file_pos = m_lastFileAddress;
         if(line_change < 0) {
             QString data;
-            file_pos = reader.readChunk(&data, &m_lineAddresses, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
+            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
             setDocumentText(data);
             performLayout();
 
@@ -393,10 +391,10 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
             m_firstVisibleBlock = 0;
 
-            file_pos = reader.getStartPosition(file_pos, real_line_count);
+            file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
             QString data;
-            file_pos = reader.readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
+            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
             setDocumentText(data);
             performLayout();
 

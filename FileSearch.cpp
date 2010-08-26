@@ -43,7 +43,6 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
 
     while(true) {
         if(isMatch(regex, &m_fileCursor, &reader, lineOffset, isForward)) {
-            qDebug() << m_fileCursor.m_lineAddress << m_fileCursor.m_charPos << m_fileCursor.m_length;
             return true;
         }
 

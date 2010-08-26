@@ -45,7 +45,6 @@ void YFileSystemWatcher::on_timer_timeout()
         if(!info.exists() || m_lastModification < lastRealModification || m_lastSize != info.size()) {
             m_status = FileChanged;
         }
-
     }
 
     if(m_status != NoActivity) {

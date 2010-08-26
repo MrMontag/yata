@@ -19,7 +19,8 @@ HEADERS += MainWindow.h \
     YFileCursor.h \
     YApplication.h \
     YTextDocument.h \
-    YTabWidget.h
+    YTabWidget.h \
+    BufferedFile.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
@@ -34,6 +35,7 @@ SOURCES += main.cpp \
     YFileSystemWatcherThread.cpp \
     YApplication.cpp \
     YTextDocument.cpp \
-    YTabWidget.cpp
+    YTabWidget.cpp \
+    BufferedFile.cpp
 RESOURCES += TailViewResources.qrc
 RC_FILE = yata_win.rc
