@@ -25,7 +25,7 @@ qint64 BufferedFile::size() const
 bool BufferedFile::getChar(qint64 pos, char * ch)
 {
     if(pos < 0 || pos >= m_size) { return false; }
-    if(!m_buffer || pos < m_buffer_pos || pos > m_buffer_pos + BUFFER_SIZE) {
+    if(!m_buffer || pos < m_buffer_pos || pos >= m_buffer_pos + BUFFER_SIZE) {
         if(m_buffer) { m_file.unmap(m_buffer); }
         m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
         qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
