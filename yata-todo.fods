@@ -51,6 +51,7 @@
       
       
       
+      
       <meta:document-statistic meta:table-count="3" meta:cell-count="60" meta:object-count="0"/>
    </office:meta>
    <office:settings>
@@ -64,7 +65,7 @@
                <config:config-item config:name="ViewId" config:type="string">View1</config:config-item>
                <config:config-item-map-named config:name="Tables">
                   <config:config-item-map-entry config:name="Sheet1">
-                     <config:config-item config:name="CursorPositionX" config:type="int">2</config:config-item>
+                     <config:config-item config:name="CursorPositionX" config:type="int">0</config:config-item>
                      <config:config-item config:name="CursorPositionY" config:type="int">1</config:config-item>
                      <config:config-item config:name="HorizontalSplitMode" config:type="short">0</config:config-item>
                      <config:config-item config:name="VerticalSplitMode" config:type="short">0</config:config-item>
@@ -277,7 +278,7 @@
             </style:region-left>
             <style:region-right>
                <text:p>
-                  <text:date style:data-style-name="N2" text:date-value="2010-07-06">07/06/2010</text:date>, <text:time>22:37:30</text:time> 
+                  <text:date style:data-style-name="N2" text:date-value="2010-08-30">08/30/2010</text:date>, <text:time>21:46:35</text:time> 
                </text:p>
             </style:region-right>
          </style:header>
@@ -311,18 +312,6 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>Fix for bottom screen with wrapped lines (bottom line rendering beyond edge of view)</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="2">
-                  <text:p>2</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
                   <text:p>Fix first line rendering too close to top of widget</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
@@ -335,73 +324,13 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>vertical scrollbar stays put when file changes</text:p>
+                  <text:p>Fix for bottom screen with wrapped lines (bottom line rendering beyond edge of view)</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="float" office:value="2">
                   <text:p>2</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>Detection of file deletion</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="3">
-                  <text:p>3</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>Detection of file creation</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="3">
-                  <text:p>3</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>horizontal scrollbar implementation</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="3">
-                  <text:p>3</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>regex searching</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="3">
-                  <text:p>3</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
-                  <text:p>text highlighting</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="3">
-                  <text:p>3</text:p>
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
@@ -419,7 +348,19 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>Investigate why QFileSystemWatcher fails when vim saves file (possibly will be fixed when file deletion/creation is done)</text:p>
+                  <text:p>fonts</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="4">
+                  <text:p>4</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>horizontal scrollbar implementation</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
@@ -443,18 +384,6 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>tabs for multiple files open</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="string">
-                  <text:p>no</text:p>
-               </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="4">
-                  <text:p>4</text:p>
-               </table:table-cell>
-               <table:table-cell table:number-columns-repeated="1021"/>
-            </table:table-row>
-            <table:table-row table:style-name="ro1">
-               <table:table-cell office:value-type="string">
                   <text:p>preferences (saving, editing, UI, etc.)</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
@@ -467,13 +396,25 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>fonts</text:p>
+                  <text:p>text highlighting</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>no</text:p>
                </table:table-cell>
-               <table:table-cell office:value-type="float" office:value="4">
-                  <text:p>4</text:p>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>vertical scrollbar stays put when file changes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>no</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="2">
+                  <text:p>2</text:p>
                </table:table-cell>
                <table:table-cell table:number-columns-repeated="1021"/>
             </table:table-row>
@@ -503,6 +444,30 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
+                  <text:p>Detection of file creation</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>yes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>Detection of file deletion</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>yes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
                   <text:p>Fix for page up/down and arrow up/down and bottom screen of file</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
@@ -515,7 +480,43 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>vertical scrollbar: bottom of file is at bottom of screen when vscrollbar's value is at maximum</text:p>
+                  <text:p>Investigate why QFileSystemWatcher fails when vim saves file (possibly will be fixed when file deletion/creation is done)</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>yes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>regex searching</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>yes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="3">
+                  <text:p>3</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>tabs for multiple files open</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="string">
+                  <text:p>yes</text:p>
+               </table:table-cell>
+               <table:table-cell office:value-type="float" office:value="4">
+                  <text:p>4</text:p>
+               </table:table-cell>
+               <table:table-cell table:number-columns-repeated="1021"/>
+            </table:table-row>
+            <table:table-row table:style-name="ro1">
+               <table:table-cell office:value-type="string">
+                  <text:p>vertical scrollbar fixes for incremental up/down</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>yes</text:p>
@@ -527,7 +528,7 @@
             </table:table-row>
             <table:table-row table:style-name="ro1">
                <table:table-cell office:value-type="string">
-                  <text:p>vertical scrollbar fixes for incremental up/down</text:p>
+                  <text:p>vertical scrollbar: bottom of file is at bottom of screen when vscrollbar's value is at maximum</text:p>
                </table:table-cell>
                <table:table-cell office:value-type="string">
                   <text:p>yes</text:p>
@@ -551,11 +552,11 @@
             </table:table-row>
          </table:table>
          <table:database-ranges>
-            <table:database-range table:target-range-address="Sheet1.A2:Sheet1.AMJ1048576"
+            <table:database-range table:target-range-address="Sheet1.A1:Sheet1.AMJ1048576"
                                   table:contains-header="false">
                <table:sort>
                   <table:sort-by table:field-number="1" table:data-type="automatic"/>
-                  <table:sort-by table:field-number="2" table:data-type="automatic"/>
+                  <table:sort-by table:field-number="0" table:data-type="automatic"/>
                </table:sort>
             </table:database-range>
          </table:database-ranges>
