@@ -1,18 +1,20 @@
 #include "BufferedFile.h"
-#include <QFile>
+#include <algorithm>
+
+const qint64 BUFFER_SIZE = 16384; // 16k
 
 BufferedFile::BufferedFile(const QString & filename)
-    : m_pos(0)
+    : m_buffer(0)
+    , m_buffer_pos(-1)
     , m_size(0)
-    , m_buffer(0)
-    , m_filename(filename)
+    , m_file(filename)
 {
+    m_file.open(QIODevice::ReadOnly);
+    m_size = m_file.size();
 }
 
 BufferedFile::~BufferedFile()
 {
-    delete [] m_buffer;
-    m_buffer = 0;
 }
 
 qint64 BufferedFile::size() const
@@ -20,48 +22,21 @@ qint64 BufferedFile::size() const
     return m_size;
 }
 
-bool BufferedFile::open(OpenMode mode)
+bool BufferedFile::getChar(qint64 pos, char * ch)
 {
-    QFile file(m_filename);
-    if(QIODevice::open(mode) && file.open(mode)) {
-        m_size = file.size();
-        m_buffer = new char[m_size];
-        file.read(m_buffer, m_size);
-        return true;
+    if(pos < 0 || pos >= m_size) { return false; }
+    if(!m_buffer || pos < m_buffer_pos || pos > m_buffer_pos + BUFFER_SIZE) {
+        if(m_buffer) { m_file.unmap(m_buffer); }
+        m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
+        qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
+        m_buffer = m_file.map(m_buffer_pos, size);
+    }
+
+    if(ch) {
+       *ch = m_buffer[pos - m_buffer_pos];
+       return true;
     }
 
     return false;
 }
 
-qint64 BufferedFile::pos() const
-{
-    return m_pos;
-}
-
-bool BufferedFile::seek(qint64 pos)
-{
-    if(QIODevice::seek(pos)) {
-        if(pos < size()) {
-            m_pos = pos;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-qint64 BufferedFile::readData(char *data, qint64 maxlen)
-{
-    if(m_pos >= size()) { return -1; }
-
-    qint64 tocopy = std::min<qint64>(maxlen, size() - m_pos);
-
-    memcpy(data, m_buffer + m_pos, tocopy);
-    m_pos += tocopy;
-    return tocopy;
-}
-
-qint64 BufferedFile::writeData(const char * /*data*/, qint64 /*len*/)
-{
-    return -1;
-}

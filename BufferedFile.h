@@ -1,28 +1,22 @@
 #ifndef BUFFEREDFILE_H
 #define BUFFEREDFILE_H
 
-#include <QIODevice>
-#include <QString>
+#include <QFile>
 
 
-class BufferedFile: public QIODevice {
+class BufferedFile {
 public:
     BufferedFile(const QString & filename);
     ~BufferedFile();
 
-    virtual qint64 pos() const;
-    virtual bool seek(qint64 pos);
-    virtual qint64 size() const;
-    virtual bool open(OpenMode mode);
-protected:
-    virtual qint64 readData(char *data, qint64 maxlen);
-    virtual qint64 writeData(const char *data, qint64 len);
+    qint64 size() const;
+    bool getChar(qint64 pos, char * ch);
 
 private:
-    qint64 m_pos;
+    uchar * m_buffer;
+    qint64 m_buffer_pos;
     qint64 m_size;
-    char * m_buffer;
-    QString m_filename;
+    QFile m_file;
 };
 
 #endif // BUFFEREDFILE_H
