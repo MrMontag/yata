@@ -48,18 +48,21 @@ private:
     int numLinesOnScreen() const;
     void setDocumentText(const QString & data);
     void updateScrollBars(int lines);
-    void updateDocumentForPartialLayout(int line_change = 0);
+    void updateDocumentForPartialLayout(int line_change = 0, qint64 new_line_address = -1);
     void performLayout();
 
     void searchFile(bool isForward);
     bool searchDocument(bool isForward, bool wrapAround = true);
     void scrollToIfNecessary(const QTextCursor & cursor);
 
+    // TODO: move to YTextCursor
+    QTextCursor qTextCursor(const YFileCursor & fileCursor);
 private:
     QString m_filename;
     QScopedPointer<YTextDocument> m_document;
     QScopedPointer<YFileSystemWatcherThread> m_watcher;
 
+    // TODO: YTextDocument should own m_lineAddresses
     std::vector<qint64> m_lineAddresses;
 
     bool m_fullLayout;
@@ -70,6 +73,8 @@ private:
     qint64 m_lastFileAddress;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
+
+    // TODO: YTextDocument should own m_fileCursor
     QScopedPointer<YFileCursor> m_fileCursor;
     QScopedPointer<FileBlockReader> m_blockReader;
 };

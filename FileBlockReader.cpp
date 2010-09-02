@@ -87,7 +87,7 @@ std::pair<qint64, qint64> FileBlockReader::read(QString * data, std::vector<qint
             if(line_count >= num_lines) {
                 break;
             }
-            filePositions->push_back(pos);
+            filePositions->push_back(pos + 1);
         }
         pos++;
     }

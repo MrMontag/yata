@@ -124,11 +124,8 @@ void TailView::searchFile(bool isForward)
             YFileCursor cursor(fileSearch.cursor());
             *m_fileCursor = cursor;
 
-            // TODO: scroll match to exactly middle of screen (it's sort of
-            // scrolled towards the top currently)
-            int newTopLine = m_fileCursor->m_lineAddress / APPROXIMATE_CHARS_PER_LINE;
-            verticalScrollBar()->setSliderPosition(newTopLine - numLinesOnScreen() / 2);
-            updateDocumentForPartialLayout(0);
+            int line_change = -(numLinesOnScreen()/2);
+            updateDocumentForPartialLayout(line_change, m_fileCursor->m_lineAddress);
         }
     }
 
@@ -146,7 +143,9 @@ void TailView::searchFile(bool isForward)
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
-    if(m_documentSearch->cursor().isNull()) {
+    if(!m_fileCursor->isNull()) {
+        m_documentSearch->setCursor(qTextCursor(*m_fileCursor));
+    } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
         QTextBlock block = m_document->findBlockAtLayoutPosition(topLine, &layoutLine);
@@ -164,6 +163,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
 
     if(foundMatch) {
         const QTextCursor & searchCursor = m_documentSearch->cursor();
+        m_document->select(searchCursor);
         int blockNum = searchCursor.block().blockNumber();
         m_fileCursor->m_lineAddress = m_lineAddresses[blockNum];
         int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
@@ -203,6 +203,27 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
     }
 }
 
+QTextCursor TailView::qTextCursor(const YFileCursor & fileCursor)
+{
+    if(fileCursor.isNull()) { return QTextCursor(); }
+
+    std::vector<qint64>::const_iterator itr =
+        std::lower_bound(m_lineAddresses.begin(), m_lineAddresses.end(), fileCursor.m_lineAddress);
+
+    if(itr == m_lineAddresses.end() || *itr != fileCursor.m_lineAddress) {
+        return QTextCursor();
+    }
+
+    int blockNum = itr - m_lineAddresses.begin();
+
+    QTextCursor cursor(m_document->document()->findBlockByNumber(blockNum));
+
+    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, fileCursor.m_charPos);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fileCursor.m_length);
+
+    return cursor;
+}
+
 void TailView::onFileChanged()
 {
     m_blockReader.reset(new FileBlockReader(m_filename));
@@ -228,23 +249,7 @@ void TailView::onFileDeleted()
 void TailView::setDocumentText(const QString & data)
 {
     m_document->setText(data);
-
-    std::vector<qint64>::const_iterator itr = std::lower_bound(m_lineAddresses.begin(), m_lineAddresses.end(), m_fileCursor->m_lineAddress);
-
-    if(itr == m_lineAddresses.end() || *itr != m_fileCursor->m_lineAddress) {
-        m_documentSearch->setCursor(QTextCursor());
-        return;
-    }
-
-    int blockNum = itr - m_lineAddresses.begin();
-
-    QTextCursor cursor(m_document->document()->findBlockByNumber(blockNum));
-
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_fileCursor->m_charPos);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_fileCursor->m_length);
-
-    m_documentSearch->setCursor(cursor);
-
+    m_document->select(qTextCursor(*m_fileCursor));
 }
 
 void TailView::performLayout()
@@ -319,7 +324,7 @@ void TailView::keyPressEvent(QKeyEvent * event)
     }
 }
 
-void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
+void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */, qint64 new_line_address /* = -1*/)
 {
     if(m_fullLayout) { return; }
     if(m_blockReader.isNull()) { return; }
@@ -334,17 +339,27 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
     updateScrollBars(approx_lines);
 
     qint64 file_pos = 0;
-    if(0 == line_change) {
+    if(0 == line_change || new_line_address != -1) {
         m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
         m_firstVisibleBlock = 0;
         m_firstVisibleBlockLine = 0;
-        if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
+
+        if(new_line_address != -1) {
+            file_pos = new_line_address;
+        } else if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
             file_pos = bottom_screen_pos;
         } else {
             file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
         }
 
-        file_pos = m_blockReader->getStartPosition(file_pos, line_change);
+        file_pos = m_blockReader->getStartPosition(file_pos, 0);
+
+        // Don't change the line further if we're at the bottom
+        if(file_pos > bottom_screen_pos) {
+            line_change = 0;
+            verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+        }
+
         file_pos = std::min(file_pos, bottom_screen_pos);
 
         QString data;
@@ -353,11 +368,15 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
         setDocumentText(data);
         performLayout();
 
-    } else {
+    }
+
+    if(line_change != 0)
+    {
         file_pos = m_lastFileAddress;
         if(line_change < 0) {
             QString data;
-            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, line_change + m_firstVisibleBlock, visible_lines).first;
+            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos,
+                line_change + m_firstVisibleBlock, visible_lines).first;
             setDocumentText(data);
             performLayout();
 
@@ -372,7 +391,10 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */)
             m_firstVisibleBlockLine += line_change;
 
             m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
-            for(QTextBlock block = m_document->document()->firstBlock(); block.blockNumber() < m_firstVisibleBlock; block = block.next()) {
+            for(QTextBlock block = m_document->document()->firstBlock();
+                block.blockNumber() < m_firstVisibleBlock;
+                block = block.next()) {
+
                 m_firstVisibleLayoutLine += block.layout()->lineCount();
             }
 

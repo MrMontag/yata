@@ -7,6 +7,7 @@
 
 class QTextBlock;
 class QTextDocument;
+class QTextCursor;
 
 class YTextDocument {
 public:
@@ -20,11 +21,14 @@ public:
     QTextDocument * document();
     int numLayoutLines() const;
 
+    void select(const QTextCursor & cursor);
+
 private:
     int layoutBlock(QTextBlock * textBlock);
 
 private:
     QScopedPointer<QTextDocument> m_document;
+    QScopedPointer<QTextCursor> m_selectedCursor;
 
     int m_numLayoutLines;
     std::vector<int> m_blockLayoutPositions;

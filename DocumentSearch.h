@@ -19,7 +19,6 @@ public:
 
 private:
     void resetSearchCursor(bool isTop);
-    void highlightCursor();
 private:
     QTextDocument * m_document;
 
