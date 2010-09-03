@@ -18,12 +18,18 @@ class TailView: public QAbstractScrollArea {
     Q_OBJECT
 
 public:
+    enum LayoutType {
+        FullLayout,
+        PartialLayout,
+        AutomaticLayout
+    };
+
     TailView(QWidget * parent);
     ~TailView();
     void setFile(const QString & filename);
 
-    void setFullLayout(bool fullLayout);
-    bool isFullLayout() const;
+    void setLayoutType(LayoutType layoutType);
+    LayoutType layoutType() const;
 
     const QString & lastSearchString() const;
     bool searchWasRegex() const;
@@ -66,6 +72,7 @@ private:
     std::vector<qint64> m_lineAddresses;
 
     bool m_fullLayout;
+    LayoutType m_layoutType;
 
     int m_firstVisibleLayoutLine;
     int m_firstVisibleBlock;

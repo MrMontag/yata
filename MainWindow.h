@@ -23,13 +23,19 @@ private slots:
     void on_action_Find_triggered();
     void on_action_Open_triggered();
 	void on_action_Exit_triggered();
-    void on_action_FullLayout_triggered(bool isChecked);
     void on_tabWidget_currentChanged(int index);
+
+    void layoutAction();
 private:
     TailView * getCurrentView();
+    void addDebugMenu();
 private:
     YTabWidget * m_tabWidget;
     QString m_currentOpenDir;
 	Ui::MainWindow ui;
+
+    QAction * m_fullLayoutAction;
+    QAction * m_partialLayoutAction;
+    QAction * m_automaticLayoutAction;
 };
 #endif

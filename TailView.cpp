@@ -30,6 +30,7 @@ TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
     , m_fullLayout(false)
+    , m_layoutType(AutomaticLayout)
     , m_firstVisibleLayoutLine(0)
     , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
@@ -62,15 +63,16 @@ void TailView::setFile(const QString & filename)
     onFileChanged();
 }
 
-void TailView::setFullLayout(bool fullLayout)
+void TailView::setLayoutType(LayoutType layoutType)
 {
-    m_fullLayout = fullLayout;
+    m_layoutType = layoutType;
+    m_fullLayout = (layoutType == FullLayout);
     onFileChanged();
 }
 
-bool TailView::isFullLayout() const
+TailView::LayoutType TailView::layoutType() const
 {
-    return m_fullLayout;
+    return m_layoutType;
 }
 
 const QString & TailView::lastSearchString() const
