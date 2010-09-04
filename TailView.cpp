@@ -23,8 +23,9 @@
 #include <cmath>
 #include <algorithm>
 
-const qint64 APPROXIMATE_CHARS_PER_LINE = 10;
+const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 const int PAGE_STEP_OVERLAP = 2;
+const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
@@ -66,7 +67,6 @@ void TailView::setFile(const QString & filename)
 void TailView::setLayoutType(LayoutType layoutType)
 {
     m_layoutType = layoutType;
-    m_fullLayout = (layoutType == FullLayout);
     onFileChanged();
 }
 
@@ -229,6 +229,15 @@ QTextCursor TailView::qTextCursor(const YFileCursor & fileCursor)
 void TailView::onFileChanged()
 {
     m_blockReader.reset(new FileBlockReader(m_filename));
+
+    switch(m_layoutType) {
+    case FullLayout: m_fullLayout = true; break;
+    case PartialLayout: m_fullLayout = false; break;
+    case AutomaticLayout:
+        m_fullLayout = (m_blockReader->size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+        break;
+    }
+
     if(m_fullLayout) {
         QString data;
         m_blockReader->readAll(&data, &m_lineAddresses);
