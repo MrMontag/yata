@@ -8,6 +8,8 @@
 #include <QMessageBox>
 #include <QTextStream>
 
+// TODO: figure out disabling/enabling menu items
+
 MainWindow::MainWindow()
     : m_fullLayoutAction(0)
     , m_partialLayoutAction(0)

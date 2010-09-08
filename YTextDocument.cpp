@@ -18,6 +18,7 @@ YTextDocument::YTextDocument(const QString & text)
     , m_needs_layout(false)
 {
     m_document->setUndoRedoEnabled(false);
+    m_document->setUseDesignMetrics(true);
     if(!text.isEmpty()) {
         setText(text);
     }
