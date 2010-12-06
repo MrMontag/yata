@@ -31,6 +31,9 @@ public:
     void setLayoutType(LayoutType layoutType);
     LayoutType layoutType() const;
 
+    void setFollowTail(bool enabled);
+    bool followTail() const;
+
     const QString & lastSearchString() const;
     bool searchWasRegex() const;
     bool searchWasCaseSensitive() const;
@@ -73,6 +76,8 @@ private:
 
     bool m_fullLayout;
     LayoutType m_layoutType;
+
+    bool m_followTail;
 
     int m_firstVisibleLayoutLine;
     int m_firstVisibleBlock;

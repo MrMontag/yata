@@ -132,6 +132,8 @@ void MainWindow::on_tabWidget_currentChanged(int index)
             case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction; break;
         }
         toBeChecked->setChecked(true);
+
+        ui.actionFollow_tail->setChecked(tailView->followTail());
     }
 }
 
@@ -168,4 +170,11 @@ void MainWindow::layoutAction()
     if(TailView * tailView = getCurrentView()) {
         tailView->setLayoutType(layoutType);
     }
+}
+
+void MainWindow::on_actionFollow_tail_triggered(bool checked)
+{
+   if(TailView * tailView = getCurrentView()) {
+       tailView->setFollowTail(checked);
+   }
 }

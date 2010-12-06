@@ -32,6 +32,7 @@ TailView::TailView(QWidget * parent)
     , m_document(new YTextDocument)
     , m_fullLayout(false)
     , m_layoutType(AutomaticLayout)
+    , m_followTail(true)
     , m_firstVisibleLayoutLine(0)
     , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
@@ -242,11 +243,24 @@ void TailView::onFileChanged()
         QString data;
         m_blockReader->readAll(&data, &m_lineAddresses);
         setDocumentText(data);
+        if(followTail()) {
+            verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+        }
     } else {
         updateDocumentForPartialLayout();
     }
 
     viewport()->update();
+}
+
+void TailView::setFollowTail(bool enabled)
+{
+    m_followTail = enabled;
+}
+
+bool TailView::followTail() const
+{
+    return m_followTail;
 }
 
 void TailView::onFileDeleted()
@@ -378,7 +392,6 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */, qint64 
 
         setDocumentText(data);
         performLayout();
-
     }
 
     if(line_change != 0)

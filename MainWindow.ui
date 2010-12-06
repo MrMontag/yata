@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -28,8 +28,6 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
-    <addaction name="separator"/>
-    <addaction name="actionRefresh"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
@@ -48,8 +46,16 @@
     <addaction name="actionAbout_Qt"/>
     <addaction name="action_About_Yata"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionRefresh"/>
+    <addaction name="actionFollow_tail"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
+   <addaction name="menu_View"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -117,6 +123,17 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionFollow_tail">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Follow tail</string>
    </property>
   </action>
  </widget>
