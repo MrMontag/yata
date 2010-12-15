@@ -15,7 +15,6 @@ BufferedFile::BufferedFile(const QString & filename)
     , m_size(0)
     , m_file(filename)
 {
-    m_file.open(QIODevice::ReadOnly);
     m_size = m_file.size();
 }
 
@@ -35,7 +34,9 @@ bool BufferedFile::getChar(qint64 pos, char * ch)
         if(m_buffer) { m_file.unmap(m_buffer); }
         m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
         qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
+        m_file.open(QIODevice::ReadOnly);
         m_buffer = m_file.map(m_buffer_pos, size);
+        m_file.close();
     }
 
     if(ch) {

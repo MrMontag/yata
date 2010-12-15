@@ -32,7 +32,9 @@ YTabWidget::YTabWidget(QWidget *parent)
 
 void YTabWidget::on_tabCloseRequested(int index)
 {
+    QWidget * to_delete = widget(index);
     removeTab(index);
+    delete to_delete;
 }
 
 void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
