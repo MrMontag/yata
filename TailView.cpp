@@ -134,7 +134,7 @@ void TailView::searchFile(bool isForward)
             *m_fileCursor = cursor;
 
             int line_change = -(numLinesOnScreen()/2);
-            updateDocumentForPartialLayout(line_change, m_fileCursor->m_lineAddress);
+            updateDocumentForPartialLayout(false, line_change, m_fileCursor->m_lineAddress);
         }
     }
 
@@ -208,7 +208,7 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
         verticalScrollBar()->setValue(newTopLine);
     } else {
         int lineChange = newTopLine - topScreenLine;
-        updateDocumentForPartialLayout(lineChange);
+        updateDocumentForPartialLayout(false, lineChange);
     }
 }
 
@@ -250,10 +250,11 @@ void TailView::onFileChanged()
         m_blockReader->readAll(&data, &m_lineAddresses);
         setDocumentText(data);
         if(followTail()) {
+            performLayout();
             verticalScrollBar()->setValue(verticalScrollBar()->maximum());
         }
     } else {
-        updateDocumentForPartialLayout();
+        updateDocumentForPartialLayout(true);
     }
 
     viewport()->update();
@@ -262,6 +263,7 @@ void TailView::onFileChanged()
 void TailView::setFollowTail(bool enabled)
 {
     m_followTail = enabled;
+    onFileChanged();
 }
 
 bool TailView::followTail() const
@@ -355,7 +357,7 @@ void TailView::keyPressEvent(QKeyEvent * event)
     }
 }
 
-void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */, qint64 new_line_address /* = -1*/)
+void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change /* = 0 */, qint64 new_line_address /* = -1 */)
 {
     if(m_fullLayout) { return; }
     if(m_blockReader.isNull()) { return; }
@@ -374,8 +376,11 @@ void TailView::updateDocumentForPartialLayout(int line_change /* = 0 */, qint64 
         m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
         m_firstVisibleBlock = 0;
         m_firstVisibleBlockLine = 0;
-
-        if(new_line_address != -1) {
+        
+        if(file_changed && followTail()) {
+            file_pos = bottom_screen_pos;
+            verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
+        } else if(new_line_address != -1) {
             file_pos = new_line_address;
         } else if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
             file_pos = bottom_screen_pos;

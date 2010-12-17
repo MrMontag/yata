@@ -63,7 +63,7 @@ private:
     int numLinesOnScreen() const;
     void setDocumentText(const QString & data);
     void updateScrollBars(int lines);
-    void updateDocumentForPartialLayout(int line_change = 0, qint64 new_line_address = -1);
+    void updateDocumentForPartialLayout(bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
     void performLayout();
 
     void searchFile(bool isForward);
