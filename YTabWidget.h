@@ -10,21 +10,36 @@
 #include <QTabWidget>
 
 class QToolButton;
+class QMenu;
 
 class YTabWidget : public QTabWidget {
 Q_OBJECT
 public:
     explicit YTabWidget(QWidget *parent = 0);
-
     void openTab(QWidget * child, const QString & fullName, const QString & shortName);
+    QMenu * contextMenu();
 
 private slots:
-    void on_tabCloseRequested(int index);
     void on_tabChooseMenuTriggered();
-private:
+    void on_tabCloseRequested(int index);
+    void closeCurrentTab();
+    void closeAllButCurrentTab();
+    void closeAllTabs();
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *);
     void tabRemoved(int index);
 private:
-    QToolButton * m_chooseTabButton;
+    void setCurrentTabIfNeeded();
+    void updateContextMenu();
+
+private:
+    QToolButton * m_buttonChooseTab;
+    QMenu * m_menuTab;
+    QAction * m_actionCloseTab;
+    QAction * m_actionCloseOtherTabs;
+    QAction * m_actionCloseAllTabs;
+    int m_tabIndexForContextMenu;
 };
 
 #endif // YTABWIDGET_H

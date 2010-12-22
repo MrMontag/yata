@@ -30,7 +30,10 @@ MainWindow::MainWindow()
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
     ui.action_About_Yata->setText(aboutYataText);
 
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(on_tabWidget_currentChanged(int)));
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(onCurrentTabChanged(int)));
+
+    ui.menu_File->insertActions(ui.action_Exit, m_tabWidget->contextMenu()->actions());
+    ui.menu_File->insertSeparator(ui.action_Exit);
 
     addDebugMenu();
 }
@@ -121,7 +124,7 @@ TailView * MainWindow::getCurrentView()
     return dynamic_cast<TailView*>(m_tabWidget->currentWidget());
 }
 
-void MainWindow::on_tabWidget_currentChanged(int index)
+void MainWindow::onCurrentTabChanged(int index)
 {
     if(index == -1) { // No tabs are open
         setWindowTitle(YApplication::displayAppName());

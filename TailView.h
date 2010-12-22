@@ -19,6 +19,9 @@ class FileBlockReader;
 class YFileCursor;
 class YFileSystemWatcherThread;
 class YTextDocument;
+class LayoutStrategy;
+class FullLayout;
+class PartialLayout;
 
 class TailView: public QAbstractScrollArea {
     Q_OBJECT

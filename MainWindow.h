@@ -30,7 +30,7 @@ private slots:
     void on_action_Find_triggered();
     void on_action_Open_triggered();
 	void on_action_Exit_triggered();
-    void on_tabWidget_currentChanged(int index);
+    void onCurrentTabChanged(int index);
 
     void layoutAction();
 private:

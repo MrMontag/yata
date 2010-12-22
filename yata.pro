@@ -24,7 +24,10 @@ HEADERS += MainWindow.h \
     YApplication.h \
     YTextDocument.h \
     YTabWidget.h \
-    BufferedFile.h
+    BufferedFile.h \
+    LayoutStrategy.h \
+    FullLayout.h \
+    PartialLayout.h
 FORMS += MainWindow.ui \
     SearchWidget.ui
 SOURCES += main.cpp \
@@ -40,6 +43,9 @@ SOURCES += main.cpp \
     YApplication.cpp \
     YTextDocument.cpp \
     YTabWidget.cpp \
-    BufferedFile.cpp
+    BufferedFile.cpp \
+    LayoutStrategy.cpp \
+    FullLayout.cpp \
+    PartialLayout.cpp
 RESOURCES += TailViewResources.qrc
 RC_FILE = yata_win.rc
