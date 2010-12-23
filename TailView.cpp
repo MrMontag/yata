@@ -515,7 +515,7 @@ void TailView::vScrollBarAction(int action)
         break;
     }
 
-    updateDocumentForPartialLayout(line_change);
+    updateDocumentForPartialLayout(false, line_change);
 }
 
 int TailView::numLinesOnScreen() const
