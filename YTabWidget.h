@@ -8,6 +8,7 @@
 #define YTABWIDGET_H
 
 #include <QTabWidget>
+#include <QScopedPointer>
 
 class QToolButton;
 class QMenu;
@@ -16,6 +17,7 @@ class YTabWidget : public QTabWidget {
 Q_OBJECT
 public:
     explicit YTabWidget(QWidget *parent = 0);
+    ~YTabWidget();
     void openTab(QWidget * child, const QString & fullName, const QString & shortName);
     QMenu * contextMenu();
 
@@ -25,6 +27,7 @@ private slots:
     void closeCurrentTab();
     void closeAllButCurrentTab();
     void closeAllTabs();
+    void onTabMoved(int from, int to);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *);
@@ -35,6 +38,7 @@ private:
 
 private:
     QToolButton * m_buttonChooseTab;
+    QScopedPointer<QMenu> m_menuChooseTab;
     QMenu * m_menuTab;
     QAction * m_actionCloseTab;
     QAction * m_actionCloseOtherTabs;

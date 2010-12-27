@@ -12,12 +12,12 @@
 #include <QToolButton>
 #include <QtDebug>
 
-// TODO: movable tabs
 // TODO: icons
 
 YTabWidget::YTabWidget(QWidget *parent)
     : QTabWidget(parent)
     , m_buttonChooseTab(new QToolButton(this))
+    , m_menuChooseTab(new QMenu(this))
     , m_menuTab(new QMenu(this))
     , m_tabIndexForContextMenu(-1)
 {
@@ -26,10 +26,12 @@ YTabWidget::YTabWidget(QWidget *parent)
 
     m_buttonChooseTab->setArrowType(Qt::DownArrow);
     m_buttonChooseTab->setPopupMode(QToolButton::InstantPopup);
-    m_buttonChooseTab->setMenu(new QMenu(m_buttonChooseTab));
+    m_buttonChooseTab->setMenu(m_menuChooseTab.data());
     setCornerWidget(m_buttonChooseTab);
+    setMovable(true);
 
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(on_tabCloseRequested(int)));
+    connect(tabBar(), SIGNAL(tabMoved(int,int)), SLOT(onTabMoved(int,int)));
 
     m_actionCloseTab = m_menuTab->addAction(
         tr("&Close tab"),
@@ -47,6 +49,10 @@ YTabWidget::YTabWidget(QWidget *parent)
         SLOT(closeAllTabs()));
 
     updateContextMenu();
+}
+
+YTabWidget::~YTabWidget()
+{
 }
 
 void YTabWidget::on_tabCloseRequested(int index)
@@ -67,7 +73,8 @@ void YTabWidget::openTab(QWidget * child, const QString & fullName, const QStrin
     child->setFocus();
     setTabToolTip(index, fullName);
 
-    QAction * action = m_buttonChooseTab->menu()->addAction(fullName);
+    QAction * action = new QAction(fullName, this);
+    m_menuChooseTab->addAction(action);
     connect(action, SIGNAL(triggered()), SLOT(on_tabChooseMenuTriggered()));
 
     setCurrentIndex(index);
@@ -101,12 +108,22 @@ void YTabWidget::closeAllTabs()
     }
 }
 
+void YTabWidget::onTabMoved(int from, int to)
+{
+    QList<QAction*> actions = m_menuChooseTab->actions();
+    actions.move(from, to);
+    QMenu * newMenu = new QMenu;
+    newMenu->addActions(actions);
+    m_buttonChooseTab->setMenu(newMenu);
+    m_menuChooseTab.reset(newMenu);
+}
+
 void YTabWidget::on_tabChooseMenuTriggered()
 {
     QAction * action = dynamic_cast<QAction*>(sender());
     if(!action) { return; }
 
-    int index = m_buttonChooseTab->menu()->actions().indexOf(action);
+    int index = m_menuChooseTab->actions().indexOf(action);
     setCurrentIndex(index);
 }
 
@@ -121,8 +138,9 @@ void YTabWidget::contextMenuEvent(QContextMenuEvent * e)
 
 void YTabWidget::tabRemoved(int index)
 {
-    QMenu * chooseTabMenu = m_buttonChooseTab->menu();
-    chooseTabMenu->removeAction(chooseTabMenu->actions().at(index));
+    QAction * action = m_menuChooseTab->actions().at(index);
+    m_menuChooseTab->removeAction(action);
+    delete action;
     updateContextMenu();
 }
 
