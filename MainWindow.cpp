@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "MainWindow.h"
@@ -9,10 +9,16 @@
 #include "YTabWidget.h"
 #include "SearchWidget.h"
 #include "YApplication.h"
+
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QTextStream>
+#include <QUrl>
 
 // TODO: figure out disabling/enabling menu items
 
@@ -36,9 +42,10 @@ MainWindow::MainWindow()
     ui.menu_File->insertSeparator(ui.action_Exit);
 
     addDebugMenu();
+
+    setAcceptDrops(true);
 }
 
-// TODO: drag and drop files! :-)
 void MainWindow::addFile(const QString & filename)
 {
     QFileInfo info(filename);
@@ -50,6 +57,45 @@ void MainWindow::addFile(const QString & filename)
     m_tabWidget->openTab(tailView, displayFilename, displayBase);
 }
 
+void MainWindow::dragEnterEvent(QDragEnterEvent * event)
+{
+    dragMoveEvent(event);
+}
+
+void MainWindow::dragMoveEvent(QDragMoveEvent * event)
+{
+    const QMimeData * mimeData = event->mimeData();
+    QList<QUrl> urlList = mimeData->urls();
+    for(int i = 0; i < urlList.size(); i++) {
+        QString filePath = urlList.at(i).toLocalFile();
+        if(!filePath.isEmpty()) {
+            event->accept();
+            return;
+        }
+    }
+
+    event->ignore();
+}
+
+void MainWindow::dropEvent(QDropEvent * event)
+{
+    bool accepted = false;
+    const QMimeData * mimeData = event->mimeData();
+    QList<QUrl> urlList = mimeData->urls();
+    for(int i = 0; i < urlList.size(); i++) {
+        QString filePath = urlList.at(i).toLocalFile();
+        if(!filePath.isEmpty()) {
+            addFile(filePath);
+            accepted = true;
+        }
+    }
+
+    if(accepted) {
+        event->accept();
+    } else {
+        event->ignore();
+    }
+}
 
 void MainWindow::on_action_Open_triggered()
 {

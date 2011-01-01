@@ -20,6 +20,10 @@ public:
 	void addFile(const QString & filename);
 signals:
     void fileOpened(const QString &);
+protected:
+        void dragEnterEvent(QDragEnterEvent *);
+        void dragMoveEvent(QDragMoveEvent *);
+        void dropEvent(QDropEvent *);
 private slots:
     void on_actionFollow_tail_triggered(bool checked);
     void on_actionRefresh_triggered();
