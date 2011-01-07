@@ -7,8 +7,8 @@
 #ifndef BUFFEREDFILE_H
 #define BUFFEREDFILE_H
 
-#include <QFile>
-
+#include <QString>
+#include <vector>
 
 class BufferedFile {
 public:
@@ -19,10 +19,10 @@ public:
     bool getChar(qint64 pos, char * ch);
 
 private:
-    uchar * m_buffer;
+    std::vector<uchar> m_buffer;
     qint64 m_buffer_pos;
     qint64 m_size;
-    QFile m_file;
+    QString m_filename;
 };
 
 #endif // BUFFEREDFILE_H

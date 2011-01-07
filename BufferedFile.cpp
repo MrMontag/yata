@@ -6,16 +6,17 @@
  */
 #include "BufferedFile.h"
 #include <algorithm>
+#include <QFileInfo>
+#include <QFile>
 
 const qint64 BUFFER_SIZE = 16384; // 16k
 
 BufferedFile::BufferedFile(const QString & filename)
-    : m_buffer(0)
-    , m_buffer_pos(-1)
+    : m_buffer_pos(-1)
     , m_size(0)
-    , m_file(filename)
+    , m_filename(filename)
 {
-    m_size = m_file.size();
+    m_size = QFileInfo(m_filename).size();
 }
 
 BufferedFile::~BufferedFile()
@@ -30,13 +31,13 @@ qint64 BufferedFile::size() const
 bool BufferedFile::getChar(qint64 pos, char * ch)
 {
     if(pos < 0 || pos >= m_size) { return false; }
-    if(!m_buffer || pos < m_buffer_pos || pos >= m_buffer_pos + BUFFER_SIZE) {
-        if(m_buffer) { m_file.unmap(m_buffer); }
+    if(m_buffer.empty() || pos < m_buffer_pos || pos >= m_buffer_pos + BUFFER_SIZE) {
         m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
         qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
-        m_file.open(QIODevice::ReadOnly);
-        m_buffer = m_file.map(m_buffer_pos, size);
-        m_file.close();
+        QFile file(m_filename);
+        file.open(QIODevice::ReadOnly);
+        uchar * buffer = file.map(m_buffer_pos, size);
+        m_buffer.assign(buffer, buffer + size);
     }
 
     if(ch) {
