@@ -1,13 +1,15 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "TailView.h"
 #include "FileBlockReader.h"
 #include "DocumentSearch.h"
 #include "FileSearch.h"
+#include "FullLayout.h"
+#include "PartialLayout.h"
 #include "YApplication.h"
 #include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
@@ -38,6 +40,9 @@ TailView::TailView(QWidget * parent)
     , m_document(new YTextDocument)
     , m_fullLayout(false)
     , m_layoutType(AutomaticLayout)
+    , m_fullLayoutStrategy(new FullLayout(this))
+    , m_partialLayoutStrategy(new PartialLayout(this))
+    , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
     , m_firstVisibleLayoutLine(0)
     , m_firstVisibleBlock(0)
@@ -115,39 +120,7 @@ void TailView::searchBackward()
 
 void TailView::searchFile(bool isForward)
 {
-    bool wrapAround = m_fullLayout;
-    bool matchFound = searchDocument(isForward, wrapAround);
-    if(matchFound) {
-        scrollToIfNecessary(m_documentSearch->cursor());
-    }
-
-    if(!m_fullLayout && !matchFound) {
-        FileSearch fileSearch(m_filename);
-        fileSearch.setCursor(*m_fileCursor);
-        fileSearch.setSearchCriteria(
-            m_documentSearch->lastSearchString(),
-            m_documentSearch->searchWasRegex(),
-            m_documentSearch->searchWasCaseSensitive());
-        if(fileSearch.searchFile(isForward, true)) {
-            matchFound = true;
-            YFileCursor cursor(fileSearch.cursor());
-            *m_fileCursor = cursor;
-
-            int line_change = -(numLinesOnScreen()/2);
-            updateDocumentForPartialLayout(false, line_change, m_fileCursor->m_lineAddress);
-        }
-    }
-
-    if(!matchFound) {
-        QString message;
-        QTextStream(&message)
-            << tr("Pattern \"")
-            << m_documentSearch->lastSearchString()
-            << tr("\" not found");
-        QMessageBox::information(this, YApplication::displayAppName(), message);
-    }
-
-    viewport()->update();
+    m_layoutStrategy->search(isForward);
 }
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
@@ -193,7 +166,7 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 
     cursorLineNumber += blockLine;
 
-    int topScreenLine = m_fullLayout ? verticalScrollBar()->value() : m_firstVisibleLayoutLine;
+    int topScreenLine = m_layoutStrategy->topScreenLine();
 
     int numReadableLines = numLinesOnScreen();
 
@@ -204,12 +177,7 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 
     int newTopLine = cursorLineNumber - numReadableLines / 2;
 
-    if(m_fullLayout) {
-        verticalScrollBar()->setValue(newTopLine);
-    } else {
-        int lineChange = newTopLine - topScreenLine;
-        updateDocumentForPartialLayout(false, lineChange);
-    }
+    m_layoutStrategy->scrollTo(newTopLine);
 }
 
 QTextCursor TailView::qTextCursor(const YFileCursor & fileCursor)
@@ -238,24 +206,20 @@ void TailView::onFileChanged()
     m_blockReader.reset(new FileBlockReader(m_filename));
 
     switch(m_layoutType) {
-    case FullLayout: m_fullLayout = true; break;
-    case PartialLayout: m_fullLayout = false; break;
+    case DebugFullLayout: m_fullLayout = true; break;
+    case DebugPartialLayout: m_fullLayout = false; break;
     case AutomaticLayout:
         m_fullLayout = (m_blockReader->size() <= MAX_FULL_LAYOUT_FILE_SIZE);
         break;
     }
 
     if(m_fullLayout) {
-        QString data;
-        m_blockReader->readAll(&data, &m_lineAddresses);
-        setDocumentText(data);
-        if(followTail()) {
-            performLayout();
-            verticalScrollBar()->setValue(verticalScrollBar()->maximum());
-        }
+        m_layoutStrategy = m_fullLayoutStrategy.data();
     } else {
-        updateDocumentForPartialLayout(true);
+        m_layoutStrategy = m_partialLayoutStrategy.data();
     }
+
+    m_layoutStrategy->onFileChanged();
 
     viewport()->update();
 }
@@ -287,11 +251,7 @@ void TailView::setDocumentText(const QString & data)
 
 void TailView::performLayout()
 {
-    m_document->layout(viewport()->width());
-
-    if(m_fullLayout) {
-        updateScrollBars(m_document->numLayoutLines());
-    }
+    m_layoutStrategy->performLayout();
 }
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
@@ -308,7 +268,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
         qreal height = fontMetrics.lineSpacing() * layout.lineCount();
 
-        int scrollValue = m_fullLayout ? verticalScrollBar()->sliderPosition() : m_firstVisibleLayoutLine;
+        int scrollValue = m_layoutStrategy->topScreenLine();
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout.boundingRect());
         layoutRect.moveTo(start);
@@ -327,11 +287,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
 void TailView::resizeEvent(QResizeEvent *)
 {
-    if(m_fullLayout) {
-        updateScrollBars(m_document->numLayoutLines());
-    } else {
-        updateDocumentForPartialLayout();
-    }
+    m_layoutStrategy->resizeEvent();
 }
 
 void TailView::keyPressEvent(QKeyEvent * event)
@@ -351,15 +307,13 @@ void TailView::keyPressEvent(QKeyEvent * event)
         break;
     }
 
-    if(handled && !m_fullLayout) {
-        updateDocumentForPartialLayout();
-        viewport()->update();
+    if(handled) {
+        m_layoutStrategy->updateAfterKeyPress();
     }
 }
 
 void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change /* = 0 */, qint64 new_line_address /* = -1 */)
 {
-    if(m_fullLayout) { return; }
     if(m_blockReader.isNull()) { return; }
 
     const int lines_on_screen = numLinesOnScreen();
@@ -376,7 +330,7 @@ void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change
         m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
         m_firstVisibleBlock = 0;
         m_firstVisibleBlockLine = 0;
-        
+
         if(file_changed && followTail()) {
             file_pos = bottom_screen_pos;
             verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());

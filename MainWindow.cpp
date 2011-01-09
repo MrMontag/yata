@@ -182,8 +182,8 @@ void MainWindow::onCurrentTabChanged(int index)
     if(TailView * tailView = getCurrentView()) {
         QAction * toBeChecked = 0;
         switch(tailView->layoutType()) {
-            case TailView::FullLayout: toBeChecked = m_fullLayoutAction; break;
-            case TailView::PartialLayout: toBeChecked = m_partialLayoutAction; break;
+            case TailView::DebugFullLayout: toBeChecked = m_fullLayoutAction; break;
+            case TailView::DebugPartialLayout: toBeChecked = m_partialLayoutAction; break;
             case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction; break;
         }
         toBeChecked->setChecked(true);
@@ -215,9 +215,9 @@ void MainWindow::layoutAction()
     QObject * senderObject = sender();
     TailView::LayoutType layoutType = TailView::AutomaticLayout;
     if(senderObject == m_fullLayoutAction) {
-        layoutType = TailView::FullLayout;
+        layoutType = TailView::DebugFullLayout;
     } else if(senderObject == m_partialLayoutAction) {
-        layoutType = TailView::PartialLayout;
+        layoutType = TailView::DebugPartialLayout;
     } else if(senderObject == m_automaticLayoutAction) {
         layoutType = TailView::AutomaticLayout;
     }

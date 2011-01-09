@@ -27,9 +27,15 @@ class TailView: public QAbstractScrollArea {
     Q_OBJECT
 
 public:
+    // TEMPORARY stopgap while layout stuff is being refactored.
+    // These friend class declarations should eventually be removed.
+    friend class LayoutStrategy;
+    friend class FullLayout;
+    friend class PartialLayout;
+
     enum LayoutType {
-        FullLayout,
-        PartialLayout,
+        DebugFullLayout,
+        DebugPartialLayout,
         AutomaticLayout
     };
 
@@ -85,6 +91,9 @@ private:
 
     bool m_fullLayout;
     LayoutType m_layoutType;
+    QScopedPointer<FullLayout> m_fullLayoutStrategy;
+    QScopedPointer<PartialLayout> m_partialLayoutStrategy;
+    LayoutStrategy * m_layoutStrategy;
 
     bool m_followTail;
 
