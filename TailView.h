@@ -23,6 +23,8 @@ class LayoutStrategy;
 class FullLayout;
 class PartialLayout;
 
+const int PAGE_STEP_OVERLAP = 2;
+
 class TailView: public QAbstractScrollArea {
     Q_OBJECT
 
@@ -30,7 +32,6 @@ public:
     // TEMPORARY stopgap while layout stuff is being refactored.
     // These friend class declarations should eventually be removed.
     friend class LayoutStrategy;
-    friend class FullLayout;
     friend class PartialLayout;
 
     enum LayoutType {
@@ -53,6 +54,14 @@ public:
     bool searchWasRegex() const;
     bool searchWasCaseSensitive() const;
 
+    // Functions used by the LayoutStrategy class and subclasses
+    FileBlockReader * blockReader() { return m_blockReader.data(); }
+    std::vector<qint64> & lineAddresses() { return m_lineAddresses; }
+    YTextDocument * document() { return m_document.data(); }
+    void setDocumentText(const QString & data);
+    void updateScrollBars(int lines, int visibleLines);
+    int numLinesOnScreen() const;
+
 public slots:
     void newSearch(const QString & searchString, bool isRegex, bool caseSensitive);
     void searchForward();
@@ -69,9 +78,6 @@ private slots:
     void vScrollBarAction(int action);
 
 private:
-    int numLinesOnScreen() const;
-    void setDocumentText(const QString & data);
-    void updateScrollBars(int lines);
     void updateDocumentForPartialLayout(bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
     void performLayout();
 
@@ -89,7 +95,6 @@ private:
     // TODO: YTextDocument should own m_lineAddresses
     std::vector<qint64> m_lineAddresses;
 
-    bool m_fullLayout;
     LayoutType m_layoutType;
     QScopedPointer<FullLayout> m_fullLayoutStrategy;
     QScopedPointer<PartialLayout> m_partialLayoutStrategy;

@@ -20,7 +20,7 @@ FullLayout::FullLayout(TailView * view)
 void FullLayout::onFileChanged()
 {
     QString data;
-    view()->m_blockReader->readAll(&data, &view()->m_lineAddresses);
+    view()->blockReader()->readAll(&data, &view()->lineAddresses());
     view()->setDocumentText(data);
     if(view()->followTail()) {
         performLayout();
@@ -31,12 +31,12 @@ void FullLayout::onFileChanged()
 void FullLayout::performLayout()
 {
     LayoutStrategy::performLayout();
-    view()->updateScrollBars(view()->m_document->numLayoutLines());
+    view()->updateScrollBars(view()->document()->numLayoutLines(), view()->numLinesOnScreen());
 }
 
 void FullLayout::resizeEvent()
 {
-    view()->updateScrollBars(view()->m_document->numLayoutLines());
+    view()->updateScrollBars(view()->document()->numLayoutLines(), view()->numLinesOnScreen());
 }
 
 int FullLayout::topScreenLine() const

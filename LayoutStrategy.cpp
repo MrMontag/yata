@@ -12,6 +12,7 @@
 #include "YApplication.h"
 
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QTextStream>
 
 LayoutStrategy::LayoutStrategy(TailView * tailView)
@@ -60,3 +61,14 @@ const TailView * LayoutStrategy::view() const
     return m_view;
 }
 
+void LayoutStrategy::vScrollBarAction(int /*action*/)
+{
+    QScrollBar * verticalScrollBar = view()->verticalScrollBar();
+    if(verticalScrollBar->sliderPosition() > verticalScrollBar->maximum()) {
+        verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
+    }
+
+    if(verticalScrollBar->sliderPosition() < verticalScrollBar->minimum()) {
+        verticalScrollBar->setSliderPosition(verticalScrollBar->minimum());
+    }
+}

@@ -21,6 +21,7 @@ public:
     virtual int topScreenLine() const = 0;
     virtual void scrollTo(int newTopLine) = 0;
     virtual void updateAfterKeyPress() = 0;
+    virtual void vScrollBarAction(int action);
 protected:
     LayoutStrategy(TailView * tailView);
 

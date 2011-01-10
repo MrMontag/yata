@@ -32,13 +32,11 @@
 #include <algorithm>
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
-const int PAGE_STEP_OVERLAP = 2;
 const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
-    , m_fullLayout(false)
     , m_layoutType(AutomaticLayout)
     , m_fullLayoutStrategy(new FullLayout(this))
     , m_partialLayoutStrategy(new PartialLayout(this))
@@ -205,15 +203,16 @@ void TailView::onFileChanged()
 {
     m_blockReader.reset(new FileBlockReader(m_filename));
 
+    bool fullLayout = false;
     switch(m_layoutType) {
-    case DebugFullLayout: m_fullLayout = true; break;
-    case DebugPartialLayout: m_fullLayout = false; break;
+    case DebugFullLayout: fullLayout = true; break;
+    case DebugPartialLayout: fullLayout = false; break;
     case AutomaticLayout:
-        m_fullLayout = (m_blockReader->size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+        fullLayout = (m_blockReader->size() <= MAX_FULL_LAYOUT_FILE_SIZE);
         break;
     }
 
-    if(m_fullLayout) {
+    if(fullLayout) {
         m_layoutStrategy = m_fullLayoutStrategy.data();
     } else {
         m_layoutStrategy = m_partialLayoutStrategy.data();
@@ -323,7 +322,9 @@ void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change
     const qint64 bottom_screen_pos = m_blockReader->getStartPosition(m_blockReader->size(), -lines_on_screen);
 
     const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
-    updateScrollBars(approx_lines);
+
+    // In partial layout, page up/down is handled manually, so just pass 0 for the visibleLines argument.
+    updateScrollBars(approx_lines, 0);
 
     qint64 file_pos = 0;
     if(0 == line_change || new_line_address != -1) {
@@ -417,21 +418,12 @@ void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change
     viewport()->update();
 }
 
-void TailView::updateScrollBars(int lines)
+void TailView::updateScrollBars(int lines, int visibleLines)
 {
-    // Since partial layout handles the scrollbars
-    // differently, the visible lines should not
-    // be taken into account. (TODO: candidate for
-    // possible refactoring; should this be
-    // decided here?)
-    int visibleLines = 0;
-    if(m_fullLayout) {
-        visibleLines = numLinesOnScreen();
-    }
-
-    if(lines != verticalScrollBar()->maximum() + visibleLines) {
+    int newMax = lines - visibleLines;
+    if(verticalScrollBar()->maximum() != newMax) {
         QScrollBar * vsb = verticalScrollBar();
-        vsb->setRange(0, lines - visibleLines);
+        vsb->setRange(0, newMax);
         vsb->setPageStep(visibleLines - PAGE_STEP_OVERLAP);
         vsb->setSingleStep(1);
     }
@@ -439,37 +431,7 @@ void TailView::updateScrollBars(int lines)
 
 void TailView::vScrollBarAction(int action)
 {
-    if(verticalScrollBar()->sliderPosition() > verticalScrollBar()->maximum()) {
-        verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
-    }
-
-    if(verticalScrollBar()->sliderPosition() < verticalScrollBar()->minimum()) {
-        verticalScrollBar()->setSliderPosition(verticalScrollBar()->minimum());
-    }
-
-    if(m_fullLayout) { return; }
-
-    int line_change = 0;
-    int page_step = numLinesOnScreen() - PAGE_STEP_OVERLAP;
-
-    switch(action) {
-    case QAbstractSlider::SliderSingleStepAdd:
-        line_change = 1;
-        break;
-    case QAbstractSlider::SliderSingleStepSub:
-        line_change = -1;
-        break;
-    case QAbstractSlider::SliderPageStepAdd:
-        line_change = page_step;
-        break;
-    case QAbstractSlider::SliderPageStepSub:
-        line_change = -page_step;
-        break;
-    default:
-        break;
-    }
-
-    updateDocumentForPartialLayout(false, line_change);
+    m_layoutStrategy->vScrollBarAction(action);
 }
 
 int TailView::numLinesOnScreen() const

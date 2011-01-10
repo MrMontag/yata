@@ -11,6 +11,8 @@
 #include "FileBlockReader.h"
 #include "TailView.h"
 
+#include <QScrollBar>
+
 PartialLayout::PartialLayout(TailView * tailView)
     : LayoutStrategy(tailView)
 {
@@ -69,3 +71,29 @@ void PartialLayout::updateAfterKeyPress()
     view()->viewport()->update();
 }
 
+void PartialLayout::vScrollBarAction(int action)
+{
+    LayoutStrategy::vScrollBarAction(action);
+
+    int line_change = 0;
+    int page_step = view()->numLinesOnScreen() - PAGE_STEP_OVERLAP;
+
+    switch(action) {
+    case QAbstractSlider::SliderSingleStepAdd:
+        line_change = 1;
+        break;
+    case QAbstractSlider::SliderSingleStepSub:
+        line_change = -1;
+        break;
+    case QAbstractSlider::SliderPageStepAdd:
+        line_change = page_step;
+        break;
+    case QAbstractSlider::SliderPageStepSub:
+        line_change = -page_step;
+        break;
+    default:
+        break;
+    }
+
+    view()->updateDocumentForPartialLayout(false, line_change);
+}
