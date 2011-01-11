@@ -8,6 +8,7 @@
 #define PARTIALLAYOUT_H
 
 #include "LayoutStrategy.h"
+#include <QtGlobal>
 
 class PartialLayout : public LayoutStrategy
 {
@@ -23,6 +24,13 @@ public:
 protected:
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
+private:
+    void updateDocumentForPartialLayout(bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
+private:
+    int m_firstVisibleLayoutLine;
+    int m_firstVisibleBlock;
+    int m_firstVisibleBlockLine;
+    qint64 m_lastFileAddress;
 };
 
 #endif // PARTIALLAYOUT_H

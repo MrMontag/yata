@@ -28,10 +28,8 @@
 #include <QTextLayout>
 #include <QTextStream>
 
-#include <cmath>
 #include <algorithm>
 
-const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 
 TailView::TailView(QWidget * parent)
@@ -42,10 +40,6 @@ TailView::TailView(QWidget * parent)
     , m_partialLayoutStrategy(new PartialLayout(this))
     , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
-    , m_firstVisibleLayoutLine(0)
-    , m_firstVisibleBlock(0)
-    , m_firstVisibleBlockLine(0)
-    , m_lastFileAddress(0)
     , m_documentSearch(new DocumentSearch(m_document->document()))
     , m_fileCursor(new YFileCursor())
 {
@@ -309,113 +303,6 @@ void TailView::keyPressEvent(QKeyEvent * event)
     if(handled) {
         m_layoutStrategy->updateAfterKeyPress();
     }
-}
-
-void TailView::updateDocumentForPartialLayout(bool file_changed, int line_change /* = 0 */, qint64 new_line_address /* = -1 */)
-{
-    if(m_blockReader.isNull()) { return; }
-
-    const int lines_on_screen = numLinesOnScreen();
-    const int visible_lines = lines_on_screen + 1;
-
-    // TODO: account for wrapped lines when computing bottom_screen_pos
-    const qint64 bottom_screen_pos = m_blockReader->getStartPosition(m_blockReader->size(), -lines_on_screen);
-
-    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
-
-    // In partial layout, page up/down is handled manually, so just pass 0 for the visibleLines argument.
-    updateScrollBars(approx_lines, 0);
-
-    qint64 file_pos = 0;
-    if(0 == line_change || new_line_address != -1) {
-        m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
-        m_firstVisibleBlock = 0;
-        m_firstVisibleBlockLine = 0;
-
-        if(file_changed && followTail()) {
-            file_pos = bottom_screen_pos;
-            verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
-        } else if(new_line_address != -1) {
-            file_pos = new_line_address;
-        } else if(verticalScrollBar()->sliderPosition() >= verticalScrollBar()->maximum()) {
-            file_pos = bottom_screen_pos;
-        } else {
-            file_pos = static_cast<qint64>(verticalScrollBar()->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
-        }
-
-        file_pos = m_blockReader->getStartPosition(file_pos, 0);
-
-        // Don't change the line further if we're at the bottom
-        if(file_pos > bottom_screen_pos) {
-            line_change = 0;
-            verticalScrollBar()->setSliderPosition(verticalScrollBar()->maximum());
-        }
-
-        file_pos = std::min(file_pos, bottom_screen_pos);
-
-        QString data;
-        m_lastFileAddress = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
-
-        setDocumentText(data);
-        performLayout();
-    }
-
-    if(line_change != 0)
-    {
-        file_pos = m_lastFileAddress;
-        if(line_change < 0) {
-            QString data;
-            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos,
-                line_change + m_firstVisibleBlock, visible_lines).first;
-            setDocumentText(data);
-            performLayout();
-
-            QTextBlock block = m_document->document()->findBlockByNumber(-line_change);
-            while(m_firstVisibleBlockLine + line_change < 0) {
-                line_change += m_firstVisibleBlockLine + 1;
-                block = block.previous();
-                m_firstVisibleBlockLine = block.layout()->lineCount() - 1;
-            }
-
-            m_firstVisibleBlock = block.blockNumber();
-            m_firstVisibleBlockLine += line_change;
-
-            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
-            for(QTextBlock block = m_document->document()->firstBlock();
-                block.blockNumber() < m_firstVisibleBlock;
-                block = block.next()) {
-
-                m_firstVisibleLayoutLine += block.layout()->lineCount();
-            }
-
-        } else {
-            line_change += m_firstVisibleBlockLine;
-            int wrapped_line_count = 0;
-            int real_line_count = 0;
-            QTextBlock block = m_document->document()->findBlockByNumber(m_firstVisibleBlock);
-            while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
-                wrapped_line_count += block.layout()->lineCount();
-                block = block.next();
-                real_line_count++;
-            }
-
-            m_firstVisibleBlockLine = line_change - wrapped_line_count;
-            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
-            m_firstVisibleBlock = 0;
-
-            file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
-            file_pos = std::min(file_pos, bottom_screen_pos);
-            QString data;
-            file_pos = m_blockReader->readChunk(&data, &m_lineAddresses, file_pos, 0, visible_lines).first;
-            setDocumentText(data);
-            performLayout();
-
-        }
-        m_lastFileAddress = file_pos;
-        verticalScrollBar()->setSliderPosition(m_lastFileAddress / APPROXIMATE_CHARS_PER_LINE);
-    }
-
-    viewport()->update();
 }
 
 void TailView::updateScrollBars(int lines, int visibleLines)

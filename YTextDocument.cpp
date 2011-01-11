@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YTextDocument.h"
@@ -115,10 +115,11 @@ int YTextDocument::numLayoutLines() const
 
 void YTextDocument::select(const QTextCursor & cursor)
 {
+    // Clear current selection first
     QTextCharFormat format;
     m_selectedCursor->setCharFormat(format);
     *m_selectedCursor = cursor;
-    
+
     if(!m_selectedCursor->isNull()) {
         // TODO: make the palette customizable (for now use the system palette)
         QPalette palette = QApplication::palette();

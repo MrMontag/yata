@@ -29,7 +29,7 @@ void LayoutStrategy::search(bool isForward)
     bool wrapAround = wrapAroundForDocumentSearch();
     bool matchFound = view()->searchDocument(isForward, wrapAround);
     if(matchFound) {
-        view()->scrollToIfNecessary(view()->m_documentSearch->cursor());
+        view()->scrollToIfNecessary(view()->documentSearch()->cursor());
     } else {
         matchFound = searchFile(isForward);
     }
@@ -38,7 +38,7 @@ void LayoutStrategy::search(bool isForward)
         QString message;
         QTextStream(&message)
             << QObject::tr("Pattern \"")
-            << view()->m_documentSearch->lastSearchString()
+            << view()->documentSearch()->lastSearchString()
             << QObject::tr("\" not found");
         QMessageBox::information(view(), YApplication::displayAppName(), message);
     }
@@ -48,7 +48,7 @@ void LayoutStrategy::search(bool isForward)
 
 void LayoutStrategy::performLayout()
 {
-    view()->m_document->layout(view()->viewport()->width());
+    view()->document()->layout(view()->viewport()->width());
 }
 
 TailView * LayoutStrategy::view()

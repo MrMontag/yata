@@ -1,7 +1,4 @@
 /*
- * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
- * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef TAIL_VIEW_H
@@ -29,11 +26,6 @@ class TailView: public QAbstractScrollArea {
     Q_OBJECT
 
 public:
-    // TEMPORARY stopgap while layout stuff is being refactored.
-    // These friend class declarations should eventually be removed.
-    friend class LayoutStrategy;
-    friend class PartialLayout;
-
     enum LayoutType {
         DebugFullLayout,
         DebugPartialLayout,
@@ -61,6 +53,11 @@ public:
     void setDocumentText(const QString & data);
     void updateScrollBars(int lines, int visibleLines);
     int numLinesOnScreen() const;
+    DocumentSearch * documentSearch() { return m_documentSearch.data(); }
+    YFileCursor * fileCursor() { return m_fileCursor.data(); }
+    const QString & filename() const { return m_filename; }
+    bool searchDocument(bool isForward, bool wrapAround = true);
+    void scrollToIfNecessary(const QTextCursor & cursor);
 
 public slots:
     void newSearch(const QString & searchString, bool isRegex, bool caseSensitive);
@@ -78,12 +75,9 @@ private slots:
     void vScrollBarAction(int action);
 
 private:
-    void updateDocumentForPartialLayout(bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
     void performLayout();
 
     void searchFile(bool isForward);
-    bool searchDocument(bool isForward, bool wrapAround = true);
-    void scrollToIfNecessary(const QTextCursor & cursor);
 
     // TODO: move to YTextCursor
     QTextCursor qTextCursor(const YFileCursor & fileCursor);
@@ -101,11 +95,6 @@ private:
     LayoutStrategy * m_layoutStrategy;
 
     bool m_followTail;
-
-    int m_firstVisibleLayoutLine;
-    int m_firstVisibleBlock;
-    int m_firstVisibleBlockLine;
-    qint64 m_lastFileAddress;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
 
