@@ -46,6 +46,7 @@ SOURCES += main.cpp \
     BufferedFile.cpp \
     LayoutStrategy.cpp \
     FullLayout.cpp \
-    PartialLayout.cpp
+    PartialLayout.cpp \
+    YFileCursor.cpp
 RESOURCES += TailViewResources.qrc
 RC_FILE = yata_win.rc

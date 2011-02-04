@@ -118,7 +118,7 @@ void TailView::searchFile(bool isForward)
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(!m_fileCursor->isNull()) {
-        m_documentSearch->setCursor(qTextCursor(*m_fileCursor));
+        m_documentSearch->setCursor(m_fileCursor->qTextCursor(m_document.data(), m_lineAddresses));
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
@@ -172,27 +172,6 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
     m_layoutStrategy->scrollTo(newTopLine);
 }
 
-QTextCursor TailView::qTextCursor(const YFileCursor & fileCursor)
-{
-    if(fileCursor.isNull()) { return QTextCursor(); }
-
-    std::vector<qint64>::const_iterator itr =
-        std::lower_bound(m_lineAddresses.begin(), m_lineAddresses.end(), fileCursor.m_lineAddress);
-
-    if(itr == m_lineAddresses.end() || *itr != fileCursor.m_lineAddress) {
-        return QTextCursor();
-    }
-
-    int blockNum = itr - m_lineAddresses.begin();
-
-    QTextCursor cursor(m_document->document()->findBlockByNumber(blockNum));
-
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, fileCursor.m_charPos);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, fileCursor.m_length);
-
-    return cursor;
-}
-
 void TailView::onFileChanged()
 {
     m_blockReader.reset(new FileBlockReader(m_filename));
@@ -239,7 +218,7 @@ void TailView::onFileDeleted()
 void TailView::setDocumentText(const QString & data)
 {
     m_document->setText(data);
-    m_document->select(qTextCursor(*m_fileCursor));
+    m_document->select(m_fileCursor->qTextCursor(m_document.data(), m_lineAddresses));
 }
 
 void TailView::performLayout()

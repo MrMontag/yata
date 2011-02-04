@@ -79,8 +79,6 @@ private:
 
     void searchFile(bool isForward);
 
-    // TODO: move to YTextCursor
-    QTextCursor qTextCursor(const YFileCursor & fileCursor);
 private:
     QString m_filename;
     QScopedPointer<YTextDocument> m_document;
