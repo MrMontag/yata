@@ -28,9 +28,7 @@ void FileSearch::setCursor(const YFileCursor & c)
 bool FileSearch::searchFile(bool isForward, bool wrapAround)
 {
     if(lastSearchString().isEmpty()) {
-        m_fileCursor.m_lineAddress = -1;
-        m_fileCursor.m_charPos = 0;
-        m_fileCursor.m_length = 0;
+        m_fileCursor.makeNull();
         return false;
     }
 
@@ -38,7 +36,7 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
         m_fileCursor = YFileCursor(0,0,0);
     }
 
-    qint64 initialLinePosition = m_fileCursor.m_lineAddress;
+    qint64 initialLinePosition = m_fileCursor.lineAddress();
 
     QRegExp regex(getRegex());
     FileBlockReader reader(m_filename);
@@ -54,23 +52,23 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
 
         if(isForward) {
             lineOffset = 1;
-            m_fileCursor.m_charPos = 0;
-            if(m_fileCursor.m_lineAddress >= reader.size() - 1) {
+            m_fileCursor.setCharPos(0);
+            if(m_fileCursor.lineAddress() >= reader.size() - 1) {
                 if(!wrapAround) { return false; }
-                m_fileCursor.m_lineAddress = 0;
+                m_fileCursor.setLineAddress(0);
                 lineOffset = 0;
             }
         } else {
             lineOffset = -1;
-            m_fileCursor.m_charPos = -1;
-            if(m_fileCursor.m_lineAddress == 0) {
+            m_fileCursor.setCharPos(YFileCursor::NULL_VALUE);
+            if(m_fileCursor.lineAddress() == 0) {
                 if(!wrapAround) { return false; }
-                m_fileCursor.m_lineAddress = reader.size();
+                m_fileCursor.setLineAddress(reader.size());
                 lineOffset = 0;
             }
         }
 
-        if(!initialLoop && m_fileCursor.m_lineAddress == initialLinePosition) {
+        if(!initialLoop && m_fileCursor.lineAddress() == initialLinePosition) {
             return false;
         }
 
@@ -83,10 +81,10 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
     std::vector<qint64> linePositions;
     QString data;
 
-    reader->readChunk(&data, &linePositions, cursor->m_lineAddress, lineOffset, 1);
+    reader->readChunk(&data, &linePositions, cursor->lineAddress(), lineOffset, 1);
 
-    if(cursor->m_charPos == -1) {
-        cursor->m_charPos = data.length();
+    if(cursor->charPos() == YFileCursor::NULL_VALUE) {
+        cursor->setCharPos(data.length());
     }
 
     if(linePositions.empty()) {
@@ -96,7 +94,7 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
     int startPos = -1;
     int matchLength = 0;
     if(isForward) {
-        startPos = regex.indexIn(data, cursor->m_charPos + cursor->m_length);
+        startPos = regex.indexIn(data, cursor->charPos() + cursor->length());
         matchLength = regex.matchedLength();
     } else {
         int pos = 0;
@@ -106,7 +104,7 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
                 break;
             }
 
-            if(pos + regex.matchedLength() < cursor->m_charPos) {
+            if(pos + regex.matchedLength() < cursor->charPos()) {
                 startPos = pos;
                 matchLength = regex.matchedLength();
             } else {
@@ -115,15 +113,15 @@ bool FileSearch::isMatch(const QRegExp & regex, YFileCursor * cursor, FileBlockR
         }
     }
 
-    cursor->m_lineAddress = linePositions.front();
+    cursor->setLineAddress(linePositions.front());
 
     if(startPos != -1) {
-        cursor->m_charPos = startPos;
-        cursor->m_length = matchLength;
+        cursor->setCharPos(startPos);
+        cursor->setLength(matchLength);
         return true;
     } else {
-        cursor->m_charPos = -1;
-        cursor->m_length = 0;
+        cursor->setCharPos(YFileCursor::NULL_VALUE);
+        cursor->setLength(0);
         return false;
     }
 }

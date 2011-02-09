@@ -13,14 +13,29 @@
 class QTextCursor;
 class YTextDocument;
 
-struct YFileCursor {
+
+class YFileCursor {
+public:
+    static const int NULL_VALUE = -1;
+
+    YFileCursor(qint64 linePosition = NULL_VALUE, int lineOffset = NULL_VALUE, int length = NULL_VALUE);
+    bool isNull() const;
+    void makeNull();
+    QTextCursor qTextCursor(YTextDocument * document, const std::vector<qint64> & lineAddresses) const;
+
+    qint64 lineAddress() const;
+    void setLineAddress(qint64 la);
+
+    int charPos() const;
+    void setCharPos(int cp);
+
+    int length() const;
+    void setLength(int l);
+
+private:
     qint64 m_lineAddress;
     int m_charPos;
     int m_length;
-
-    YFileCursor(qint64 linePosition = -1, int lineOffset = -1, int length = -1);
-    bool isNull() const;
-    QTextCursor qTextCursor(YTextDocument * document, const std::vector<qint64> & lineAddresses) const;
 };
 
 #endif // YFILECURSOR_H

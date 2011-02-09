@@ -12,7 +12,7 @@
 #include <QTextDocument>
 #include <algorithm>
 
-YFileCursor::YFileCursor(qint64 linePosition /*= -1*/, int lineOffset /*= -1*/, int length /*= -1*/)
+YFileCursor::YFileCursor(qint64 linePosition /*= NULL_VALUE*/, int lineOffset /*= NULL_VALUE*/, int length /*= NULL_VALUE*/)
     : m_lineAddress(linePosition)
     , m_charPos(lineOffset)
     , m_length(length)
@@ -21,7 +21,14 @@ YFileCursor::YFileCursor(qint64 linePosition /*= -1*/, int lineOffset /*= -1*/, 
 
 bool YFileCursor::isNull() const
 {
-    return m_lineAddress == -1;
+    return m_lineAddress == NULL_VALUE;
+}
+
+void YFileCursor::makeNull()
+{
+    m_lineAddress = NULL_VALUE;
+    m_charPos = 0;
+    m_length = 0;
 }
 
 QTextCursor YFileCursor::qTextCursor(YTextDocument * document, const std::vector<qint64> & lineAddresses) const
@@ -44,3 +51,34 @@ QTextCursor YFileCursor::qTextCursor(YTextDocument * document, const std::vector
 
     return cursor;
 }
+
+qint64 YFileCursor::lineAddress() const
+{
+    return m_lineAddress;
+}
+
+void YFileCursor::setLineAddress(qint64 la)
+{
+    m_lineAddress = la;
+}
+
+int YFileCursor::charPos() const
+{
+    return m_charPos;
+}
+
+void YFileCursor::setCharPos(int cp)
+{
+    m_charPos = cp;
+}
+
+int YFileCursor::length() const
+{
+    return m_length;
+}
+
+void YFileCursor::setLength(int l)
+{
+    m_length = l;
+}
+

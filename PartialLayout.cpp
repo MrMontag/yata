@@ -64,7 +64,7 @@ bool PartialLayout::searchFile(bool isForward)
         *view()->fileCursor() = cursor;
 
         int line_change = -(view()->numLinesOnScreen()/2);
-        updateDocumentForPartialLayout(false, line_change, view()->fileCursor()->m_lineAddress);
+        updateDocumentForPartialLayout(false, line_change, view()->fileCursor()->lineAddress());
     }
 
     return matchFound;
