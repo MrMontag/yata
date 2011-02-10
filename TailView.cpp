@@ -112,7 +112,24 @@ void TailView::searchBackward()
 
 void TailView::searchFile(bool isForward)
 {
-    m_layoutStrategy->search(isForward);
+    bool wrapAround = m_layoutStrategy->wrapAroundForDocumentSearch();
+    bool matchFound = searchDocument(isForward, wrapAround);
+    if(matchFound) {
+        scrollToIfNecessary(documentSearch()->cursor());
+    } else {
+        matchFound = m_layoutStrategy->searchFile(isForward);
+    }
+
+    if(!matchFound) {
+        QString message;
+        QTextStream(&message)
+            << QObject::tr("Pattern \"")
+            << documentSearch()->lastSearchString()
+            << QObject::tr("\" not found");
+        QMessageBox::information(this, YApplication::displayAppName(), message);
+    }
+
+    viewport()->update();
 }
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
@@ -297,6 +314,15 @@ void TailView::updateScrollBars(int lines, int visibleLines)
 
 void TailView::vScrollBarAction(int action)
 {
+    QScrollBar * vsb = verticalScrollBar();
+    if(vsb->sliderPosition() > vsb->maximum()) {
+        vsb->setSliderPosition(vsb->maximum());
+    }
+
+    if(vsb->sliderPosition() < vsb->minimum()) {
+        vsb->setSliderPosition(vsb->minimum());
+    }
+
     m_layoutStrategy->vScrollBarAction(action);
 }
 

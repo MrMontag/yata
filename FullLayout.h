@@ -20,7 +20,7 @@ public:
     virtual int topScreenLine() const;
     virtual void scrollTo(int newTopLine);
     virtual void updateAfterKeyPress();
-protected:
+    virtual void vScrollBarAction(int action);
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
 };

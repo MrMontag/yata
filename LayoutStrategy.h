@@ -14,19 +14,18 @@ class LayoutStrategy
 public:
     virtual ~LayoutStrategy();
 
-    void search(bool isForward);
     virtual void onFileChanged() = 0;
     virtual void performLayout();
     virtual void resizeEvent() = 0;
     virtual int topScreenLine() const = 0;
     virtual void scrollTo(int newTopLine) = 0;
     virtual void updateAfterKeyPress() = 0;
-    virtual void vScrollBarAction(int action);
-protected:
-    LayoutStrategy(TailView * tailView);
-
+    virtual void vScrollBarAction(int action) = 0;
     virtual bool searchFile(bool isForward) = 0;
     virtual bool wrapAroundForDocumentSearch() const = 0;
+
+protected:
+    LayoutStrategy(TailView * tailView);
 
     TailView * view();
     const TailView * view() const;

@@ -24,28 +24,6 @@ LayoutStrategy::~LayoutStrategy()
 {
 }
 
-void LayoutStrategy::search(bool isForward)
-{
-    bool wrapAround = wrapAroundForDocumentSearch();
-    bool matchFound = view()->searchDocument(isForward, wrapAround);
-    if(matchFound) {
-        view()->scrollToIfNecessary(view()->documentSearch()->cursor());
-    } else {
-        matchFound = searchFile(isForward);
-    }
-
-    if(!matchFound) {
-        QString message;
-        QTextStream(&message)
-            << QObject::tr("Pattern \"")
-            << view()->documentSearch()->lastSearchString()
-            << QObject::tr("\" not found");
-        QMessageBox::information(view(), YApplication::displayAppName(), message);
-    }
-
-    view()->viewport()->update();
-}
-
 void LayoutStrategy::performLayout()
 {
     view()->document()->layout(view()->viewport()->width());
@@ -61,14 +39,3 @@ const TailView * LayoutStrategy::view() const
     return m_view;
 }
 
-void LayoutStrategy::vScrollBarAction(int /*action*/)
-{
-    QScrollBar * verticalScrollBar = view()->verticalScrollBar();
-    if(verticalScrollBar->sliderPosition() > verticalScrollBar->maximum()) {
-        verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
-    }
-
-    if(verticalScrollBar->sliderPosition() < verticalScrollBar->minimum()) {
-        verticalScrollBar->setSliderPosition(verticalScrollBar->minimum());
-    }
-}

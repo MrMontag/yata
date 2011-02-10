@@ -61,6 +61,10 @@ void FullLayout::updateAfterKeyPress()
 {
 }
 
+void FullLayout::vScrollBarAction(int /*action*/)
+{
+}
+
 bool FullLayout::wrapAroundForDocumentSearch() const
 {
     return true;

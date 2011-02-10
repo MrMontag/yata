@@ -83,8 +83,6 @@ void PartialLayout::updateAfterKeyPress()
 
 void PartialLayout::vScrollBarAction(int action)
 {
-    LayoutStrategy::vScrollBarAction(action);
-
     int line_change = 0;
     int page_step = view()->numLinesOnScreen() - PAGE_STEP_OVERLAP;
 
