@@ -53,7 +53,7 @@ bool PartialLayout::searchFile(bool isForward)
 {
     bool matchFound = false;
     FileSearch fileSearch(view()->filename());
-    fileSearch.setCursor(*view()->fileCursor());
+    fileSearch.setCursor(*document()->fileCursor());
     fileSearch.setSearchCriteria(
         view()->documentSearch()->lastSearchString(),
         view()->documentSearch()->searchWasRegex(),
@@ -61,10 +61,10 @@ bool PartialLayout::searchFile(bool isForward)
     if(fileSearch.searchFile(isForward, true)) {
         matchFound = true;
         YFileCursor cursor(fileSearch.cursor());
-        *view()->fileCursor() = cursor;
+        *document()->fileCursor() = cursor;
 
         int line_change = -(view()->numLinesOnScreen()/2);
-        updateDocumentForPartialLayout(false, line_change, view()->fileCursor()->lineAddress());
+        updateDocumentForPartialLayout(false, line_change, document()->fileCursor()->lineAddress());
     }
 
     return matchFound;
@@ -152,7 +152,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
         file_pos = std::min(file_pos, bottom_screen_pos);
 
         QString data;
-        m_lastFileAddress = blockReader->readChunk(&data, &view()->lineAddresses(), file_pos, 0, visible_lines).first;
+        m_lastFileAddress = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos, 0, visible_lines).first;
 
         view()->setDocumentText(data);
         performLayout();
@@ -163,7 +163,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
         file_pos = m_lastFileAddress;
         if(line_change < 0) {
             QString data;
-            file_pos = blockReader->readChunk(&data, &view()->lineAddresses(), file_pos,
+            file_pos = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos,
                 line_change + m_firstVisibleBlock, visible_lines).first;
             view()->setDocumentText(data);
             performLayout();
@@ -204,7 +204,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             file_pos = blockReader->getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
             QString data;
-            file_pos = blockReader->readChunk(&data, &view()->lineAddresses(), file_pos, 0, visible_lines).first;
+            file_pos = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos, 0, visible_lines).first;
             view()->setDocumentText(data);
             performLayout();
 

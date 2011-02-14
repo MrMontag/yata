@@ -8,6 +8,7 @@
 #define LAYOUTSTRATEGY_H
 
 class TailView;
+class YTextDocument;
 
 class LayoutStrategy
 {
@@ -29,6 +30,9 @@ protected:
 
     TailView * view();
     const TailView * view() const;
+
+    YTextDocument * document();
+    const YTextDocument * document() const;
 private:
     TailView * m_view;
 };

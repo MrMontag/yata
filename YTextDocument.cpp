@@ -5,6 +5,7 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YTextDocument.h"
+#include "YFileCursor.h"
 
 #include <QApplication>
 #include <QFontMetrics>
@@ -20,6 +21,7 @@ YTextDocument::YTextDocument(const QString & text)
     : m_document(new QTextDocument())
     , m_selectedCursor(new QTextCursor())
     , m_numLayoutLines(0)
+    , m_fileCursor(new YFileCursor())
     , m_width(0)
     , m_needs_layout(false)
 {
@@ -33,6 +35,7 @@ YTextDocument::YTextDocument(const QString & text)
 void YTextDocument::setText(const QString & text)
 {
     m_document->setPlainText(text);
+    select(m_fileCursor->qTextCursor(this, m_lineAddresses));
     m_needs_layout = true;
 }
 

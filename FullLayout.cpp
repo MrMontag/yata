@@ -20,7 +20,7 @@ FullLayout::FullLayout(TailView * view)
 void FullLayout::onFileChanged()
 {
     QString data;
-    view()->blockReader()->readAll(&data, &view()->lineAddresses());
+    view()->blockReader()->readAll(&data, &document()->lineAddresses());
     view()->setDocumentText(data);
     if(view()->followTail()) {
         performLayout();

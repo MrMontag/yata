@@ -41,7 +41,6 @@ TailView::TailView(QWidget * parent)
     , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
     , m_documentSearch(new DocumentSearch(m_document->document()))
-    , m_fileCursor(new YFileCursor())
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
 }
@@ -134,8 +133,9 @@ void TailView::searchFile(bool isForward)
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
-    if(!m_fileCursor->isNull()) {
-        m_documentSearch->setCursor(m_fileCursor->qTextCursor(m_document.data(), m_lineAddresses));
+    if(!m_document->fileCursor()->isNull()) {
+        m_documentSearch->setCursor(
+            m_document->fileCursor()->qTextCursor(m_document.data(), m_document->lineAddresses()));
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
@@ -156,10 +156,11 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
         const QTextCursor & searchCursor = m_documentSearch->cursor();
         m_document->select(searchCursor);
         int blockNum = searchCursor.block().blockNumber();
-        m_fileCursor->setLineAddress(m_lineAddresses[blockNum]);
         int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
-        m_fileCursor->setCharPos(cursorBeginPos - searchCursor.block().position());
-        m_fileCursor->setLength(std::abs(searchCursor.anchor() - searchCursor.position()));
+        YFileCursor newCursor(m_document->lineAddresses()[blockNum], 
+            cursorBeginPos - searchCursor.block().position(),
+            std::abs(searchCursor.anchor() - searchCursor.position()));
+        *m_document->fileCursor() = newCursor;
     }
 
     return foundMatch;
@@ -227,7 +228,7 @@ bool TailView::followTail() const
 void TailView::onFileDeleted()
 {
     // TODO: display an error message
-    m_lineAddresses.clear();
+    m_document->lineAddresses().clear();
     setDocumentText(QString());
     viewport()->update();
 }
@@ -235,7 +236,6 @@ void TailView::onFileDeleted()
 void TailView::setDocumentText(const QString & data)
 {
     m_document->setText(data);
-    m_document->select(m_fileCursor->qTextCursor(m_document.data(), m_lineAddresses));
 }
 
 void TailView::performLayout()

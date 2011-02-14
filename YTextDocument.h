@@ -14,6 +14,7 @@
 class QTextBlock;
 class QTextDocument;
 class QTextCursor;
+class YFileCursor;
 
 class YTextDocument {
 public:
@@ -29,6 +30,9 @@ public:
 
     void select(const QTextCursor & cursor);
 
+    std::vector<qint64> & lineAddresses() { return m_lineAddresses; }
+    YFileCursor * fileCursor() { return m_fileCursor.data(); }
+
 private:
     int layoutBlock(QTextBlock * textBlock);
 
@@ -38,6 +42,8 @@ private:
 
     int m_numLayoutLines;
     std::vector<int> m_blockLayoutPositions;
+    std::vector<qint64> m_lineAddresses;
+    QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;
     bool m_needs_layout;
 };

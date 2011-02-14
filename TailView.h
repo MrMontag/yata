@@ -48,13 +48,11 @@ public:
 
     // Functions used by the LayoutStrategy class and subclasses
     FileBlockReader * blockReader() { return m_blockReader.data(); }
-    std::vector<qint64> & lineAddresses() { return m_lineAddresses; }
     YTextDocument * document() { return m_document.data(); }
     void setDocumentText(const QString & data);
     void updateScrollBars(int lines, int visibleLines);
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
-    YFileCursor * fileCursor() { return m_fileCursor.data(); }
     const QString & filename() const { return m_filename; }
     bool searchDocument(bool isForward, bool wrapAround = true);
     void scrollToIfNecessary(const QTextCursor & cursor);
@@ -84,9 +82,6 @@ private:
     QScopedPointer<YTextDocument> m_document;
     QScopedPointer<YFileSystemWatcherThread> m_watcher;
 
-    // TODO: YTextDocument should own m_lineAddresses
-    std::vector<qint64> m_lineAddresses;
-
     LayoutType m_layoutType;
     QScopedPointer<FullLayout> m_fullLayoutStrategy;
     QScopedPointer<PartialLayout> m_partialLayoutStrategy;
@@ -96,8 +91,6 @@ private:
 
     QScopedPointer<DocumentSearch> m_documentSearch;
 
-    // TODO: YTextDocument should own m_fileCursor
-    QScopedPointer<YFileCursor> m_fileCursor;
     QScopedPointer<FileBlockReader> m_blockReader;
 };
 

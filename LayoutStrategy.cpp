@@ -39,3 +39,13 @@ const TailView * LayoutStrategy::view() const
     return m_view;
 }
 
+YTextDocument * LayoutStrategy::document()
+{
+    return m_view->document();
+}
+
+const YTextDocument * LayoutStrategy::document() const
+{
+    return m_view->document();
+}
+
