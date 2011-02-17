@@ -31,9 +31,11 @@ void YFileCursor::makeNull()
     m_length = 0;
 }
 
-QTextCursor YFileCursor::qTextCursor(YTextDocument * document, const std::vector<qint64> & lineAddresses) const
+QTextCursor YFileCursor::qTextCursor(YTextDocument * document) const
 {
     if(isNull()) { return QTextCursor(); }
+
+    const std::vector<qint64> & lineAddresses = document->lineAddresses();
 
     std::vector<qint64>::const_iterator itr =
         std::lower_bound(lineAddresses.begin(), lineAddresses.end(), m_lineAddress);

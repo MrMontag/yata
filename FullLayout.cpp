@@ -20,10 +20,11 @@ FullLayout::FullLayout(TailView * view)
 void FullLayout::onFileChanged()
 {
     QString data;
-    view()->blockReader()->readAll(&data, &document()->lineAddresses());
-    view()->setDocumentText(data);
+    std::vector<qint64> lineAddresses;
+    view()->blockReader()->readAll(&data, &lineAddresses);
+    document()->setText(data, lineAddresses);
     if(view()->followTail()) {
-        performLayout();
+        performLayout(); // Need this call to get the scroll bars set correctly.
         view()->verticalScrollBar()->setValue(view()->verticalScrollBar()->maximum());
     }
 }

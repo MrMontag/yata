@@ -25,7 +25,9 @@ protected:
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
 private:
-    void updateDocumentForPartialLayout(bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
+    void updateDocumentForPartialLayout(
+        bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
+    void updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
 private:
     int m_firstVisibleLayoutLine;
     int m_firstVisibleBlock;

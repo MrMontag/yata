@@ -20,7 +20,7 @@ void FileBlockReader::readAll(QString * data, std::vector<qint64> * filePosition
     read(data, filePositions, 0, std::numeric_limits<qint64>::max());
 }
 
-std::pair<qint64, qint64> FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositions,
+qint64 FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositions,
     qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
 {
     start_pos = getStartPosition(start_pos, lines_after_start);
@@ -74,7 +74,7 @@ qint64 FileBlockReader::nextLine(qint64 start_pos)
     return start_pos;
 }
 
-std::pair<qint64, qint64> FileBlockReader::read(QString * data, std::vector<qint64> * filePositions,
+qint64 FileBlockReader::read(QString * data, std::vector<qint64> * filePositions,
     qint64 start_pos, qint64 num_lines)
 {
     data->clear();
@@ -98,5 +98,5 @@ std::pair<qint64, qint64> FileBlockReader::read(QString * data, std::vector<qint
         pos++;
     }
 
-    return std::pair<qint64,qint64>(start_pos, pos);
+    return start_pos;
 }

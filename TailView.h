@@ -49,7 +49,6 @@ public:
     // Functions used by the LayoutStrategy class and subclasses
     FileBlockReader * blockReader() { return m_blockReader.data(); }
     YTextDocument * document() { return m_document.data(); }
-    void setDocumentText(const QString & data);
     void updateScrollBars(int lines, int visibleLines);
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
@@ -73,8 +72,6 @@ private slots:
     void vScrollBarAction(int action);
 
 private:
-    void performLayout();
-
     void searchFile(bool isForward);
 
 private:

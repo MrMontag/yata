@@ -21,7 +21,7 @@ public:
     YFileCursor(qint64 linePosition = NULL_VALUE, int lineOffset = NULL_VALUE, int length = NULL_VALUE);
     bool isNull() const;
     void makeNull();
-    QTextCursor qTextCursor(YTextDocument * document, const std::vector<qint64> & lineAddresses) const;
+    QTextCursor qTextCursor(YTextDocument * document) const;
 
     qint64 lineAddress() const;
     void setLineAddress(qint64 la);

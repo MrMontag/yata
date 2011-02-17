@@ -53,18 +53,19 @@ bool PartialLayout::searchFile(bool isForward)
 {
     bool matchFound = false;
     FileSearch fileSearch(view()->filename());
-    fileSearch.setCursor(*document()->fileCursor());
+    fileSearch.setCursor(document()->fileCursor());
+    DocumentSearch * docSearch = view()->documentSearch();
     fileSearch.setSearchCriteria(
-        view()->documentSearch()->lastSearchString(),
-        view()->documentSearch()->searchWasRegex(),
-        view()->documentSearch()->searchWasCaseSensitive());
+        docSearch->lastSearchString(),
+        docSearch->searchWasRegex(),
+        docSearch->searchWasCaseSensitive());
     if(fileSearch.searchFile(isForward, true)) {
         matchFound = true;
         YFileCursor cursor(fileSearch.cursor());
-        *document()->fileCursor() = cursor;
+        document()->setFileCursor(cursor);
 
         int line_change = -(view()->numLinesOnScreen()/2);
-        updateDocumentForPartialLayout(false, line_change, document()->fileCursor()->lineAddress());
+        updateDocumentForPartialLayout(false, line_change, document()->fileCursor().lineAddress());
     }
 
     return matchFound;
@@ -151,24 +152,16 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
 
         file_pos = std::min(file_pos, bottom_screen_pos);
 
-        QString data;
-        m_lastFileAddress = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos, 0, visible_lines).first;
-
-        view()->setDocumentText(data);
-        performLayout();
+        updateDocument(file_pos, 0, visible_lines);
     }
 
     if(line_change != 0)
     {
         file_pos = m_lastFileAddress;
         if(line_change < 0) {
-            QString data;
-            file_pos = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos,
-                line_change + m_firstVisibleBlock, visible_lines).first;
-            view()->setDocumentText(data);
-            performLayout();
+            updateDocument(file_pos, line_change + m_firstVisibleBlock, visible_lines);
 
-            QTextBlock block = view()->document()->document()->findBlockByNumber(-line_change);
+            QTextBlock block = document()->document()->findBlockByNumber(-line_change);
             while(m_firstVisibleBlockLine + line_change < 0) {
                 line_change += m_firstVisibleBlockLine + 1;
                 block = block.previous();
@@ -179,7 +172,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             m_firstVisibleBlockLine += line_change;
 
             m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
-            for(QTextBlock block = view()->document()->document()->firstBlock();
+            for(QTextBlock block = document()->document()->firstBlock();
                 block.blockNumber() < m_firstVisibleBlock;
                 block = block.next()) {
 
@@ -190,7 +183,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             line_change += m_firstVisibleBlockLine;
             int wrapped_line_count = 0;
             int real_line_count = 0;
-            QTextBlock block = view()->document()->document()->findBlockByNumber(m_firstVisibleBlock);
+            QTextBlock block = document()->document()->findBlockByNumber(m_firstVisibleBlock);
             while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
                 wrapped_line_count += block.layout()->lineCount();
                 block = block.next();
@@ -203,15 +196,21 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
 
             file_pos = blockReader->getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
-            QString data;
-            file_pos = blockReader->readChunk(&data, &document()->lineAddresses(), file_pos, 0, visible_lines).first;
-            view()->setDocumentText(data);
-            performLayout();
 
+            updateDocument(file_pos, 0, visible_lines);
         }
-        m_lastFileAddress = file_pos;
         verticalScrollBar->setSliderPosition(m_lastFileAddress / APPROXIMATE_CHARS_PER_LINE);
     }
 
     view()->viewport()->update();
+}
+
+void PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
+{
+    QString data;
+    std::vector<qint64> lineAddresses;
+    m_lastFileAddress = view()->blockReader()->readChunk(
+        &data, &lineAddresses, start_pos, lines_after_start, num_lines);
+    document()->setText(data, lineAddresses);
+    performLayout();
 }

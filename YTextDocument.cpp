@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-YTextDocument::YTextDocument(const QString & text)
+YTextDocument::YTextDocument()
     : m_document(new QTextDocument())
     , m_selectedCursor(new QTextCursor())
     , m_numLayoutLines(0)
@@ -27,15 +27,14 @@ YTextDocument::YTextDocument(const QString & text)
 {
     m_document->setUndoRedoEnabled(false);
     m_document->setUseDesignMetrics(true);
-    if(!text.isEmpty()) {
-        setText(text);
-    }
 }
 
-void YTextDocument::setText(const QString & text)
+void YTextDocument::setText(const QString & text, const std::vector<qint64> & newAddresses)
 {
     m_document->setPlainText(text);
-    select(m_fileCursor->qTextCursor(this, m_lineAddresses));
+    m_lineAddresses = newAddresses;
+
+    select(m_fileCursor->qTextCursor(this));
     m_needs_layout = true;
 }
 
@@ -130,4 +129,9 @@ void YTextDocument::select(const QTextCursor & cursor)
         format.setForeground(palette.highlightedText());
         m_selectedCursor->setCharFormat(format);
     }
+}
+
+void YTextDocument::setFileCursor(const YFileCursor & cursor)
+{
+    *m_fileCursor = cursor;
 }

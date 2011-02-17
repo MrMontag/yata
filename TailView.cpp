@@ -133,9 +133,8 @@ void TailView::searchFile(bool isForward)
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
-    if(!m_document->fileCursor()->isNull()) {
-        m_documentSearch->setCursor(
-            m_document->fileCursor()->qTextCursor(m_document.data(), m_document->lineAddresses()));
+    if(!m_document->fileCursor().isNull()) {
+        m_documentSearch->setCursor(m_document->fileCursor().qTextCursor(m_document.data()));
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
@@ -160,7 +159,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
         YFileCursor newCursor(m_document->lineAddresses()[blockNum], 
             cursorBeginPos - searchCursor.block().position(),
             std::abs(searchCursor.anchor() - searchCursor.position()));
-        *m_document->fileCursor() = newCursor;
+        m_document->setFileCursor(newCursor);
     }
 
     return foundMatch;
@@ -228,24 +227,13 @@ bool TailView::followTail() const
 void TailView::onFileDeleted()
 {
     // TODO: display an error message
-    m_document->lineAddresses().clear();
-    setDocumentText(QString());
+    m_document->setText(QString(), std::vector<qint64>());
     viewport()->update();
-}
-
-void TailView::setDocumentText(const QString & data)
-{
-    m_document->setText(data);
-}
-
-void TailView::performLayout()
-{
-    m_layoutStrategy->performLayout();
 }
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
 {
-    performLayout();
+    m_layoutStrategy->performLayout();
 
     qreal dy = 0;
 

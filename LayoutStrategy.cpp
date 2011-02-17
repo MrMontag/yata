@@ -26,7 +26,7 @@ LayoutStrategy::~LayoutStrategy()
 
 void LayoutStrategy::performLayout()
 {
-    view()->document()->layout(view()->viewport()->width());
+    document()->layout(view()->viewport()->width());
 }
 
 TailView * LayoutStrategy::view()

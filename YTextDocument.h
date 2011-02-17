@@ -18,8 +18,8 @@ class YFileCursor;
 
 class YTextDocument {
 public:
-    explicit YTextDocument(const QString & text = QString());
-    void setText(const QString & text);
+    explicit YTextDocument();
+    void setText(const QString & text, const std::vector<qint64> & newAddresses);
     void layout(int width);
 
     QTextBlock findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos = 0);
@@ -30,8 +30,10 @@ public:
 
     void select(const QTextCursor & cursor);
 
-    std::vector<qint64> & lineAddresses() { return m_lineAddresses; }
-    YFileCursor * fileCursor() { return m_fileCursor.data(); }
+    const std::vector<qint64> & lineAddresses() const { return m_lineAddresses; }
+
+    const YFileCursor & fileCursor() const { return *m_fileCursor; }
+    void setFileCursor(const YFileCursor & cursor);
 
 private:
     int layoutBlock(QTextBlock * textBlock);
