@@ -46,6 +46,8 @@ set(Yata_Srcs
 
 set(Yata_Rsrcs TailViewResources.qrc)
 
+set(Win32_Rsrcs yata_win.rc)
+
 qt4_wrap_cpp(Yata_Moc_Srcs ${Yata_Mocs})
 qt4_wrap_ui(Yata_Ui_Srcs ${Yata_Uis})
 qt4_add_resources(Yata_Rsrcs_Srcs ${Yata_Rsrcs})
@@ -54,6 +56,7 @@ add_executable(yata
     ${Yata_Srcs}
     ${Yata_Moc_Srcs}
     ${Yata_Ui_Srcs}
-    ${Yata_Rsrcs_Srcs})
+    ${Yata_Rsrcs_Srcs}
+    ${Win32_Rsrcs})
 target_link_libraries(yata ${QT_LIBRARIES})
 
