@@ -9,6 +9,9 @@ cmake_minimum_required(VERSION 2.6)
 find_package(Qt4 4.7.0 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 
+include_directories(${CMAKE_BINARY_DIR})
+set(CMAKE_BUILD_TYPE Release)
+
 set(Yata_Mocs
     MainWindow.h
     SearchWidget.h
