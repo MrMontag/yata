@@ -12,6 +12,11 @@ include(${QT_USE_FILE})
 include_directories(${CMAKE_BINARY_DIR})
 set(CMAKE_BUILD_TYPE Release)
 
+# commented until winres.exe is figured out
+#if(CMAKE_COMPILER_IS_GNUCXX)
+#    add_definitions(-Wall -Wextra)
+#endif(CMAKE_COMPILER_IS_GNUCXX)
+
 set(Yata_Mocs
     MainWindow.h
     SearchWidget.h

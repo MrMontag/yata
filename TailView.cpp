@@ -289,13 +289,12 @@ void TailView::keyPressEvent(QKeyEvent * event)
     }
 }
 
-void TailView::updateScrollBars(int lines, int visibleLines)
+void TailView::updateScrollBars(int newMax)
 {
-    int newMax = lines - visibleLines;
     if(verticalScrollBar()->maximum() != newMax) {
         QScrollBar * vsb = verticalScrollBar();
         vsb->setRange(0, newMax);
-        vsb->setPageStep(visibleLines - PAGE_STEP_OVERLAP);
+        vsb->setPageStep(numLinesOnScreen() - PAGE_STEP_OVERLAP);
         vsb->setSingleStep(1);
     }
 }

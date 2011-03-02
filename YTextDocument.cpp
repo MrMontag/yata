@@ -29,6 +29,10 @@ YTextDocument::YTextDocument()
     m_document->setUseDesignMetrics(true);
 }
 
+YTextDocument::~YTextDocument()
+{
+}
+
 void YTextDocument::setText(const QString & text, const std::vector<qint64> & newAddresses)
 {
     m_document->setPlainText(text);
@@ -80,7 +84,7 @@ int YTextDocument::layoutBlock(QTextBlock * textBlock)
 
 }
 
-QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos /* = 0 */)
+QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos /* = 0 */) const
 {
     std::vector<int>::const_iterator blockitr = std::upper_bound(
         m_blockLayoutPositions.begin(),
@@ -98,14 +102,30 @@ QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * cl
     }
 }
 
-int YTextDocument::blockLayoutPosition(QTextBlock block)
+int YTextDocument::blockLayoutPosition(QTextBlock block) const
 {
     int blockNumber = block.blockNumber();
-    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutPositions.size()) { return -1; }
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutPositions.size()) {
+        return -1;
+    }
     return m_blockLayoutPositions[blockNumber];
 }
 
+qint64 YTextDocument::blockAddress(QTextBlock block) const
+{
+    int blockNumber = block.blockNumber();
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_lineAddresses.size()) {
+        return -1;
+    }
+    return m_lineAddresses[blockNumber];
+}
+
 QTextDocument * YTextDocument::document()
+{
+    return m_document.data();
+}
+
+const QTextDocument * YTextDocument::document() const
 {
     return m_document.data();
 }

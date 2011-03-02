@@ -32,12 +32,12 @@ void FullLayout::onFileChanged()
 void FullLayout::performLayout()
 {
     LayoutStrategy::performLayout();
-    view()->updateScrollBars(view()->document()->numLayoutLines(), view()->numLinesOnScreen());
+    view()->updateScrollBars(view()->document()->numLayoutLines() - view()->numLinesOnScreen());
 }
 
 void FullLayout::resizeEvent()
 {
-    view()->updateScrollBars(view()->document()->numLayoutLines(), view()->numLinesOnScreen());
+    view()->updateScrollBars(view()->document()->numLayoutLines() - view()->numLinesOnScreen());
 }
 
 int FullLayout::topScreenLine() const

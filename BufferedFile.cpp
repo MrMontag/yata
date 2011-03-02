@@ -23,6 +23,11 @@ BufferedFile::~BufferedFile()
 {
 }
 
+const QString & BufferedFile::filename() const
+{
+    return m_filename;
+}
+
 qint64 BufferedFile::size() const
 {
     return m_size;

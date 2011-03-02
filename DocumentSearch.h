@@ -18,6 +18,8 @@ class DocumentSearch: public BaseSearch {
 public:
     DocumentSearch(QTextDocument * document);
 
+    ~DocumentSearch();
+
     bool searchDocument(bool isForward, bool wrapAround = true);
 
     void setCursor(const QTextCursor & cursor);

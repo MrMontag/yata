@@ -48,8 +48,9 @@ public:
 
     // Functions used by the LayoutStrategy class and subclasses
     FileBlockReader * blockReader() { return m_blockReader.data(); }
+    const FileBlockReader * blockReader() const { return m_blockReader.data(); }
     YTextDocument * document() { return m_document.data(); }
-    void updateScrollBars(int lines, int visibleLines);
+    void updateScrollBars(int newMax);
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
     const QString & filename() const { return m_filename; }

@@ -28,6 +28,7 @@ public:
     void readAll(QString * data, std::vector<qint64> * filePositions);
 
 	qint64 size() const;
+    const QString & filename() const;
 private:
     qint64 beginningOfLine(qint64 start_pos);
     qint64 nextLine(qint64 start_pos);

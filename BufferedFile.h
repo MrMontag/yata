@@ -15,6 +15,8 @@ public:
     BufferedFile(const QString & filename);
     ~BufferedFile();
 
+    const QString & filename() const;
+
     qint64 size() const;
     bool getChar(qint64 pos, char * ch);
 

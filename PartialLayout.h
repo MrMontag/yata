@@ -28,8 +28,9 @@ private:
     void updateDocumentForPartialLayout(
         bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
     void updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
+    qint64 bottomScreenPosition() const;
 private:
-    int m_firstVisibleLayoutLine;
+    int m_topScreenLine;
     int m_firstVisibleBlock;
     int m_firstVisibleBlockLine;
     qint64 m_lastFileAddress;

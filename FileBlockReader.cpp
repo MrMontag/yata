@@ -49,6 +49,11 @@ qint64 FileBlockReader::size() const
 	return m_file.size();
 }
 
+const QString & FileBlockReader::filename() const
+{
+    return m_file.filename();
+}
+
 qint64 FileBlockReader::beginningOfLine(qint64 start_pos)
 {
     while(start_pos > 0) {

@@ -21,7 +21,7 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 
 PartialLayout::PartialLayout(TailView * tailView)
     : LayoutStrategy(tailView)
-    , m_firstVisibleLayoutLine(0)
+    , m_topScreenLine(0)
     , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
     , m_lastFileAddress(0)
@@ -40,7 +40,7 @@ void PartialLayout::resizeEvent()
 
 int PartialLayout::topScreenLine() const
 {
-    return m_firstVisibleLayoutLine;
+    return m_topScreenLine;
 }
 
 void PartialLayout::scrollTo(int newTopLine)
@@ -115,19 +115,17 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
     const int lines_on_screen = view()->numLinesOnScreen();
     const int visible_lines = lines_on_screen + 1;
 
-    // TODO: account for wrapped lines when computing bottom_screen_pos
-    const qint64 bottom_screen_pos = blockReader->getStartPosition(blockReader->size(), -lines_on_screen);
+    const qint64 bottom_screen_pos = bottomScreenPosition();
 
     const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
 
-    // In partial layout, page up/down is handled manually, so just pass 0 for the visibleLines argument.
-    view()->updateScrollBars(approx_lines, 0);
+    view()->updateScrollBars(approx_lines);
 
     QScrollBar * verticalScrollBar = view()->verticalScrollBar();
 
     qint64 file_pos = 0;
     if(0 == line_change || new_line_address != -1) {
-        m_firstVisibleLayoutLine = 0; // TODO: don't reset if scrollbar didn't move
+        m_topScreenLine = 0; // TODO: don't reset if scrollbar didn't move
         m_firstVisibleBlock = 0;
         m_firstVisibleBlockLine = 0;
 
@@ -171,12 +169,12 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             m_firstVisibleBlock = block.blockNumber();
             m_firstVisibleBlockLine += line_change;
 
-            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
+            m_topScreenLine = m_firstVisibleBlockLine;
             for(QTextBlock block = document()->document()->firstBlock();
                 block.blockNumber() < m_firstVisibleBlock;
                 block = block.next()) {
 
-                m_firstVisibleLayoutLine += block.layout()->lineCount();
+                m_topScreenLine += block.layout()->lineCount();
             }
 
         } else {
@@ -191,7 +189,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             }
 
             m_firstVisibleBlockLine = line_change - wrapped_line_count;
-            m_firstVisibleLayoutLine = m_firstVisibleBlockLine;
+            m_topScreenLine = m_firstVisibleBlockLine;
             m_firstVisibleBlock = 0;
 
             file_pos = blockReader->getStartPosition(file_pos, real_line_count);
@@ -213,4 +211,37 @@ void PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, q
         &data, &lineAddresses, start_pos, lines_after_start, num_lines);
     document()->setText(data, lineAddresses);
     performLayout();
+}
+
+qint64 PartialLayout::bottomScreenPosition() const
+{
+    //TODO: Account for when top line of bottom screen is wrapped.
+
+    FileBlockReader bottomReader(view()->blockReader()->filename());
+    QString data;
+    std::vector<qint64> lineAddresses;
+    const int numLines = view()->numLinesOnScreen();
+    bottomReader.readChunk(
+        &data, &lineAddresses, bottomReader.size(), -numLines, numLines);
+    YTextDocument document;
+    document.setText(data, lineAddresses);
+    document.layout(view()->width());
+
+    int lines = 0;
+    qint64 line_address = 0;
+
+    QTextBlock block = document.document()->lastBlock();
+    while(block.isValid()) {
+        lines += block.layout()->lineCount();
+        if(lines >= numLines) {
+            line_address = document.blockAddress(block);
+            break;
+        }
+        block = block.previous();
+    }
+
+    // in case YTextDocument::blockAddress() returns -1
+    line_address = std::max(line_address, 0LL);
+
+    return line_address;
 }

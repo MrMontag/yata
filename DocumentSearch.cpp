@@ -14,6 +14,10 @@ DocumentSearch::DocumentSearch(QTextDocument * document)
 {
 }
 
+DocumentSearch::~DocumentSearch()
+{
+}
+
 void DocumentSearch::setCursor(const QTextCursor & cursor)
 {
     *m_textCursor = cursor;
