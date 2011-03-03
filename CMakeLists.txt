@@ -12,10 +12,13 @@ include(${QT_USE_FILE})
 include_directories(${CMAKE_BINARY_DIR})
 set(CMAKE_BUILD_TYPE Release)
 
-# commented until winres.exe is figured out
-#if(CMAKE_COMPILER_IS_GNUCXX)
-#    add_definitions(-Wall -Wextra)
-#endif(CMAKE_COMPILER_IS_GNUCXX)
+# cmake apparently doesn't distinguish between g++ and winres, and so winres gets these options, and
+# chokes. So, for now, disable extra warnings if on mingw.
+if(NOT MINGW)
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-Wall -Wextra)
+endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(NOT MINGW)
 
 set(Yata_Mocs
     MainWindow.h
@@ -63,5 +66,9 @@ add_executable(yata
     ${Yata_Ui_Srcs}
     ${Yata_Rsrcs_Srcs}
     ${Win32_Rsrcs})
+if(MINGW)
+    # Disable the console window
+    target_link_libraries(yata "-mwindows")
+endif(MINGW)
 target_link_libraries(yata ${QT_LIBRARIES})
 
