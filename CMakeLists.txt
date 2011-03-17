@@ -1,3 +1,4 @@
+
 # This file is part of yata -- Yet Another Tail Application
 # Copyright 2010-2011 James Smith
 # 
@@ -8,6 +9,11 @@ cmake_minimum_required(VERSION 2.6)
 
 find_package(Qt4 4.7.0 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake-modules/")
+
+find_package(yaml-cpp REQUIRED)
+include_directories(${YAML_INCLUDE_PATH})
 
 include_directories(${CMAKE_BINARY_DIR})
 set(CMAKE_BUILD_TYPE Release)
@@ -31,6 +37,12 @@ set(Yata_Mocs
 set(Yata_Uis
     MainWindow.ui
     SearchWidget.ui)
+
+set(Yata_Session_Srcs
+    session/ApplicationSession.cpp
+    session/FileSession.cpp
+    session/SearchSession.cpp
+    session/SessionIO.cpp)
 
 set(Yata_Srcs
     BaseSearch.cpp
@@ -62,6 +74,7 @@ qt4_add_resources(Yata_Rsrcs_Srcs ${Yata_Rsrcs})
 
 add_executable(yata
     ${Yata_Srcs}
+    ${Yata_Session_Srcs}
     ${Yata_Moc_Srcs}
     ${Yata_Ui_Srcs}
     ${Yata_Rsrcs_Srcs}
@@ -70,5 +83,5 @@ if(MINGW)
     # Disable the console window
     target_link_libraries(yata "-mwindows")
 endif(MINGW)
-target_link_libraries(yata ${QT_LIBRARIES})
+target_link_libraries(yata ${QT_LIBRARIES} ${YAML_LIB})
 
