@@ -9,6 +9,8 @@ const std::string ApplicationSession::FILE_KEY = "files";
 const std::string ApplicationSession::SEARCH_KEY = "search-data";
 const std::string ApplicationSession::VERSION_KEY = "version";
 
+// TODO: include active tab as part of session
+
 ApplicationSession::ApplicationSession()
     : m_search(new SearchSession)
     , m_status(ParsingStatus::OK)

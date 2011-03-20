@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
- * 
+ * Copyright 2010-2011 James Smith
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef MAINWINDOW_H
@@ -11,6 +11,7 @@
 
 class TailView;
 class YTabWidget;
+class FileSession;
 
 class MainWindow: public QMainWindow {
 	Q_OBJECT
@@ -18,12 +19,16 @@ public:
 	MainWindow();
 
 	void addFile(const QString & filename);
+
+    void fileSessions(std::vector<FileSession> * sessions) const;
 signals:
     void fileOpened(const QString &);
 protected:
-        void dragEnterEvent(QDragEnterEvent *);
-        void dragMoveEvent(QDragMoveEvent *);
-        void dropEvent(QDropEvent *);
+    void dragEnterEvent(QDragEnterEvent *);
+    void dragMoveEvent(QDragMoveEvent *);
+    void dropEvent(QDropEvent *);
+
+    void closeEvent(QCloseEvent *);
 private slots:
     void on_actionFollow_tail_triggered(bool checked);
     void on_actionRefresh_triggered();

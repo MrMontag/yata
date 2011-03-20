@@ -1,11 +1,17 @@
+/*
+ * This file is part of yata -- Yet Another Tail Application
+ * Copyright 2010-2011 James Smith
+ *
+ * Licensed under the GNU General Public License.  See license.txt for details.
+ */
 #include "SessionIO.h"
 #include "ApplicationSession.h"
 
 #include <fstream>
 
-ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, const char * filename)
+ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, const std::string & filename)
 {
-    std::ifstream in(filename);
+    std::ifstream in(filename.c_str());
     if (in) {
         return readSession(session, in);
     }
@@ -27,9 +33,9 @@ ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, std::is
     return session->status();
 }
 
-void SessionIO::writeSession(const ApplicationSession & session, const char * filename)
+void SessionIO::writeSession(const ApplicationSession & session, const std::string & filename)
 {
-    std::ofstream out(filename);
+    std::ofstream out(filename.c_str());
     if (out) {
         writeSession(session, out);
     }

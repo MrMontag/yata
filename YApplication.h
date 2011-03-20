@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -13,6 +13,8 @@ class YApplication
 {
 public:
     static QString displayAppName();
+    static QString settingsPath();
+    static QString sessionFilePath();
 private:
     YApplication();
 };

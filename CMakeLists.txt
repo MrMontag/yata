@@ -52,17 +52,18 @@ set(Yata_Srcs
     FileSearch.cpp
     FullLayout.cpp
     LayoutStrategy.cpp
-    main.cpp
     MainWindow.cpp
     PartialLayout.cpp
     SearchWidget.cpp
+    SessionLoader.cpp
     TailView.cpp
     YApplication.cpp
     YFileCursor.cpp
     YFileSystemWatcher.cpp
     YFileSystemWatcherThread.cpp
     YTabWidget.cpp
-    YTextDocument.cpp)
+    YTextDocument.cpp
+    main.cpp)
 
 set(Yata_Rsrcs TailViewResources.qrc)
 

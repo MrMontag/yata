@@ -1,4 +1,7 @@
 /*
+ * This file is part of yata -- Yet Another Tail Application
+ * Copyright 2010-2011 James Smith
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef TAIL_VIEW_H

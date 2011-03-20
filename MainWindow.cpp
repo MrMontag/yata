@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -8,7 +8,9 @@
 #include "TailView.h"
 #include "YTabWidget.h"
 #include "SearchWidget.h"
+#include "SessionLoader.h"
 #include "YApplication.h"
+#include "session/FileSession.h"
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -57,6 +59,16 @@ void MainWindow::addFile(const QString & filename)
     m_tabWidget->openTab(tailView, displayFilename, displayBase);
 }
 
+void MainWindow::fileSessions(std::vector<FileSession> * sessions) const
+{
+    sessions->clear();
+    for (int i = 0; i < m_tabWidget->count(); i++) {
+        TailView * view = dynamic_cast<TailView*>(m_tabWidget->widget(i));
+        sessions->push_back(FileSession());
+        sessions->back().path = view->filename().toStdString();
+    }
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent * event)
 {
     dragMoveEvent(event);
@@ -97,6 +109,12 @@ void MainWindow::dropEvent(QDropEvent * event)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent * e)
+{
+    SessionLoader::writeSession(this);
+    e->accept();
+}
+
 void MainWindow::on_action_Open_triggered()
 {
     QStringList filenames = QFileDialog::getOpenFileNames(
@@ -114,7 +132,7 @@ void MainWindow::on_action_Open_triggered()
 
 void MainWindow::on_action_Exit_triggered()
 {
-    qApp->exit();
+    close();
 }
 
 void MainWindow::on_action_Find_triggered()
