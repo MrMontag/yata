@@ -227,8 +227,7 @@ bool TailView::followTail() const
 void TailView::onFileDeleted()
 {
     // TODO: display an error message
-    m_document->setText(QString(), std::vector<qint64>());
-    viewport()->update();
+    onFileChanged();
 }
 
 void TailView::paintEvent(QPaintEvent * /*event*/)
