@@ -21,6 +21,7 @@ struct SearchSession;
 class ApplicationSession {
 public:
     static const std::string FILE_KEY;
+    static const std::string FILE_INDEX_KEY;
     static const std::string SEARCH_KEY;
     static const std::string VERSION_KEY;
     static const int VERSION_MAJOR = 1;
@@ -39,9 +40,12 @@ public:
     ParsingStatus::Enum status() const { return m_status; }
     void setStatus(ParsingStatus::Enum status) { m_status = status; }
 
+    int currentIndex() const { return m_currentIndex; }
+    void setCurrentIndex(int currentIndex) { m_currentIndex = currentIndex; }
 private:
     std::auto_ptr<SearchSession> m_search;
     std::vector<FileSession> m_files;
+    int m_currentIndex;
     ParsingStatus::Enum m_status;
 };
 

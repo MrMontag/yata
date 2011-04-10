@@ -24,17 +24,18 @@ void SessionLoader::readSession(MainWindow * win)
         const FileSession & fileSession = appSession.fileAt(i);
         win->addFile(QString::fromStdString(fileSession.path));
     }
+
+    win->setCurrentFileIndex(appSession.currentIndex());
 }
 
 void SessionLoader::writeSession(MainWindow * win)
 {
     SessionIO sessionIO;
     ApplicationSession appSession;
+    appSession.setCurrentIndex(win->currentFileIndex());
 
     std::vector<FileSession> sessions;
-
     win->fileSessions(&sessions);
-    
     for(std::vector<FileSession>::const_iterator itr = sessions.begin();
         itr != sessions.end();
         ++itr) {

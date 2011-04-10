@@ -69,6 +69,16 @@ void MainWindow::fileSessions(std::vector<FileSession> * sessions) const
     }
 }
 
+int MainWindow::currentFileIndex() const
+{
+    return m_tabWidget->currentIndex();
+}
+
+void MainWindow::setCurrentFileIndex(int index)
+{
+    m_tabWidget->setCurrentIndex(index);
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent * event)
 {
     dragMoveEvent(event);

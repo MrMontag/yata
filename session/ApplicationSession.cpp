@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+const std::string ApplicationSession::FILE_INDEX_KEY = "current-file-index";
 const std::string ApplicationSession::FILE_KEY = "files";
 const std::string ApplicationSession::SEARCH_KEY = "search-data";
 const std::string ApplicationSession::VERSION_KEY = "version";
@@ -13,6 +14,7 @@ const std::string ApplicationSession::VERSION_KEY = "version";
 
 ApplicationSession::ApplicationSession()
     : m_search(new SearchSession)
+    , m_currentIndex(-1)
     , m_status(ParsingStatus::OK)
 {
 }
@@ -60,6 +62,11 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const ApplicationSession & appSe
 
     out << YAML::Key << ApplicationSession::SEARCH_KEY << YAML::Value << appSession.search();
 
+    if(appSession.currentIndex() >= 0) {
+        out << YAML::Key << ApplicationSession::FILE_INDEX_KEY
+            << YAML::Value << appSession.currentIndex();
+    }
+
     out << YAML::Key << ApplicationSession::FILE_KEY << YAML::Value;
     out << YAML::BeginSeq;
     for(size_t i = 0; i < appSession.fileCount(); i++) {
@@ -100,6 +107,7 @@ void operator>>(const YAML::Node & in, ApplicationSession & appSession)
     if (appSession.status() == ParsingStatus::IncompatibleVersion) { return; }
 
     appSession.setSearch(getValue<SearchSession>(in, ApplicationSession::SEARCH_KEY));
+    appSession.setCurrentIndex(getValue<int>(in, ApplicationSession::FILE_INDEX_KEY));
     if(const YAML::Node * files = in.FindValue(ApplicationSession::FILE_KEY)) {
         for(YAML::Iterator itr = files->begin(); itr != files->end(); ++itr) {
             FileSession file;

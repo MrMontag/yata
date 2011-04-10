@@ -21,6 +21,8 @@ public:
 	void addFile(const QString & filename);
 
     void fileSessions(std::vector<FileSession> * sessions) const;
+    int currentFileIndex() const;
+    void setCurrentFileIndex(int index);
 signals:
     void fileOpened(const QString &);
 protected:
