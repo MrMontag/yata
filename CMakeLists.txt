@@ -16,7 +16,13 @@ find_package(yaml-cpp REQUIRED)
 include_directories(${YAML_INCLUDE_PATH})
 
 include_directories(${CMAKE_BINARY_DIR})
-set(CMAKE_BUILD_TYPE Release)
+
+if(DEFINED CONFIG)
+    message("-- Setting CMAKE_BUILD_TYPE to ${CONFIG}")
+    set(CMAKE_BUILD_TYPE ${CONFIG})
+else()
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 # cmake apparently doesn't distinguish between g++ and winres, and so winres gets these options, and
 # chokes. So, for now, disable extra warnings if on mingw.
