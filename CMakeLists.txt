@@ -45,7 +45,7 @@ set(Yata_Uis
     SearchWidget.ui)
 
 set(Yata_Session_Srcs
-    session/ApplicationSession.cpp
+    session/AppSession.cpp
     session/FileSession.cpp
     session/SearchSession.cpp
     session/SessionIO.cpp)

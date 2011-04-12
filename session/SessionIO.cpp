@@ -5,11 +5,11 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "SessionIO.h"
-#include "ApplicationSession.h"
+#include "AppSession.h"
 
 #include <fstream>
 
-ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, const std::string & filename)
+ParsingStatus::Enum SessionIO::readSession(AppSession * session, const std::string & filename)
 {
     std::ifstream in(filename.c_str());
     if (in) {
@@ -18,7 +18,7 @@ ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, const s
     return ParsingStatus::FileNotFound;
 }
 
-ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, std::istream & in)
+ParsingStatus::Enum SessionIO::readSession(AppSession * session, std::istream & in)
 {
     try {
         YAML::Parser parser(in);
@@ -33,7 +33,7 @@ ParsingStatus::Enum SessionIO::readSession(ApplicationSession * session, std::is
     return session->status();
 }
 
-void SessionIO::writeSession(const ApplicationSession & session, const std::string & filename)
+void SessionIO::writeSession(const AppSession & session, const std::string & filename)
 {
     std::ofstream out(filename.c_str());
     if (out) {
@@ -41,7 +41,7 @@ void SessionIO::writeSession(const ApplicationSession & session, const std::stri
     }
 }
 
-void SessionIO::writeSession(const ApplicationSession & session, std::ostream & out)
+void SessionIO::writeSession(const AppSession & session, std::ostream & out)
 {
     YAML::Emitter emitter;
     emitter << session;

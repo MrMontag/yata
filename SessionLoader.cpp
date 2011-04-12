@@ -7,7 +7,7 @@
 #include "SessionLoader.h"
 #include "MainWindow.h"
 #include "YApplication.h"
-#include "session/ApplicationSession.h"
+#include "session/AppSession.h"
 #include "session/FileSession.h"
 #include "session/SessionIO.h"
 #include <QDir>
@@ -15,7 +15,7 @@
 void SessionLoader::readSession(MainWindow * win)
 {
     SessionIO sessionIO;
-    ApplicationSession appSession;
+    AppSession appSession;
 
     std::string sessionFile = nativeSessionPath();
     sessionIO.readSession(&appSession, sessionFile);
@@ -28,8 +28,8 @@ void SessionLoader::readSession(MainWindow * win)
     win->setCurrentFileIndex(appSession.currentIndex());
 
     QByteArray qGeometry;
-    const ApplicationSession::GContainer & geometry = appSession.geometry();
-    for(ApplicationSession::GContainer::const_iterator itr = geometry.begin();
+    const AppSession::GContainer & geometry = appSession.geometry();
+    for(AppSession::GContainer::const_iterator itr = geometry.begin();
         itr != geometry.end(); ++itr) {
         qGeometry.push_back(*itr);
     }
@@ -40,7 +40,7 @@ void SessionLoader::readSession(MainWindow * win)
 void SessionLoader::writeSession(MainWindow * win)
 {
     SessionIO sessionIO;
-    ApplicationSession appSession;
+    AppSession appSession;
     appSession.setCurrentIndex(win->currentFileIndex());
 
     std::vector<FileSession> sessions;
@@ -53,7 +53,7 @@ void SessionLoader::writeSession(MainWindow * win)
 
     QByteArray qGeometry = win->saveGeometry();
 
-    ApplicationSession::GContainer geometry;
+    AppSession::GContainer geometry;
 
     for(int i = 0; i < qGeometry.size(); i++) {
         geometry.push_back(qGeometry[i]);

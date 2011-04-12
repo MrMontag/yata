@@ -18,7 +18,7 @@ namespace YAML {
 struct FileSession;
 struct SearchSession;
 
-class ApplicationSession {
+class AppSession {
 public:
     typedef std::vector<int> GContainer;
 
@@ -31,8 +31,8 @@ public:
     static const int VERSION_MAJOR = 1;
     static const int VERSION_MINOR = 0;
 
-    ApplicationSession();
-    ~ApplicationSession();
+    AppSession();
+    ~AppSession();
  
     void addFile(const FileSession & fileSession);
     void setSearch(const SearchSession & searchSession);
@@ -57,7 +57,7 @@ private:
     GContainer m_geometry;
 };
 
-YAML::Emitter & operator<<(YAML::Emitter & out, const ApplicationSession & appSession);
-void operator>>(const YAML::Node & in, ApplicationSession & appSession);
+YAML::Emitter & operator<<(YAML::Emitter & out, const AppSession & appSession);
+void operator>>(const YAML::Node & in, AppSession & appSession);
 
 #endif

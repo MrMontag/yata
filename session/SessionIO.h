@@ -12,15 +12,15 @@
 
 #include "SessionCommon.h"
 
-class ApplicationSession;
+class AppSession;
 
 class SessionIO {
 public:
-    ParsingStatus::Enum readSession(ApplicationSession * session, const std::string & filename);
-    ParsingStatus::Enum readSession(ApplicationSession * session, std::istream & in);
+    ParsingStatus::Enum readSession(AppSession * session, const std::string & filename);
+    ParsingStatus::Enum readSession(AppSession * session, std::istream & in);
 
-    void writeSession(const ApplicationSession & session, const std::string & filename);
-    void writeSession(const ApplicationSession & session, std::ostream & out);
+    void writeSession(const AppSession & session, const std::string & filename);
+    void writeSession(const AppSession & session, std::ostream & out);
 
     const ParsingError * parsingError() const;
 private:
