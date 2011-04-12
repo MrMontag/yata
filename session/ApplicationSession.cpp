@@ -5,6 +5,7 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+const std::string ApplicationSession::GEOMETRY_KEY = "geometry";
 const std::string ApplicationSession::FILE_INDEX_KEY = "current-file-index";
 const std::string ApplicationSession::FILE_KEY = "files";
 const std::string ApplicationSession::SEARCH_KEY = "search-data";
@@ -49,6 +50,16 @@ const SearchSession & ApplicationSession::search() const
     return *m_search;
 }
 
+void ApplicationSession::setGeometry(GContainer & geometry)
+{
+    m_geometry.clear();
+    m_geometry.swap(geometry);
+}
+
+const ApplicationSession::GContainer & ApplicationSession::geometry() const
+{
+    return m_geometry;
+}
 
 YAML::Emitter & operator<<(YAML::Emitter & out, const ApplicationSession & appSession)
 {
@@ -73,6 +84,9 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const ApplicationSession & appSe
         out << appSession.fileAt(i);
     }
     out << YAML::EndSeq;
+
+    out << YAML::Key << ApplicationSession::GEOMETRY_KEY
+        << YAML::Value << YAML::Flow << appSession.geometry();
 
     out << YAML::EndMap;
     return out;
@@ -115,4 +129,8 @@ void operator>>(const YAML::Node & in, ApplicationSession & appSession)
             appSession.addFile(file);
         }
     }
+    
+    ApplicationSession::GContainer geometry =
+        getValue<ApplicationSession::GContainer>(in, ApplicationSession::GEOMETRY_KEY);
+    appSession.setGeometry(geometry);
 }

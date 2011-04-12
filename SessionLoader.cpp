@@ -26,6 +26,15 @@ void SessionLoader::readSession(MainWindow * win)
     }
 
     win->setCurrentFileIndex(appSession.currentIndex());
+
+    QByteArray qGeometry;
+    const ApplicationSession::GContainer & geometry = appSession.geometry();
+    for(ApplicationSession::GContainer::const_iterator itr = geometry.begin();
+        itr != geometry.end(); ++itr) {
+        qGeometry.push_back(*itr);
+    }
+
+    win->restoreGeometry(qGeometry);
 }
 
 void SessionLoader::writeSession(MainWindow * win)
@@ -41,6 +50,16 @@ void SessionLoader::writeSession(MainWindow * win)
         ++itr) {
         appSession.addFile(*itr);
     }
+
+    QByteArray qGeometry = win->saveGeometry();
+
+    ApplicationSession::GContainer geometry;
+
+    for(int i = 0; i < qGeometry.size(); i++) {
+        geometry.push_back(qGeometry[i]);
+    }
+
+    appSession.setGeometry(geometry);
 
     std::string sessionFile = nativeSessionPath();
     sessionIO.writeSession(appSession, sessionFile);
