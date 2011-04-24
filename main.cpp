@@ -14,7 +14,7 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/smiley.png"));
+    app.setWindowIcon(QIcon(":/yata.png"));
     QScopedPointer<MainWindow> win(new MainWindow);
 
     QDir dir;
