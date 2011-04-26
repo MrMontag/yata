@@ -10,7 +10,7 @@
 #include <QTabWidget>
 #include <QScopedPointer>
 
-class QToolButton;
+class YTabMenuButton;
 class QMenu;
 
 class YTabWidget : public QTabWidget {
@@ -37,7 +37,7 @@ private:
     void updateContextMenu();
 
 private:
-    QToolButton * m_buttonChooseTab;
+    YTabMenuButton * m_buttonChooseTab;
     QScopedPointer<QMenu> m_menuChooseTab;
     QMenu * m_menuTab;
     QAction * m_actionCloseTab;

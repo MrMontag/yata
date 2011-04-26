@@ -68,6 +68,7 @@ set(Yata_Srcs
     YFileSystemWatcher.cpp
     YFileSystemWatcherThread.cpp
     YTabWidget.cpp
+    YTabMenuButton.cpp
     YTextDocument.cpp
     main.cpp)
 

@@ -5,18 +5,18 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YTabWidget.h"
+#include "YTabMenuButton.h"
 
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QTabBar>
-#include <QToolButton>
 #include <QtDebug>
 
 // TODO: icons
 
 YTabWidget::YTabWidget(QWidget *parent)
     : QTabWidget(parent)
-    , m_buttonChooseTab(new QToolButton(this))
+    , m_buttonChooseTab(new YTabMenuButton(this))
     , m_menuChooseTab(new QMenu(this))
     , m_menuTab(new QMenu(this))
     , m_tabIndexForContextMenu(-1)
@@ -24,8 +24,6 @@ YTabWidget::YTabWidget(QWidget *parent)
     setDocumentMode(true);
     setTabsClosable(true);
 
-    m_buttonChooseTab->setArrowType(Qt::DownArrow);
-    m_buttonChooseTab->setPopupMode(QToolButton::InstantPopup);
     m_buttonChooseTab->setMenu(m_menuChooseTab.data());
     setCornerWidget(m_buttonChooseTab);
     setMovable(true);
