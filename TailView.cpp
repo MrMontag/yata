@@ -1,15 +1,16 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "TailView.h"
-#include "FileBlockReader.h"
 #include "DocumentSearch.h"
+#include "FileBlockReader.h"
 #include "FileSearch.h"
 #include "FullLayout.h"
 #include "PartialLayout.h"
+#include "SearchInfo.h"
 #include "YApplication.h"
 #include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
@@ -35,6 +36,7 @@ const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
+    , m_isActive(false)
     , m_layoutType(AutomaticLayout)
     , m_fullLayoutStrategy(new FullLayout(this))
     , m_partialLayoutStrategy(new PartialLayout(this))
@@ -93,9 +95,8 @@ bool TailView::searchWasCaseSensitive() const
     return m_documentSearch->searchWasCaseSensitive();
 }
 
-void TailView::newSearch(const QString & searchString, bool isRegex, bool caseSensitive)
+void TailView::newSearch()
 {
-    m_documentSearch->setSearchCriteria(searchString, isRegex, caseSensitive);
     searchFile(true);
 }
 
@@ -111,6 +112,8 @@ void TailView::searchBackward()
 
 void TailView::searchFile(bool isForward)
 {
+    const SearchCriteria & sc = SearchInfo::instance().search();
+    m_documentSearch->setSearchCriteria(sc.expression, sc.isRegex, sc.isCaseSensitive);
     bool wrapAround = m_layoutStrategy->wrapAroundForDocumentSearch();
     bool matchFound = searchDocument(isForward, wrapAround);
     if(matchFound) {
@@ -187,6 +190,22 @@ void TailView::scrollToIfNecessary(const QTextCursor & cursor)
     int newTopLine = cursorLineNumber - numReadableLines / 2;
 
     m_layoutStrategy->scrollTo(newTopLine);
+}
+
+void TailView::setActive(bool active)
+{
+    // No need to perform any action if we're not changing state
+    if (active == m_isActive) { return; }
+
+    m_isActive = active;
+
+    SearchInfo & si = SearchInfo::instance();
+
+    if (active) {
+        connect(&si, SIGNAL(newSearch()), SLOT(newSearch()));
+    } else {
+        disconnect(&si, SIGNAL(newSearch()), this, SLOT(newSearch()));
+    }
 }
 
 void TailView::onFileChanged()

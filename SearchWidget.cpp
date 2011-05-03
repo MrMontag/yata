@@ -1,11 +1,13 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "SearchWidget.h"
 #include "ui_SearchWidget.h"
+
+#include "SearchInfo.h"
 
 #include <QMessageBox>
 #include <QRegExp>
@@ -13,16 +15,18 @@
 
 #include "YApplication.h"
 
-SearchWidget::SearchWidget(const QString & searchExpression, bool isRegex, bool caseSensitive, QWidget *parent)
+SearchWidget::SearchWidget(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SearchWidget)
 {
     ui->setupUi(this);
 
-    ui->lineEdit_search->setText(searchExpression);
+    const SearchCriteria & sc = SearchInfo::instance().search();
+
+    ui->lineEdit_search->setText(sc.expression);
     ui->lineEdit_search->selectAll();
-    ui->checkBox_regex->setChecked(isRegex);
-    ui->checkBox_caseSensitive->setChecked(caseSensitive);
+    ui->checkBox_regex->setChecked(sc.isRegex);
+    ui->checkBox_caseSensitive->setChecked(sc.isCaseSensitive);
 }
 
 SearchWidget::~SearchWidget()
@@ -59,6 +63,10 @@ void SearchWidget::accept()
             return;
         }
     }
-    emit searchAccepted(ui->lineEdit_search->text(), ui->checkBox_regex->isChecked(), ui->checkBox_caseSensitive->isChecked());
+    SearchCriteria sc(
+        ui->lineEdit_search->text(),
+        ui->checkBox_regex->isChecked(),
+        ui->checkBox_caseSensitive->isChecked());
+    SearchInfo::instance().setSearch(sc);
     QDialog::accept();
 }

@@ -1,11 +1,12 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YTabWidget.h"
 #include "YTabMenuButton.h"
+#include "TailView.h"
 
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -20,6 +21,7 @@ YTabWidget::YTabWidget(QWidget *parent)
     , m_menuChooseTab(new QMenu(this))
     , m_menuTab(new QMenu(this))
     , m_tabIndexForContextMenu(-1)
+    , m_currentIndex(-1)
 {
     setDocumentMode(true);
     setTabsClosable(true);
@@ -30,6 +32,7 @@ YTabWidget::YTabWidget(QWidget *parent)
 
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(on_tabCloseRequested(int)));
     connect(tabBar(), SIGNAL(tabMoved(int,int)), SLOT(onTabMoved(int,int)));
+    connect(this, SIGNAL(currentChanged(int)), SLOT(on_currentChanged(int)));
 
     m_actionCloseTab = m_menuTab->addAction(
         tr("&Close tab"),
@@ -114,6 +117,16 @@ void YTabWidget::onTabMoved(int from, int to)
     newMenu->addActions(actions);
     m_buttonChooseTab->setMenu(newMenu);
     m_menuChooseTab.reset(newMenu);
+    m_currentIndex = currentIndex();
+}
+
+void YTabWidget::on_currentChanged(int index)
+{
+    if(m_currentIndex > -1) {
+        setViewActive(m_currentIndex, false);
+    }
+    setViewActive(index, true);
+    m_currentIndex = index;
 }
 
 void YTabWidget::on_tabChooseMenuTriggered()
@@ -155,4 +168,11 @@ void YTabWidget::updateContextMenu()
     m_actionCloseTab->setEnabled(count() > 0);
     m_actionCloseOtherTabs->setEnabled(count() > 1);
     m_actionCloseAllTabs->setEnabled(count() > 0);
+}
+
+void YTabWidget::setViewActive(int index, bool active)
+{
+    if(TailView * view = dynamic_cast<TailView*>(widget(index))) {
+        view->setActive(active);
+    }
 }

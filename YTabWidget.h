@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -28,6 +28,7 @@ private slots:
     void closeAllButCurrentTab();
     void closeAllTabs();
     void onTabMoved(int from, int to);
+    void on_currentChanged(int index);
 
 protected:
     void contextMenuEvent(QContextMenuEvent *);
@@ -35,6 +36,7 @@ protected:
 private:
     void setCurrentTabIfNeeded();
     void updateContextMenu();
+    void setViewActive(int index, bool active);
 
 private:
     YTabMenuButton * m_buttonChooseTab;
@@ -44,6 +46,7 @@ private:
     QAction * m_actionCloseOtherTabs;
     QAction * m_actionCloseAllTabs;
     int m_tabIndexForContextMenu;
+    int m_currentIndex;
 };
 
 #endif // YTABWIDGET_H

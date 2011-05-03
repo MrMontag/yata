@@ -11,17 +11,18 @@
 #include <QScopedPointer>
 #include <vector>
 
+class DocumentSearch;
+class FileBlockReader;
+class FullLayout;
+class LayoutStrategy;
+class PartialLayout;
 class QString;
 class QTextBlock;
 class QTextCursor;
-class DocumentSearch;
-class FileBlockReader;
+class SearchCriteria;
 class YFileCursor;
 class YFileSystemWatcherThread;
 class YTextDocument;
-class LayoutStrategy;
-class FullLayout;
-class PartialLayout;
 
 const int PAGE_STEP_OVERLAP = 2;
 
@@ -45,6 +46,9 @@ public:
     void setFollowTail(bool enabled);
     bool followTail() const;
 
+    void setActive(bool active);
+
+    // Search functions
     const QString & lastSearchString() const;
     bool searchWasRegex() const;
     bool searchWasCaseSensitive() const;
@@ -61,7 +65,7 @@ public:
     void scrollToIfNecessary(const QTextCursor & cursor);
 
 public slots:
-    void newSearch(const QString & searchString, bool isRegex, bool caseSensitive);
+    void newSearch();
     void searchForward();
     void searchBackward();
     void onFileChanged();
@@ -82,6 +86,8 @@ private:
     QString m_filename;
     QScopedPointer<YTextDocument> m_document;
     QScopedPointer<YFileSystemWatcherThread> m_watcher;
+
+    bool m_isActive;
 
     LayoutType m_layoutType;
     QScopedPointer<FullLayout> m_fullLayoutStrategy;

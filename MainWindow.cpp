@@ -147,11 +147,8 @@ void MainWindow::on_action_Exit_triggered()
 
 void MainWindow::on_action_Find_triggered()
 {
-    if(TailView * tailView = getCurrentView()) {
-        SearchWidget widget(tailView->lastSearchString(), tailView->searchWasRegex(), tailView->searchWasCaseSensitive(), this);
-        connect(&widget, SIGNAL(searchAccepted(QString,bool,bool)), tailView, SLOT(newSearch(const QString &,bool,bool)));
-        widget.exec();
-    }
+    SearchWidget widget(this);
+    widget.exec();
 }
 
 void MainWindow::on_actionFind_next_triggered()
@@ -182,7 +179,7 @@ void MainWindow::on_action_About_Yata_triggered()
     QTextStream(&message) <<
         YApplication::displayAppName() <<
         tr(" (Yet Another Tail Application): a universal log viewer\n\n"
-           "Copyright (c) 2010 James Smith");
+           "Copyright (c) 2010-2011 James Smith");
     QMessageBox::about(this, title, message);
 }
 

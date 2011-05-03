@@ -34,6 +34,7 @@ endif(NOT MINGW)
 
 set(Yata_Mocs
     MainWindow.h
+    SearchInfo.h
     SearchWidget.h
     TailView.h
     YFileSystemWatcher.h
@@ -60,6 +61,7 @@ set(Yata_Srcs
     LayoutStrategy.cpp
     MainWindow.cpp
     PartialLayout.cpp
+    SearchInfo.cpp
     SearchWidget.cpp
     SessionLoader.cpp
     TailView.cpp
@@ -67,8 +69,8 @@ set(Yata_Srcs
     YFileCursor.cpp
     YFileSystemWatcher.cpp
     YFileSystemWatcherThread.cpp
-    YTabWidget.cpp
     YTabMenuButton.cpp
+    YTabWidget.cpp
     YTextDocument.cpp
     main.cpp)
 

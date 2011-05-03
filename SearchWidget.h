@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -14,10 +14,10 @@ namespace Ui {
 }
 
 
-class SearchWidget : public QDialog {
+class SearchWidget: public QDialog {
     Q_OBJECT
 public:
-    SearchWidget(const QString & searchExpression, bool isRegex, bool caseSensitive, QWidget *parent = 0);
+    SearchWidget(QWidget *parent = 0);
     ~SearchWidget();
 signals:
     void searchAccepted(const QString & searchExpression, bool isRegex, bool caseSensitive);
