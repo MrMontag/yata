@@ -4,11 +4,13 @@
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
-#include "SessionLoader.h"
 #include "MainWindow.h"
+#include "SearchInfo.h"
+#include "SessionLoader.h"
 #include "YApplication.h"
 #include "session/AppSession.h"
 #include "session/FileSession.h"
+#include "session/SearchSession.h"
 #include "session/SessionIO.h"
 #include <QDir>
 
@@ -19,6 +21,13 @@ void SessionLoader::readSession(MainWindow * win)
 
     std::string sessionFile = nativeSessionPath();
     sessionIO.readSession(&appSession, sessionFile);
+
+    SearchInfo & searchInfo = SearchInfo::instance();
+    const SearchSession & searchSession = appSession.search();
+    searchInfo.setSearch(SearchCriteria(
+        QString::fromStdString(searchSession.expression),
+        searchSession.isCaseSensitive,
+        searchSession.isRegex));
 
     for(size_t i = 0; i < appSession.fileCount(); i++) {
         const FileSession & fileSession = appSession.fileAt(i);
@@ -42,6 +51,12 @@ void SessionLoader::writeSession(MainWindow * win)
     SessionIO sessionIO;
     AppSession appSession;
     appSession.setCurrentIndex(win->currentFileIndex());
+
+    const SearchCriteria & searchInfo = SearchInfo::instance().search();
+
+    SearchSession searchSession(
+        searchInfo.expression.toStdString(), searchInfo.isRegex, searchInfo.isCaseSensitive);
+    appSession.setSearch(searchSession);
 
     std::vector<FileSession> sessions;
     win->fileSessions(&sessions);
