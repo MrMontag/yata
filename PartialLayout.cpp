@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2011 James Smith
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -25,16 +25,19 @@ PartialLayout::PartialLayout(TailView * tailView)
     , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
     , m_lastFileAddress(0)
+    , m_bottomDocument(new YTextDocument())
 {
 }
 
 void PartialLayout::onFileChanged()
 {
+    updateBottomDocument();
     updateDocumentForPartialLayout(true);
 }
 
 void PartialLayout::resizeEvent()
 {
+    updateBottomDocument();
     updateDocumentForPartialLayout();
 }
 
@@ -213,28 +216,30 @@ void PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, q
     performLayout();
 }
 
-qint64 PartialLayout::bottomScreenPosition() const
+void PartialLayout::updateBottomDocument()
 {
-    //TODO: Account for when top line of bottom screen is wrapped.
-
     FileBlockReader bottomReader(view()->blockReader()->filename());
     QString data;
     std::vector<qint64> lineAddresses;
     const int numLines = view()->numLinesOnScreen();
     bottomReader.readChunk(
         &data, &lineAddresses, bottomReader.size(), -numLines, numLines);
-    YTextDocument document;
-    document.setText(data, lineAddresses);
-    document.layout(view()->width());
+    m_bottomDocument->setText(data, lineAddresses);
+    m_bottomDocument->layout(view()->width());
+}
+
+qint64 PartialLayout::bottomScreenPosition() const
+{
+    //TODO: Account for when top line of bottom screen is wrapped.
 
     int lines = 0;
     qint64 line_address = 0;
 
-    QTextBlock block = document.document()->lastBlock();
+    QTextBlock block = m_bottomDocument->document()->lastBlock();
     while(block.isValid()) {
         lines += block.layout()->lineCount();
-        if(lines >= numLines) {
-            line_address = document.blockAddress(block);
+        if(lines >= view()->numLinesOnScreen()) {
+            line_address = m_bottomDocument->blockAddress(block);
             break;
         }
         block = block.previous();
