@@ -31,6 +31,7 @@ PartialLayout::PartialLayout(TailView * tailView)
 
 void PartialLayout::onFileChanged()
 {
+    m_blockReader.reset(new FileBlockReader(view()->filename()));
     updateBottomDocument();
     updateDocumentForPartialLayout(true);
 }
@@ -112,8 +113,7 @@ void PartialLayout::vScrollBarAction(int action)
 
 void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_change /* = 0 */, qint64 new_line_address /* = -1 */)
 {
-    FileBlockReader * blockReader = view()->blockReader();
-    if(0 == blockReader) { return; }
+    if(0 == m_blockReader.get()) { return; }
 
     const int lines_on_screen = view()->numLinesOnScreen();
     const int visible_lines = lines_on_screen + 1;
@@ -143,7 +143,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             file_pos = static_cast<qint64>(verticalScrollBar->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
         }
 
-        file_pos = blockReader->getStartPosition(file_pos, 0);
+        file_pos = m_blockReader->getStartPosition(file_pos, 0);
 
         // Don't change the line further if we're at the bottom
         if(file_pos > bottom_screen_pos) {
@@ -195,7 +195,7 @@ void PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
             m_topScreenLine = m_firstVisibleBlockLine;
             m_firstVisibleBlock = 0;
 
-            file_pos = blockReader->getStartPosition(file_pos, real_line_count);
+            file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
             file_pos = std::min(file_pos, bottom_screen_pos);
 
             updateDocument(file_pos, 0, visible_lines);
@@ -210,7 +210,7 @@ void PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, q
 {
     QString data;
     std::vector<qint64> lineAddresses;
-    m_lastFileAddress = view()->blockReader()->readChunk(
+    m_lastFileAddress = m_blockReader->readChunk(
         &data, &lineAddresses, start_pos, lines_after_start, num_lines);
     document()->setText(data, lineAddresses);
     performLayout();
@@ -218,7 +218,7 @@ void PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, q
 
 void PartialLayout::updateBottomDocument()
 {
-    FileBlockReader bottomReader(view()->blockReader()->filename());
+    FileBlockReader bottomReader(view()->filename());
     QString data;
     std::vector<qint64> lineAddresses;
     const int numLines = view()->numLinesOnScreen();

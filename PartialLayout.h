@@ -13,6 +13,7 @@
 #include <memory>
 
 class YTextDocument;
+class FileBlockReader;
 
 class PartialLayout: public LayoutStrategy {
 public:
@@ -39,6 +40,7 @@ private:
     int m_firstVisibleBlockLine;
     qint64 m_lastFileAddress;
     std::auto_ptr<YTextDocument> m_bottomDocument;
+    std::auto_ptr<FileBlockReader> m_blockReader;
 };
 
 #endif // PARTIALLAYOUT_H

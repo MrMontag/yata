@@ -12,7 +12,6 @@
 #include <vector>
 
 class DocumentSearch;
-class FileBlockReader;
 class FullLayout;
 class LayoutStrategy;
 class PartialLayout;
@@ -54,8 +53,6 @@ public:
     bool searchWasCaseSensitive() const;
 
     // Functions used by the LayoutStrategy class and subclasses
-    FileBlockReader * blockReader() { return m_blockReader.data(); }
-    const FileBlockReader * blockReader() const { return m_blockReader.data(); }
     YTextDocument * document() { return m_document.data(); }
     void updateScrollBars(int newMax);
     int numLinesOnScreen() const;
@@ -97,8 +94,6 @@ private:
     bool m_followTail;
 
     QScopedPointer<DocumentSearch> m_documentSearch;
-
-    QScopedPointer<FileBlockReader> m_blockReader;
 };
 
 #endif

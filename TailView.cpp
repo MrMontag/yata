@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
@@ -210,14 +211,12 @@ void TailView::setActive(bool active)
 
 void TailView::onFileChanged()
 {
-    m_blockReader.reset(new FileBlockReader(m_filename));
-
     bool fullLayout = false;
     switch(m_layoutType) {
     case DebugFullLayout: fullLayout = true; break;
     case DebugPartialLayout: fullLayout = false; break;
     case AutomaticLayout:
-        fullLayout = (m_blockReader->size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+        fullLayout = (QFileInfo(m_filename).size() <= MAX_FULL_LAYOUT_FILE_SIZE);
         break;
     }
 
