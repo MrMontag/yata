@@ -22,12 +22,16 @@ void SessionLoader::readSession(MainWindow * win)
     std::string sessionFile = nativeSessionPath();
     sessionIO.readSession(&appSession, sessionFile);
 
-    SearchInfo & searchInfo = SearchInfo::instance();
-    const SearchSession & searchSession = appSession.search();
-    searchInfo.setSearch(SearchCriteria(
-        QString::fromStdString(searchSession.expression),
-        searchSession.isCaseSensitive,
-        searchSession.isRegex));
+    SearchInfo::Container searchList;
+    for(size_t i = 0; i < appSession.searchCount(); i++) {
+        const SearchSession & searchSession = appSession.searchAt(i);
+        searchList.push_back(SearchCriteria(
+            QString::fromStdString(searchSession.expression),
+            searchSession.isCaseSensitive,
+            searchSession.isRegex));
+    }
+
+    SearchInfo::instance().populateSearchList(&searchList);
 
     for(size_t i = 0; i < appSession.fileCount(); i++) {
         const FileSession & fileSession = appSession.fileAt(i);
@@ -52,11 +56,14 @@ void SessionLoader::writeSession(MainWindow * win)
     AppSession appSession;
     appSession.setCurrentIndex(win->currentFileIndex());
 
-    const SearchCriteria & searchInfo = SearchInfo::instance().search();
+    const SearchInfo & searchInfo = SearchInfo::instance();
 
-    SearchSession searchSession(
-        searchInfo.expression.toStdString(), searchInfo.isRegex, searchInfo.isCaseSensitive);
-    appSession.setSearch(searchSession);
+    for(SearchInfo::const_iterator sc = searchInfo.begin(); sc != searchInfo.end(); ++sc) {
+        SearchSession searchSession(
+            sc->expression.toStdString(), sc->isRegex, sc->isCaseSensitive);
+        appSession.addSearch(searchSession);
+    }
+
 
     std::vector<FileSession> sessions;
     win->fileSessions(&sessions);

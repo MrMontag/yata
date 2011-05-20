@@ -35,11 +35,13 @@ public:
     ~AppSession();
  
     void addFile(const FileSession & fileSession);
-    void setSearch(const SearchSession & searchSession);
+    void addSearch(const SearchSession & searchSession);
 
     size_t fileCount() const;
     const FileSession & fileAt(int index) const;
-    const SearchSession & search() const;
+
+    size_t searchCount() const;
+    const SearchSession & searchAt(int index) const;
 
     ParsingStatus::Enum status() const { return m_status; }
     void setStatus(ParsingStatus::Enum status) { m_status = status; }
@@ -50,7 +52,7 @@ public:
     void setGeometry(GContainer & geometry);
     const GContainer & geometry() const;
 private:
-    std::auto_ptr<SearchSession> m_search;
+    std::vector<SearchSession> m_searches;
     std::vector<FileSession> m_files;
     int m_currentIndex;
     ParsingStatus::Enum m_status;

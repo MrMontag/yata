@@ -9,6 +9,7 @@
 
 #include "SearchInfo.h"
 
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QRegExp>
 #include <QTextStream>
@@ -21,10 +22,15 @@ SearchWidget::SearchWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    const SearchCriteria & sc = SearchInfo::instance().search();
+    const SearchInfo & si = SearchInfo::instance();
 
-    ui->lineEdit_search->setText(sc.expression);
-    ui->lineEdit_search->selectAll();
+    for(SearchInfo::const_iterator sc = si.begin(); sc != si.end(); ++sc) {
+        ui->comboBox_search->addItem(sc->expression);
+    }
+
+    const SearchCriteria & sc = si.search();
+
+    ui->comboBox_search->lineEdit()->selectAll();
     ui->checkBox_regex->setChecked(sc.isRegex);
     ui->checkBox_caseSensitive->setChecked(sc.isCaseSensitive);
 }
@@ -49,24 +55,24 @@ void SearchWidget::changeEvent(QEvent *e)
 void SearchWidget::accept()
 {
     if(ui->checkBox_regex->isChecked()) {
-        QRegExp regex(ui->lineEdit_search->text(),
+        QRegExp regex(ui->comboBox_search->currentText(),
             ui->checkBox_caseSensitive->isChecked() ? Qt::CaseSensitive: Qt::CaseInsensitive,
             QRegExp::RegExp2);
         if(!regex.isValid()) {
             QString message;
             QTextStream(&message)
                 << tr("The pattern \"")
-                << ui->lineEdit_search->text()
+                << ui->comboBox_search->currentText()
                 << tr("\" is invalid.");
             QMessageBox::critical(this, YApplication::displayAppName(), message);
-            ui->lineEdit_search->setFocus();
+            ui->comboBox_search->setFocus();
             return;
         }
     }
     SearchCriteria sc(
-        ui->lineEdit_search->text(),
-        ui->checkBox_regex->isChecked(),
-        ui->checkBox_caseSensitive->isChecked());
-    SearchInfo::instance().setSearch(sc);
+        ui->comboBox_search->currentText(),
+        ui->checkBox_caseSensitive->isChecked(),
+        ui->checkBox_regex->isChecked());
+    SearchInfo::instance().acceptNewSearch(sc);
     QDialog::accept();
 }

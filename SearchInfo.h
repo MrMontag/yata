@@ -10,6 +10,7 @@
 
 #include <QString>
 #include <QObject>
+#include <list>
 
 struct SearchCriteria {
     QString expression;
@@ -27,12 +28,21 @@ struct SearchCriteria {
 class SearchInfo: public QObject {
     Q_OBJECT
 public:
+    typedef std::list<SearchCriteria> Container;
+
     ~SearchInfo();
 
     static SearchInfo & instance();
 
-    void setSearch(const SearchCriteria & s);
+    void populateSearchList(Container * searches);
+
+    void acceptNewSearch(const SearchCriteria & s);
     const SearchCriteria & search() const;
+
+    typedef Container::const_iterator const_iterator;
+
+    const_iterator begin() const;
+    const_iterator end() const;
 
 signals:
     void newSearch();
@@ -41,8 +51,7 @@ private:
     SearchInfo();
 
 private:
-
-    SearchCriteria m_search;
+    Container m_searches;
 };
 
 #endif

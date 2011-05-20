@@ -14,8 +14,7 @@ const std::string AppSession::VERSION_KEY = "version";
 // TODO: include active tab as part of session
 
 AppSession::AppSession()
-    : m_search(new SearchSession)
-    , m_currentIndex(-1)
+    : m_currentIndex(-1)
     , m_status(ParsingStatus::OK)
 {
 }
@@ -30,9 +29,9 @@ void AppSession::addFile(const FileSession & fileSession)
     m_files.push_back(fileSession);
 }
 
-void AppSession::setSearch(const SearchSession & searchSession)
+void AppSession::addSearch(const SearchSession & searchSession)
 {
-    m_search.reset(new SearchSession(searchSession));
+    m_searches.push_back(searchSession);
 }
 
 size_t AppSession::fileCount() const
@@ -45,9 +44,14 @@ const FileSession & AppSession::fileAt(int index) const
     return m_files.at(index);
 }
 
-const SearchSession & AppSession::search() const
+size_t AppSession::searchCount() const
 {
-    return *m_search;
+    return m_searches.size();
+}
+
+const SearchSession & AppSession::searchAt(int index) const
+{
+    return m_searches.at(index);
 }
 
 void AppSession::setGeometry(GContainer & geometry)
@@ -71,7 +75,12 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const AppSession & appSession)
     out << AppSession::VERSION_MAJOR << AppSession::VERSION_MINOR;
     out << YAML::EndSeq;
 
-    out << YAML::Key << AppSession::SEARCH_KEY << YAML::Value << appSession.search();
+    out << YAML::Key << AppSession::SEARCH_KEY << YAML::Value;
+    out << YAML::BeginSeq;
+    for(size_t i = 0; i < appSession.searchCount(); i++) {
+        out << appSession.searchAt(i);
+    }
+    out << YAML::EndSeq;
 
     if(appSession.currentIndex() >= 0) {
         out << YAML::Key << AppSession::FILE_INDEX_KEY
@@ -120,7 +129,14 @@ void operator>>(const YAML::Node & in, AppSession & appSession)
     appSession.setStatus(readVersion(in));
     if (appSession.status() == ParsingStatus::IncompatibleVersion) { return; }
 
-    appSession.setSearch(getValue<SearchSession>(in, AppSession::SEARCH_KEY));
+    if(const YAML::Node * searches = in.FindValue(AppSession::SEARCH_KEY)) {
+        for(YAML::Iterator itr = searches->begin(); itr != searches->end(); ++itr) {
+            SearchSession search;
+            *itr >> search;
+            appSession.addSearch(search);
+        }
+    }
+
     appSession.setCurrentIndex(getValue<int>(in, AppSession::FILE_INDEX_KEY));
     if(const YAML::Node * files = in.FindValue(AppSession::FILE_KEY)) {
         for(YAML::Iterator itr = files->begin(); itr != files->end(); ++itr) {
