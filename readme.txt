@@ -4,8 +4,7 @@ Building requirements:
 - Qt 4.6 or later
 - cmake 2.6 or later (available at http://www.cmake.org; and is usually packaged
   with most Linux distributions)
-- yaml-cpp 0.2.5 (must be this version, at least currently. The next version is
-  slated to be source incompatible.)
+- yaml-cpp 0.2.6
 - C++ compiler capable of building Qt (GNU gcc is recommended)
 
 On Windows, the easiest way to build is to download the Qt SDK
