@@ -6,11 +6,6 @@ const std::string FileSession::PATH_KEY = "path";
 const std::string FileSession::ADDRESS_KEY = "address";
 const std::string FileSession::FOLLOW_TAIL_KEY = "follow-tail";
 
-YAML::Emitter & operator<<(YAML::Emitter & out, long long long_int)
-{
-    return out.WriteIntegralType(long_int);
-}
-
 YAML::Emitter & operator<<(YAML::Emitter & out, const FileSession & session)
 {
     out << YAML::BeginMap;
