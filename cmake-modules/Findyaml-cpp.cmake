@@ -11,7 +11,7 @@ if(UNIX)
     find_library(YAML_LIB yaml-cpp ${YAML_CPP_LIB_SEARCH_PATH})
 else(UNIX)
 if(WIN32)
-    set(YAML_CPP_BASE_DIR C:/Program\ Files/YAML_CPP)
+    set(YAML_CPP_BASE_DIR ${CMAKE_SOURCE_DIR}/../yaml-cpp)
     set(YAML_CPP_INC_SEARCH_PATH ${YAML_CPP_BASE_DIR}/include)
 
     set(YAML_CPP_LIB_SEARCH_PATH ${YAML_CPP_BASE_DIR}/lib)
