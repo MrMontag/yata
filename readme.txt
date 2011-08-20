@@ -2,8 +2,6 @@ Yata -- Yet Another Tail Application
 
 Building requirements:
 - Qt 4.6 or later
-- cmake 2.6 or later (available at http://www.cmake.org; and is usually packaged
-  with most Linux distributions)
 - yaml-cpp 0.2.6
 - C++ compiler capable of building Qt (GNU gcc is recommended)
 
@@ -11,19 +9,10 @@ On Windows, the easiest way to build is to download the Qt SDK
 from http://qt.nokia.com/downloads.
 
 To build on Linux:
-Make a directory where the build object files, generated code, etc. will go.
-This can be anywhere, however I usually put it under the source directory.
-So, assuming your current working directory is the source directory:
 
-mkdir build && cd build
+Ensure yaml-cpp is built and installed in a standard place (/usr/lib or /usr/local/lib)
 
-Next, run cmake with the directory containing the CMakeLists.txt file. So, if
-you made a build directory in the source directory:
-
-cmake ..
-
-Then, run make:
-
+qmake
 make
 
 To build on Windows:
