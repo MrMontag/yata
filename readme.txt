@@ -10,8 +10,8 @@ from http://qt.nokia.com/downloads.
 
 To build on Linux:
 
-Ensure yaml-cpp is built and installed in a standard place (/usr/lib or /usr/local/lib)
-
+- Ensure yaml-cpp is built and installed in a standard place (/usr/lib or /usr/local/lib)
+- Run the following commands:
 qmake
 make
 

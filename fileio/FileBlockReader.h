@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef FILEBLOCKREADER_H
@@ -23,9 +23,8 @@ public:
 
     qint64 readChunk(QString *data, std::vector<qint64> * filePositions,
         qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
-    qint64 getStartPosition(qint64 init_pos, qint64 lines_after_start);
-
     void readAll(QString * data, std::vector<qint64> * filePositions);
+    qint64 getStartPosition(qint64 init_pos, qint64 lines_after_start);
 
 	qint64 size() const;
     const QString & filename() const;

@@ -4,7 +4,12 @@
 # Licensed under the GNU General Public License.  See license.txt for details.
 
 TEMPLATE = app
-TARGET = 
+CONFIG += debug_and_release
+CONFIG(debug, debug|release) {
+    TARGET = yatad
+} else {
+    TARGET = yata
+}
 DEPENDPATH += . app document fileio gui resource search session view watcher
 
 # TODO: make the following line unnecessary.
