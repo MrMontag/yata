@@ -4,12 +4,13 @@
 # Licensed under the GNU General Public License.  See license.txt for details.
 
 TEMPLATE = app
-CONFIG += debug_and_release
+CONFIG += debug_and_release warn_on
 CONFIG(debug, debug|release) {
     TARGET = yatad
 } else {
     TARGET = yata
 }
+
 DEPENDPATH += . app document fileio gui resource search session view watcher
 
 # TODO: make the following line unnecessary.
@@ -68,5 +69,11 @@ SOURCES += main.cpp \
            watcher/YFileSystemWatcher.cpp \
            watcher/YFileSystemWatcherThread.cpp
 RESOURCES += resource/TailViewResources.qrc
+
+win32 {
+    isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
+    INCLUDEPATH += $$YAMLCPP/include
+    LIBS += -L$$YAMLCPP/lib
+}
 
 LIBS += -lyaml-cpp
