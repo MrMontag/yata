@@ -11,6 +11,7 @@
 #include <QString>
 #include <vector>
 
+class QFont;
 class QTextBlock;
 class QTextDocument;
 class QTextCursor;
@@ -21,6 +22,7 @@ public:
     YTextDocument();
     ~YTextDocument();
     void setText(const QString & text, const std::vector<qint64> & newAddresses);
+    void setFont(const QFont & font);
     void layout(int width);
 
     QTextBlock findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos = 0) const;

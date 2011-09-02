@@ -42,6 +42,14 @@ void YTextDocument::setText(const QString & text, const std::vector<qint64> & ne
     m_needs_layout = true;
 }
 
+void YTextDocument::setFont(const QFont & font)
+{
+    if (font != m_document->defaultFont()) {
+        m_document->setDefaultFont(font);
+        m_needs_layout = true;
+    }
+}
+
 void YTextDocument::layout(int width)
 {
     if(!m_needs_layout && m_width == width) {
@@ -63,6 +71,7 @@ void YTextDocument::layout(int width)
 int YTextDocument::layoutBlock(QTextBlock * textBlock)
 {
     QTextLayout & layout(*textBlock->layout());
+    layout.setFont(m_document->defaultFont());
     QFontMetrics fontMetrics(layout.font());
 
     qreal height = 0;

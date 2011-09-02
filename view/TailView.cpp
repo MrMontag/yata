@@ -10,6 +10,7 @@
 #include "FileSearch.h"
 #include "FullLayout.h"
 #include "PartialLayout.h"
+#include "preferences/Preferences.h"
 #include "SearchInfo.h"
 #include "YApplication.h"
 #include "YFileCursor.h"
@@ -46,6 +47,7 @@ TailView::TailView(QWidget * parent)
     , m_documentSearch(new DocumentSearch(m_document->document()))
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
+    connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
 }
 
 TailView::~TailView()
@@ -330,9 +332,15 @@ void TailView::vScrollBarAction(int action)
     m_layoutStrategy->vScrollBarAction(action);
 }
 
+void TailView::onPreferencesChanged()
+{
+    m_document->setFont(Preferences::instance()->font());
+    onFileChanged();
+}
+
 int TailView::numLinesOnScreen() const
 {
-    QFont font = m_document->document()->firstBlock().layout()->font();
+    QFont font = m_document->document()->defaultFont();
     QFontMetrics fontMetrics(font);
     int lineHeight = fontMetrics.lineSpacing();
     int windowHeight = viewport()->height();

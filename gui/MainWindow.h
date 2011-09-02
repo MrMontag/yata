@@ -44,6 +44,8 @@ private slots:
     void onCurrentTabChanged(int index);
 
     void layoutAction();
+    void on_actionPreferences_triggered();
+
 private:
     TailView * getCurrentView();
     void addDebugMenu();

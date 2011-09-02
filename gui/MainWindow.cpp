@@ -5,11 +5,12 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "MainWindow.h"
+#include "PreferencesDialog.h"
 #include "TailView.h"
-#include "YTabWidget.h"
 #include "SearchWidget.h"
 #include "SessionLoader.h"
 #include "YApplication.h"
+#include "YTabWidget.h"
 #include "session/FileSession.h"
 
 #include <QDragEnterEvent>
@@ -257,4 +258,10 @@ void MainWindow::on_actionFollow_tail_triggered(bool checked)
    if(TailView * tailView = getCurrentView()) {
        tailView->setFollowTail(checked);
    }
+}
+
+void MainWindow::on_actionPreferences_triggered()
+{
+    PreferencesDialog dialog;
+    dialog.exec();
 }

@@ -75,6 +75,7 @@ protected:
 private slots:
     void onFileDeleted();
     void vScrollBarAction(int action);
+    void onPreferencesChanged();
 
 private:
     void searchFile(bool isForward);
