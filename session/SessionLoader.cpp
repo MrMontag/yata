@@ -64,7 +64,6 @@ void SessionLoader::writeSession(MainWindow * win)
         appSession.addSearch(searchSession);
     }
 
-
     std::vector<FileSession> sessions;
     win->fileSessions(&sessions);
     for(std::vector<FileSession>::const_iterator itr = sessions.begin();

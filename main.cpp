@@ -10,6 +10,7 @@
 #include "MainWindow.h"
 #include "SessionLoader.h"
 #include "YApplication.h"
+#include "preferences/Preferences.h"
 
 int main(int argc, char **argv)
 {
@@ -19,6 +20,8 @@ int main(int argc, char **argv)
 
     QDir dir;
     dir.mkpath(YApplication::settingsPath());
+
+    Preferences::instance()->read();
 
     // TODO: When search sessions is implemented, it should still be read in when files are
     // specified on the command line.

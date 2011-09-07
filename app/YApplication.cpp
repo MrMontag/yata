@@ -25,3 +25,9 @@ QString YApplication::sessionFilePath()
     const QString sessionFileName = "session.yaml";
     return settingsPath() + "/" + sessionFileName;
 }
+
+QString YApplication::preferencesFilePath()
+{
+    const QString preferencesFileName = "preferences.yaml";
+    return settingsPath() + "/" + preferencesFileName;
+}

@@ -1,3 +1,10 @@
+/*
+ * This file is part of yata -- Yet Another Tail Application
+ * Copyright 2010-2011 James Smith
+ *
+ * Licensed under the GNU General Public License.  See license.txt for details.
+ */
+
 #include "AppSession.h"
 #include "FileSession.h"
 #include "SearchSession.h"
@@ -10,8 +17,6 @@ const std::string AppSession::FILE_INDEX_KEY = "current-file-index";
 const std::string AppSession::FILE_KEY = "files";
 const std::string AppSession::SEARCH_KEY = "search-data";
 const std::string AppSession::VERSION_KEY = "version";
-
-// TODO: include active tab as part of session
 
 AppSession::AppSession()
     : m_currentIndex(-1)

@@ -18,6 +18,9 @@ class Preferences: public QObject {
 public:
     static Preferences * instance();
 
+    void write();
+    void read();
+
     const QFont & font() const;
     void setFont(const QFont & font);
 

@@ -35,6 +35,7 @@ void PreferencesDialog::on_buttonBox_accepted()
     font.setItalic(ui->italicCheckBox->isChecked());
     font.setPointSize(ui->fontSizeComboBox->currentText().toInt());
     Preferences::instance()->setFont(font);
+    Preferences::instance()->write();
 }
 
 void PreferencesDialog::on_fontComboBox_currentFontChanged(const QFont & font)

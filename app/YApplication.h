@@ -15,6 +15,7 @@ public:
     static QString displayAppName();
     static QString settingsPath();
     static QString sessionFilePath();
+    static QString preferencesFilePath();
 private:
     YApplication();
 };

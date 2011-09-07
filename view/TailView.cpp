@@ -48,6 +48,7 @@ TailView::TailView(QWidget * parent)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
+    m_document->setFont(Preferences::instance()->font());
 }
 
 TailView::~TailView()
