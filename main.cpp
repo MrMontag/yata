@@ -22,15 +22,15 @@ int main(int argc, char **argv)
     dir.mkpath(YApplication::settingsPath());
 
     Preferences::instance()->read();
+    SessionLoader::readSession(win.data());
 
-    // TODO: When search sessions is implemented, it should still be read in when files are
-    // specified on the command line.
     if (argc > 1) {
         for(int i = 1; i < argc; i++) {
             win->addFile(argv[i]);
         }
-    } else {
-        SessionLoader::readSession(win.data());
+        if (win->fileCount() > 0) {
+            win->setCurrentFileIndex(win->fileCount() - 1);
+        }
     }
 
     win->show();

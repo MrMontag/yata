@@ -23,6 +23,7 @@ public:
     void fileSessions(std::vector<FileSession> * sessions) const;
     int currentFileIndex() const;
     void setCurrentFileIndex(int index);
+    int fileCount() const;
 signals:
     void fileOpened(const QString &);
 protected:

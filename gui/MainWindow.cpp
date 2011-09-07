@@ -80,6 +80,11 @@ void MainWindow::setCurrentFileIndex(int index)
     m_tabWidget->setCurrentIndex(index);
 }
 
+int MainWindow::fileCount() const
+{
+    return m_tabWidget->count();
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent * event)
 {
     dragMoveEvent(event);
