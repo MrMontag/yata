@@ -87,6 +87,7 @@ win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
     INCLUDEPATH += $$YAMLCPP/include
     LIBS += -L$$YAMLCPP/lib
+    RC_FILE += resource/yata_win.rc
 }
 
 LIBS += -lyaml-cpp
