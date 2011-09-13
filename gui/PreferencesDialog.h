@@ -26,8 +26,11 @@ private slots:
     void on_buttonBox_accepted();
     void on_fontComboBox_currentFontChanged(const QFont & font);
 
+    void on_fontDefaultBox_clicked();
+
 private:
     QList<int> pointSizes(const QFont & font) const;
+    void updateFont(const QFont & font);
     Ui::PreferencesDialog *ui;
 };
 

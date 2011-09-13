@@ -16,11 +16,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui(new Ui::PreferencesDialog)
 {
     ui->setupUi(this);
-    const QFont & font = Preferences::instance()->font();
-    ui->fontComboBox->setCurrentFont(font);
-    ui->boldCheckBox->setChecked(font.bold());
-    ui->italicCheckBox->setChecked(font.italic());
-    on_fontComboBox_currentFontChanged(font);
+    updateFont(Preferences::instance()->font());
 }
 
 PreferencesDialog::~PreferencesDialog()
@@ -59,7 +55,6 @@ void PreferencesDialog::on_fontComboBox_currentFontChanged(const QFont & font)
     if (newCurrentIndex != -1) {
         ui->fontSizeComboBox->setCurrentIndex(newCurrentIndex);
     }
-
 }
 
 // The following function was taken and modified from the source for QtCreator
@@ -80,4 +75,18 @@ QList<int> PreferencesDialog::pointSizes(const QFont & font) const
     }
 
     return sizeLst;
+}
+
+void PreferencesDialog::on_fontDefaultBox_clicked()
+{
+    updateFont(QFont());
+}
+
+void PreferencesDialog::updateFont(const QFont & font)
+{
+    ui->fontComboBox->setCurrentFont(font);
+    ui->boldCheckBox->setChecked(font.bold());
+    ui->italicCheckBox->setChecked(font.italic());
+    ui->fontSizeComboBox->clear();
+    on_fontComboBox_currentFontChanged(font);
 }
