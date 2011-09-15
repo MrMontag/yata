@@ -8,6 +8,7 @@
 #include "YTabMenuButton.h"
 #include "TailView.h"
 
+#include <QActionGroup>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QTabBar>
@@ -19,6 +20,7 @@ YTabWidget::YTabWidget(QWidget *parent)
     : QTabWidget(parent)
     , m_buttonChooseTab(new YTabMenuButton(this))
     , m_menuChooseTab(new QMenu(this))
+    , m_actionGroupChooseTab(new QActionGroup(this))
     , m_menuTab(new QMenu(this))
     , m_tabIndexForContextMenu(-1)
     , m_currentIndex(-1)
@@ -75,7 +77,9 @@ void YTabWidget::openTab(QWidget * child, const QString & fullName, const QStrin
     setTabToolTip(index, fullName);
 
     QAction * action = new QAction(fullName, this);
+    action->setCheckable(true);
     m_menuChooseTab->addAction(action);
+    m_actionGroupChooseTab->addAction(action);
     connect(action, SIGNAL(triggered()), SLOT(on_tabChooseMenuTriggered()));
 
     setCurrentIndex(index);
@@ -127,6 +131,8 @@ void YTabWidget::on_currentChanged(int index)
     }
     setViewActive(index, true);
     m_currentIndex = index;
+
+    updateCurrentForMenuChooseTab();
 }
 
 void YTabWidget::on_tabChooseMenuTriggered()
@@ -151,8 +157,11 @@ void YTabWidget::tabRemoved(int index)
 {
     QAction * action = m_menuChooseTab->actions().at(index);
     m_menuChooseTab->removeAction(action);
+    m_actionGroupChooseTab->removeAction(action);
     delete action;
+
     updateContextMenu();
+    updateCurrentForMenuChooseTab();
 }
 
 void YTabWidget::setCurrentTabIfNeeded()
@@ -168,6 +177,14 @@ void YTabWidget::updateContextMenu()
     m_actionCloseTab->setEnabled(count() > 0);
     m_actionCloseOtherTabs->setEnabled(count() > 1);
     m_actionCloseAllTabs->setEnabled(count() > 0);
+}
+
+void YTabWidget::updateCurrentForMenuChooseTab()
+{
+    QList<QAction*> actions = m_menuChooseTab->actions();
+    if(m_currentIndex >= 0 && m_currentIndex < actions.size()) {
+        actions[m_currentIndex]->setChecked(true);
+    }
 }
 
 void YTabWidget::setViewActive(int index, bool active)

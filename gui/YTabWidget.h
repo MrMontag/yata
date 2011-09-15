@@ -11,6 +11,7 @@
 #include <QScopedPointer>
 
 class YTabMenuButton;
+class QActionGroup;
 class QMenu;
 
 class YTabWidget : public QTabWidget {
@@ -36,11 +37,13 @@ protected:
 private:
     void setCurrentTabIfNeeded();
     void updateContextMenu();
+    void updateCurrentForMenuChooseTab();
     void setViewActive(int index, bool active);
 
 private:
     YTabMenuButton * m_buttonChooseTab;
     QScopedPointer<QMenu> m_menuChooseTab;
+    QActionGroup * m_actionGroupChooseTab;
     QMenu * m_menuTab;
     QAction * m_actionCloseTab;
     QAction * m_actionCloseOtherTabs;
