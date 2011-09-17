@@ -1,12 +1,9 @@
 Yata -- Yet Another Tail Application
 
 Building requirements:
-- Qt 4.6 or later
+- Qt 4.7 or later
 - yaml-cpp 0.2.6
 - C++ compiler capable of building Qt (GNU gcc is recommended)
-
-On Windows, the easiest way to build is to download the Qt SDK
-from http://qt.nokia.com/downloads.
 
 To build on Linux:
 
