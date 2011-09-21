@@ -39,6 +39,7 @@ void SessionLoader::readSession(MainWindow * win)
     }
 
     win->setCurrentFileIndex(appSession.currentIndex());
+    win->setCurrentOpenDirectory(QString::fromStdString(appSession.lastOpenDirectory()));
 
     QByteArray qGeometry;
     const AppSession::GContainer & geometry = appSession.geometry();
@@ -79,6 +80,8 @@ void SessionLoader::writeSession(MainWindow * win)
     for(int i = 0; i < qGeometry.size(); i++) {
         geometry.push_back(qGeometry[i]);
     }
+
+    appSession.setLastOpenDirectory(win->currentOpenDirectory().toStdString());
 
     appSession.setGeometry(geometry);
 

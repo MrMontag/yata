@@ -11,6 +11,8 @@
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
+// TODO: implement versioning for preference files
+
 Preferences * Preferences::m_instance;
 
 const std::string FONT_KEY = "font";

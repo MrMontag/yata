@@ -24,6 +24,10 @@ public:
     int currentFileIndex() const;
     void setCurrentFileIndex(int index);
     int fileCount() const;
+
+    const QString & currentOpenDirectory() const;
+    void setCurrentOpenDirectory(const QString & dir);
+
 signals:
     void fileOpened(const QString &);
 protected:

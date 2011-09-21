@@ -17,6 +17,7 @@ const std::string AppSession::FILE_INDEX_KEY = "current-file-index";
 const std::string AppSession::FILE_KEY = "files";
 const std::string AppSession::SEARCH_KEY = "search-data";
 const std::string AppSession::VERSION_KEY = "version";
+const std::string AppSession::LAST_OPEN_DIR_KEY = "last-open-file-directory";
 
 AppSession::AppSession()
     : m_currentIndex(-1)
@@ -59,10 +60,9 @@ const SearchSession & AppSession::searchAt(int index) const
     return m_searches.at(index);
 }
 
-void AppSession::setGeometry(GContainer & geometry)
+void AppSession::setGeometry(const GContainer & geometry)
 {
-    m_geometry.clear();
-    m_geometry.swap(geometry);
+    m_geometry = geometry;
 }
 
 const AppSession::GContainer & AppSession::geometry() const
@@ -98,6 +98,9 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const AppSession & appSession)
         out << appSession.fileAt(i);
     }
     out << YAML::EndSeq;
+
+    out << YAML::Key << AppSession::LAST_OPEN_DIR_KEY
+        << YAML::Value << appSession.lastOpenDirectory();
 
     out << YAML::Key << AppSession::GEOMETRY_KEY
         << YAML::Value << YAML::Flow << appSession.geometry();
@@ -150,8 +153,7 @@ void operator>>(const YAML::Node & in, AppSession & appSession)
             appSession.addFile(file);
         }
     }
-    
-    AppSession::GContainer geometry =
-        getValue<AppSession::GContainer>(in, AppSession::GEOMETRY_KEY);
-    appSession.setGeometry(geometry);
+
+    appSession.setLastOpenDirectory(getValue<std::string>(in, AppSession::LAST_OPEN_DIR_KEY));
+    appSession.setGeometry(getValue<AppSession::GContainer>(in, AppSession::GEOMETRY_KEY));
 }

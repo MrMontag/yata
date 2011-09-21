@@ -85,6 +85,16 @@ int MainWindow::fileCount() const
     return m_tabWidget->count();
 }
 
+const QString & MainWindow::currentOpenDirectory() const
+{
+    return m_currentOpenDir;
+}
+
+void MainWindow::setCurrentOpenDirectory(const QString & dir)
+{
+    m_currentOpenDir = dir;
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent * event)
 {
     dragMoveEvent(event);
