@@ -28,6 +28,7 @@ private slots:
     void closeCurrentTab();
     void closeAllButCurrentTab();
     void closeAllTabs();
+    void copyFullPathToClipboard();
     void onTabMoved(int from, int to);
     void on_currentChanged(int index);
 

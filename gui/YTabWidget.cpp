@@ -9,7 +9,10 @@
 #include "TailView.h"
 
 #include <QActionGroup>
+#include <QApplication>
+#include <QClipboard>
 #include <QContextMenuEvent>
+#include <QDir>
 #include <QMenu>
 #include <QTabBar>
 #include <QtDebug>
@@ -50,6 +53,11 @@ YTabWidget::YTabWidget(QWidget *parent)
         tr("Close &all tabs"),
         this,
         SLOT(closeAllTabs()));
+    m_menuTab->addSeparator();
+    m_menuTab->addAction(
+        tr("Copy full &path to clipboard"),
+        this,
+        SLOT(copyFullPathToClipboard()));
 
     updateContextMenu();
 }
@@ -110,6 +118,13 @@ void YTabWidget::closeAllTabs()
 {
     while(count() > 0) {
         on_tabCloseRequested(0);
+    }
+}
+
+void YTabWidget::copyFullPathToClipboard()
+{
+    if(TailView * view = dynamic_cast<TailView*>(widget(m_tabIndexForContextMenu))) {
+        QApplication::clipboard()->setText(QDir::toNativeSeparators(view->filename()));
     }
 }
 
