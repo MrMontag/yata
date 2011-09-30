@@ -40,12 +40,15 @@ bool BufferedFile::getChar(qint64 pos, char * ch)
         m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
         qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
         QFile file(m_filename);
-        file.open(QIODevice::ReadOnly);
-        uchar * buffer = file.map(m_buffer_pos, size);
-        m_buffer.assign(buffer, buffer + size);
+        if(file.open(QIODevice::ReadOnly)) {
+            uchar * buffer = file.map(m_buffer_pos, size);
+            m_buffer.assign(buffer, buffer + size);
+        } else {
+            m_buffer.clear();
+        }
     }
 
-    if(ch) {
+    if(ch && !m_buffer.empty()) {
        *ch = m_buffer[pos - m_buffer_pos];
        return true;
     }
