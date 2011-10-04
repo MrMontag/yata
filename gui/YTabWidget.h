@@ -42,13 +42,14 @@ private:
     void setViewActive(int index, bool active);
 
 private:
-    YTabMenuButton * m_buttonChooseTab;
+    QScopedPointer<YTabMenuButton> m_buttonChooseTab;
     QScopedPointer<QMenu> m_menuChooseTab;
-    QActionGroup * m_actionGroupChooseTab;
-    QMenu * m_menuTab;
-    QAction * m_actionCloseTab;
-    QAction * m_actionCloseOtherTabs;
-    QAction * m_actionCloseAllTabs;
+    QScopedPointer<QActionGroup> m_actionGroupChooseTab;
+    QScopedPointer<QMenu> m_menuTab;
+    QScopedPointer<QAction> m_actionCloseTab;
+    QScopedPointer<QAction> m_actionCloseOtherTabs;
+    QScopedPointer<QAction> m_actionCloseAllTabs;
+    QScopedPointer<QAction> m_actionCopyFullPathToClipboard;
     int m_tabIndexForContextMenu;
     int m_currentIndex;
 };

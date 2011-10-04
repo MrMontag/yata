@@ -32,32 +32,32 @@ YTabWidget::YTabWidget(QWidget *parent)
     setTabsClosable(true);
 
     m_buttonChooseTab->setMenu(m_menuChooseTab.data());
-    setCornerWidget(m_buttonChooseTab);
+    setCornerWidget(m_buttonChooseTab.data());
     setMovable(true);
 
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(on_tabCloseRequested(int)));
     connect(tabBar(), SIGNAL(tabMoved(int,int)), SLOT(onTabMoved(int,int)));
     connect(this, SIGNAL(currentChanged(int)), SLOT(on_currentChanged(int)));
 
-    m_actionCloseTab = m_menuTab->addAction(
+    m_actionCloseTab.reset(m_menuTab->addAction(
         tr("&Close tab"),
         this,
         SLOT(closeCurrentTab()),
-        QKeySequence(tr("Ctrl+W")));
-    m_actionCloseOtherTabs = m_menuTab->addAction(
+        QKeySequence(tr("Ctrl+W"))));
+    m_actionCloseOtherTabs.reset(m_menuTab->addAction(
         tr("Close &other tabs"),
         this,
         SLOT(closeAllButCurrentTab()),
-        QKeySequence(tr("Ctrl+Shift+W")));
-    m_actionCloseAllTabs = m_menuTab->addAction(
+        QKeySequence(tr("Ctrl+Shift+W"))));
+    m_actionCloseAllTabs.reset(m_menuTab->addAction(
         tr("Close &all tabs"),
         this,
-        SLOT(closeAllTabs()));
+        SLOT(closeAllTabs())));
     m_menuTab->addSeparator();
-    m_menuTab->addAction(
+    m_actionCopyFullPathToClipboard.reset(m_menuTab->addAction(
         tr("Copy full &path to clipboard"),
         this,
-        SLOT(copyFullPathToClipboard()));
+        SLOT(copyFullPathToClipboard())));
 
     updateContextMenu();
 }
@@ -75,7 +75,7 @@ void YTabWidget::on_tabCloseRequested(int index)
 
 QMenu * YTabWidget::contextMenu()
 {
-    return m_menuTab;
+    return m_menuTab.data();
 }
 
 void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
@@ -192,6 +192,7 @@ void YTabWidget::updateContextMenu()
     m_actionCloseTab->setEnabled(count() > 0);
     m_actionCloseOtherTabs->setEnabled(count() > 1);
     m_actionCloseAllTabs->setEnabled(count() > 0);
+    m_actionCopyFullPathToClipboard->setEnabled(count() > 0);
 }
 
 void YTabWidget::updateCurrentForMenuChooseTab()
