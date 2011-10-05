@@ -31,7 +31,6 @@ private:
     QTextDocument * m_document;
 
     QScopedPointer<QTextCursor> m_textCursor;
-
 };
 
 #endif // DOCUMENTSEARCH_H

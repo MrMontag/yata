@@ -5,6 +5,7 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include "PreferencesDialog.h"
 #include "TailView.h"
 #include "SearchWidget.h"
@@ -25,28 +26,33 @@
 
 // TODO: figure out disabling/enabling menu items
 
-MainWindow::MainWindow()
-    : m_fullLayoutAction(0)
-    , m_partialLayoutAction(0)
-    , m_automaticLayoutAction(0)
+MainWindow::MainWindow(): 
+    ui(new Ui::MainWindow()),
+    m_fullLayoutAction(0),
+    m_partialLayoutAction(0),
+    m_automaticLayoutAction(0)
 {
-    ui.setupUi(this);
-    m_tabWidget = new YTabWidget(this);
-    setCentralWidget(m_tabWidget);
+    ui->setupUi(this);
+    m_tabWidget.reset(new YTabWidget(this));
+    setCentralWidget(m_tabWidget.data());
 
     setWindowTitle(YApplication::displayAppName());
-    QString aboutYataText = ui.action_About_Yata->text();
+    QString aboutYataText = ui->action_About_Yata->text();
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
-    ui.action_About_Yata->setText(aboutYataText);
+    ui->action_About_Yata->setText(aboutYataText);
 
-    connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(onCurrentTabChanged(int)));
+    connect(m_tabWidget.data(), SIGNAL(currentChanged(int)), SLOT(onCurrentTabChanged(int)));
 
-    ui.menu_File->insertActions(ui.action_Exit, m_tabWidget->contextMenu()->actions());
-    ui.menu_File->insertSeparator(ui.action_Exit);
+    ui->menu_File->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
+    ui->menu_File->insertSeparator(ui->action_Exit);
 
     addDebugMenu();
 
     setAcceptDrops(true);
+}
+
+MainWindow::~MainWindow()
+{
 }
 
 void MainWindow::addFile(const QString & filename)
@@ -223,13 +229,13 @@ void MainWindow::onCurrentTabChanged(int index)
     if(TailView * tailView = getCurrentView()) {
         QAction * toBeChecked = 0;
         switch(tailView->layoutType()) {
-            case TailView::DebugFullLayout: toBeChecked = m_fullLayoutAction; break;
-            case TailView::DebugPartialLayout: toBeChecked = m_partialLayoutAction; break;
-            case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction; break;
+            case TailView::DebugFullLayout: toBeChecked = m_fullLayoutAction.data(); break;
+            case TailView::DebugPartialLayout: toBeChecked = m_partialLayoutAction.data(); break;
+            case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction.data(); break;
         }
         toBeChecked->setChecked(true);
 
-        ui.actionFollow_tail->setChecked(tailView->followTail());
+        ui->actionFollow_tail->setChecked(tailView->followTail());
     }
 }
 
@@ -238,12 +244,12 @@ void MainWindow::addDebugMenu()
     QMenu * debugMenu = menuBar()->addMenu("&Debug");
     QActionGroup * layoutGroup(new QActionGroup(this));
 
-    m_fullLayoutAction =
-        layoutGroup->addAction(debugMenu->addAction("&Full layout", this, SLOT(layoutAction())));
-    m_partialLayoutAction =
-        layoutGroup->addAction(debugMenu->addAction("&Partial layout", this, SLOT(layoutAction())));
-    m_automaticLayoutAction =
-        layoutGroup->addAction(debugMenu->addAction("&Automatic layout", this, SLOT(layoutAction())));
+    m_fullLayoutAction.reset(
+        layoutGroup->addAction(debugMenu->addAction("&Full layout", this, SLOT(layoutAction()))));
+    m_partialLayoutAction.reset(
+        layoutGroup->addAction(debugMenu->addAction("&Partial layout", this, SLOT(layoutAction()))));
+    m_automaticLayoutAction.reset(
+        layoutGroup->addAction(debugMenu->addAction("&Automatic layout", this, SLOT(layoutAction()))));
 
     QAction * itr = 0;
     foreach(itr, layoutGroup->actions()) {
@@ -255,11 +261,11 @@ void MainWindow::layoutAction()
 {
     QObject * senderObject = sender();
     TailView::LayoutType layoutType = TailView::AutomaticLayout;
-    if(senderObject == m_fullLayoutAction) {
+    if(senderObject == m_fullLayoutAction.data()) {
         layoutType = TailView::DebugFullLayout;
-    } else if(senderObject == m_partialLayoutAction) {
+    } else if(senderObject == m_partialLayoutAction.data()) {
         layoutType = TailView::DebugPartialLayout;
-    } else if(senderObject == m_automaticLayoutAction) {
+    } else if(senderObject == m_automaticLayoutAction.data()) {
         layoutType = TailView::AutomaticLayout;
     }
 

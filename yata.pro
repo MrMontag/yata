@@ -19,6 +19,7 @@ INCLUDEPATH += . gui session app document fileio view search watcher
 # Input
 HEADERS += \
     app/YApplication.h \
+    app/YObjectPointer.h \
     document/YFileCursor.h \
     document/YTextDocument.h \
     fileio/BufferedFile.h \

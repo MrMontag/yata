@@ -8,7 +8,7 @@
 #define YTABWIDGET_H
 
 #include <QTabWidget>
-#include <QScopedPointer>
+#include "app/YObjectPointer.h"
 
 class YTabMenuButton;
 class QActionGroup;
@@ -42,14 +42,14 @@ private:
     void setViewActive(int index, bool active);
 
 private:
-    QScopedPointer<YTabMenuButton> m_buttonChooseTab;
-    QScopedPointer<QMenu> m_menuChooseTab;
-    QScopedPointer<QActionGroup> m_actionGroupChooseTab;
-    QScopedPointer<QMenu> m_menuTab;
-    QScopedPointer<QAction> m_actionCloseTab;
-    QScopedPointer<QAction> m_actionCloseOtherTabs;
-    QScopedPointer<QAction> m_actionCloseAllTabs;
-    QScopedPointer<QAction> m_actionCopyFullPathToClipboard;
+    YObjectPointer<YTabMenuButton> m_buttonChooseTab;
+    YObjectPointer<QMenu> m_menuChooseTab;
+    YObjectPointer<QActionGroup> m_actionGroupChooseTab;
+    YObjectPointer<QMenu> m_menuTab;
+    YObjectPointer<QAction> m_actionCloseTab;
+    YObjectPointer<QAction> m_actionCloseOtherTabs;
+    YObjectPointer<QAction> m_actionCloseAllTabs;
+    YObjectPointer<QAction> m_actionCopyFullPathToClipboard;
     int m_tabIndexForContextMenu;
     int m_currentIndex;
 };

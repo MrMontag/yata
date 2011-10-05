@@ -9,10 +9,10 @@
 #define PREFERENCESDIALOG_H
 
 #include <QDialog>
+#include <QScopedPointer>
 
 namespace Ui {
     class PreferencesDialog;
-    //template <class T> class QList;
 }
 
 class PreferencesDialog : public QDialog {
@@ -31,7 +31,7 @@ private slots:
 private:
     QList<int> pointSizes(const QFont & font) const;
     void updateFont(const QFont & font);
-    Ui::PreferencesDialog *ui;
+    QScopedPointer<Ui::PreferencesDialog> ui;
 };
 
 #endif // PREFERENCESDIALOG_H

@@ -7,7 +7,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "ui_MainWindow.h"
+#include "app/YObjectPointer.h"
+#include <QScopedPointer>
+#include <QMainWindow>
+
+namespace Ui {
+    class MainWindow;
+}
 
 class TailView;
 class YTabWidget;
@@ -17,6 +23,7 @@ class MainWindow: public QMainWindow {
 	Q_OBJECT
 public:
 	MainWindow();
+    ~MainWindow();
 
 	void addFile(const QString & filename);
 
@@ -55,12 +62,13 @@ private:
     TailView * getCurrentView();
     void addDebugMenu();
 private:
-    YTabWidget * m_tabWidget;
-    QString m_currentOpenDir;
-	Ui::MainWindow ui;
+	QScopedPointer<Ui::MainWindow> ui;
 
-    QAction * m_fullLayoutAction;
-    QAction * m_partialLayoutAction;
-    QAction * m_automaticLayoutAction;
+    YObjectPointer<YTabWidget> m_tabWidget;
+    QString m_currentOpenDir;
+
+    YObjectPointer<QAction> m_fullLayoutAction;
+    YObjectPointer<QAction> m_partialLayoutAction;
+    YObjectPointer<QAction> m_automaticLayoutAction;
 };
 #endif

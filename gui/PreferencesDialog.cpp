@@ -21,7 +21,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
 PreferencesDialog::~PreferencesDialog()
 {
-    delete ui;
 }
 
 void PreferencesDialog::on_buttonBox_accepted()

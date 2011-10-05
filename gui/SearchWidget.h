@@ -8,11 +8,11 @@
 #define SEARCHWIDGET_H
 
 #include <QDialog>
+#include <QScopedPointer>
 
 namespace Ui {
     class SearchWidget;
 }
-
 
 class SearchWidget: public QDialog {
     Q_OBJECT
@@ -29,7 +29,7 @@ protected:
     void changeEvent(QEvent *e);
 
 private:
-    Ui::SearchWidget *ui;
+    QScopedPointer<Ui::SearchWidget> ui;
 };
 
 #endif // SEARCHWIDGET_H

@@ -37,7 +37,6 @@ SearchWidget::SearchWidget(QWidget *parent)
 
 SearchWidget::~SearchWidget()
 {
-    delete ui;
 }
 
 void SearchWidget::changeEvent(QEvent *e)
