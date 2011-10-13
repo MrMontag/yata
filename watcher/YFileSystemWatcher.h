@@ -21,7 +21,6 @@ public:
 
 signals:
     void fileChanged();
-    void fileDeleted();
 
 private slots:
     void on_timer_timeout();

@@ -15,12 +15,12 @@ FileBlockReader::FileBlockReader(const QString & filename)
 {
 }
 
-void FileBlockReader::readAll(QString * data, std::vector<qint64> * filePositions)
+bool FileBlockReader::readAll(QString * data, std::vector<qint64> * filePositions)
 {
-    read(data, filePositions, 0, std::numeric_limits<qint64>::max());
+    return read(data, filePositions, 0, std::numeric_limits<qint64>::max());
 }
 
-qint64 FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositions,
+bool FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositions,
     qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
 {
     start_pos = getStartPosition(start_pos, lines_after_start);
@@ -54,11 +54,16 @@ const QString & FileBlockReader::filename() const
     return m_file.filename();
 }
 
+const QString & FileBlockReader::errorString() const
+{
+    return m_file.errorString();
+}
+
 qint64 FileBlockReader::beginningOfLine(qint64 start_pos)
 {
     while(start_pos > 0) {
         char c = 0;
-        m_file.getChar(start_pos - 1, &c);
+        BufferedFile::Status status = m_file.getChar(start_pos - 1, &c);
         if(c == '\n') { break; }
         --start_pos;
     }
@@ -70,7 +75,7 @@ qint64 FileBlockReader::nextLine(qint64 start_pos)
     while(start_pos < size()) {
         ++start_pos;
         char c;
-        m_file.getChar(start_pos - 1, &c);
+        BufferedFile::Status status = m_file.getChar(start_pos - 1, &c);
         if(c == '\n') {
             break;
         }
@@ -79,7 +84,7 @@ qint64 FileBlockReader::nextLine(qint64 start_pos)
     return start_pos;
 }
 
-qint64 FileBlockReader::read(QString * data, std::vector<qint64> * filePositions,
+bool FileBlockReader::read(QString * data, std::vector<qint64> * filePositions,
     qint64 start_pos, qint64 num_lines)
 {
     data->clear();
@@ -88,20 +93,21 @@ qint64 FileBlockReader::read(QString * data, std::vector<qint64> * filePositions
     filePositions->push_back(start_pos);
 
     qint64 line_count = 0;
-    char ch;
-
+    char ch = 0;
     qint64 pos = start_pos;
-    while(m_file.getChar(pos, &ch)) {
+    while(true) {
+        BufferedFile::Status status = m_file.getChar(pos, &ch);
+        if(status == BufferedFile::Error) { return false; }
+        if(status == BufferedFile::Eof) { break; }
         data->append(ch);
+        pos++;
         if(ch == '\n') {
             line_count++;
             if(line_count >= num_lines) {
                 break;
             }
-            filePositions->push_back(pos + 1);
+            filePositions->push_back(pos);
         }
-        pos++;
     }
-
-    return start_pos;
+    return true;
 }

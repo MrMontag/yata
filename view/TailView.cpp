@@ -4,7 +4,9 @@
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
+
 #include "TailView.h"
+
 #include "DocumentSearch.h"
 #include "FileBlockReader.h"
 #include "FileSearch.h"
@@ -19,12 +21,14 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
 #include <QString>
+#include <QStringBuilder>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
@@ -62,7 +66,6 @@ void TailView::setFile(const QString & filename)
     if(!filename.isEmpty()) {
         m_watcher.reset(new YFileSystemWatcherThread(filename, this));
         connect(m_watcher.data(), SIGNAL(fileChanged()), SLOT(onFileChanged()));
-        connect(m_watcher.data(), SIGNAL(fileDeleted()), SLOT(onFileDeleted()));
     } else {
         m_watcher.reset();
     }
@@ -229,7 +232,16 @@ void TailView::onFileChanged()
         m_layoutStrategy = m_partialLayoutStrategy.data();
     }
 
-    m_layoutStrategy->onFileChanged();
+    QString error;
+    if(m_layoutStrategy->onFileChanged(&error)) {
+        if(!m_currentFileError.isEmpty()) {
+            m_currentFileError.clear();
+            emit fileErrorCleared();
+        }
+    } else {
+        m_currentFileError = tr("ERROR - ") % QDir::toNativeSeparators(m_filename) % ": " % error;
+        emit fileError(m_currentFileError);
+    }
 
     viewport()->update();
 }
@@ -243,12 +255,6 @@ void TailView::setFollowTail(bool enabled)
 bool TailView::followTail() const
 {
     return m_followTail;
-}
-
-void TailView::onFileDeleted()
-{
-    // TODO: display an error message
-    onFileChanged();
 }
 
 void TailView::paintEvent(QPaintEvent * /*event*/)

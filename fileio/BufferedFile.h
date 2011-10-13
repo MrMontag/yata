@@ -12,19 +12,27 @@
 
 class BufferedFile {
 public:
+    enum Status {
+        Ok,
+        Eof,
+        Error
+    };
+
     BufferedFile(const QString & filename);
     ~BufferedFile();
 
     const QString & filename() const;
 
     qint64 size() const;
-    bool getChar(qint64 pos, char * ch);
+    Status getChar(qint64 pos, char * ch);
+    const QString & errorString() const;
 
 private:
     std::vector<uchar> m_buffer;
     qint64 m_buffer_pos;
     qint64 m_size;
     QString m_filename;
+    QString m_errorString;
 };
 
 #endif // BUFFEREDFILE_H

@@ -145,9 +145,11 @@ void YTabWidget::on_currentChanged(int index)
         setViewActive(m_currentIndex, false);
     }
     setViewActive(index, true);
+    int oldIndex = m_currentIndex;
     m_currentIndex = index;
 
     updateCurrentForMenuChooseTab();
+    emit currentChanged(oldIndex, m_currentIndex);
 }
 
 void YTabWidget::on_tabChooseMenuTriggered()

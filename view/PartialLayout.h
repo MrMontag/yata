@@ -19,7 +19,7 @@ class PartialLayout: public LayoutStrategy {
 public:
     PartialLayout(TailView * tailView);
 
-    virtual void onFileChanged();
+    virtual bool onFileChanged(QString * error);
     virtual void resizeEvent();
     virtual int topScreenLine() const;
     virtual void scrollTo(int newTopLine);
@@ -29,16 +29,15 @@ protected:
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
 private:
-    void updateDocumentForPartialLayout(
+    bool updateDocumentForPartialLayout(
         bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
-    void updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
+    bool updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
     void updateBottomDocument();
     qint64 bottomScreenPosition() const;
 private:
     int m_topScreenLine;
     int m_firstVisibleBlock;
     int m_firstVisibleBlockLine;
-    qint64 m_lastFileAddress;
     std::auto_ptr<YTextDocument> m_bottomDocument;
     std::auto_ptr<FileBlockReader> m_blockReader;
 };

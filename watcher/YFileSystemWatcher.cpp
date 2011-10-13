@@ -70,7 +70,7 @@ void YFileSystemWatcher::on_timer_timeout()
             emit fileChanged();
             m_status = NoActivity;
         } else if(m_status != FileDeleted) {
-            emit fileDeleted();
+            emit fileChanged();
             m_status = FileDeleted;
         }
     }

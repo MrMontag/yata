@@ -11,6 +11,7 @@
 #include "SearchWidget.h"
 #include "SessionLoader.h"
 #include "YApplication.h"
+#include "YStatusBar.h"
 #include "YTabWidget.h"
 #include "session/FileSession.h"
 
@@ -36,12 +37,15 @@ MainWindow::MainWindow():
     m_tabWidget.reset(new YTabWidget(this));
     setCentralWidget(m_tabWidget.data());
 
+    m_statusBar.reset(new YStatusBar(this));
+    setStatusBar(m_statusBar.data());
+
     setWindowTitle(YApplication::displayAppName());
     QString aboutYataText = ui->action_About_Yata->text();
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
     ui->action_About_Yata->setText(aboutYataText);
 
-    connect(m_tabWidget.data(), SIGNAL(currentChanged(int)), SLOT(onCurrentTabChanged(int)));
+    connect(m_tabWidget.data(), SIGNAL(currentChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
 
     ui->menu_File->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
     ui->menu_File->insertSeparator(ui->action_Exit);
@@ -217,14 +221,22 @@ TailView * MainWindow::getCurrentView()
     return dynamic_cast<TailView*>(m_tabWidget->currentWidget());
 }
 
-void MainWindow::onCurrentTabChanged(int index)
+void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
 {
-    if(index == -1) { // No tabs are open
+    m_statusBar->clearErrorMessage();
+    if(oldIndex != -1) {
+        if(TailView * tailView = dynamic_cast<TailView*>(m_tabWidget->widget(oldIndex))) {
+            disconnect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
+            disconnect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearMessage()));
+        }
+    }
+
+    if(newIndex == -1) { // No tabs are open
         setWindowTitle(YApplication::displayAppName());
         return;
     }
 
-    QString filename = m_tabWidget->tabText(index);
+    QString filename = m_tabWidget->tabText(newIndex);
     setWindowTitle(filename + " - " + YApplication::displayAppName());
     if(TailView * tailView = getCurrentView()) {
         QAction * toBeChecked = 0;
@@ -233,9 +245,14 @@ void MainWindow::onCurrentTabChanged(int index)
             case TailView::DebugPartialLayout: toBeChecked = m_partialLayoutAction.data(); break;
             case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction.data(); break;
         }
-        toBeChecked->setChecked(true);
+        if (toBeChecked) { toBeChecked->setChecked(true); }
 
         ui->actionFollow_tail->setChecked(tailView->followTail());
+        connect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
+        connect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearErrorMessage()));
+        if(!tailView->currentFileError().isEmpty()) {
+            m_statusBar->errorMessage(tailView->currentFileError());
+        }
     }
 }
 

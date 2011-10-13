@@ -27,6 +27,7 @@ HEADERS += \
     gui/MainWindow.h \
     gui/PreferencesDialog.h \
     gui/SearchWidget.h \
+    gui/YStatusBar.h \
     gui/YTabMenuButton.h \
     gui/YTabWidget.h \
     preferences/Preferences.h \
@@ -61,6 +62,7 @@ SOURCES += \
     gui/MainWindow.cpp \
     gui/PreferencesDialog.cpp \
     gui/SearchWidget.cpp \
+    gui/YStatusBar.cpp \
     gui/YTabMenuButton.cpp \
     gui/YTabWidget.cpp \
     main.cpp \

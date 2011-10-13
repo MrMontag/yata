@@ -10,6 +10,7 @@
 #include <QAbstractScrollArea>
 #include <QScopedPointer>
 #include <vector>
+#include "app/YObjectPointer.h"
 
 class DocumentSearch;
 class FullLayout;
@@ -61,6 +62,12 @@ public:
     bool searchDocument(bool isForward, bool wrapAround = true);
     void scrollToIfNecessary(const QTextCursor & cursor);
 
+    const QString & currentFileError() const { return m_currentFileError; }
+
+signals:
+    void fileError(const QString &);
+    void fileErrorCleared();
+
 public slots:
     void newSearch();
     void searchForward();
@@ -73,7 +80,6 @@ protected:
     void keyPressEvent(QKeyEvent * event);
 
 private slots:
-    void onFileDeleted();
     void vScrollBarAction(int action);
     void onPreferencesChanged();
 
@@ -83,9 +89,10 @@ private:
 private:
     QString m_filename;
     QScopedPointer<YTextDocument> m_document;
-    QScopedPointer<YFileSystemWatcherThread> m_watcher;
+    YObjectPointer<YFileSystemWatcherThread> m_watcher;
 
     bool m_isActive;
+    QString m_currentFileError;
 
     LayoutType m_layoutType;
     QScopedPointer<FullLayout> m_fullLayoutStrategy;

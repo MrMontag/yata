@@ -15,12 +15,14 @@ class QActionGroup;
 class QMenu;
 
 class YTabWidget : public QTabWidget {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit YTabWidget(QWidget *parent = 0);
     ~YTabWidget();
     void openTab(QWidget * child, const QString & fullName, const QString & shortName);
     QMenu * contextMenu();
+signals:
+    void currentChanged(int oldIndex, int newIndex);
 
 private slots:
     void on_tabChooseMenuTriggered();

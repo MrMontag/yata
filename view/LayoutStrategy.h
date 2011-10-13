@@ -7,15 +7,15 @@
 #ifndef LAYOUTSTRATEGY_H
 #define LAYOUTSTRATEGY_H
 
+class QString;
 class TailView;
 class YTextDocument;
 
-class LayoutStrategy
-{
+class LayoutStrategy {
 public:
     virtual ~LayoutStrategy();
 
-    virtual void onFileChanged() = 0;
+    virtual bool onFileChanged(QString * error) = 0;
     virtual void performLayout();
     virtual void resizeEvent() = 0;
     virtual int topScreenLine() const = 0;

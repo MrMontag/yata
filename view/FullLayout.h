@@ -9,12 +9,11 @@
 
 #include "LayoutStrategy.h"
 
-class FullLayout : public LayoutStrategy
-{
+class FullLayout : public LayoutStrategy {
 public:
     FullLayout(TailView * tailView);
 
-    virtual void onFileChanged();
+    virtual bool onFileChanged(QString * error);
     virtual void performLayout();
     virtual void resizeEvent();
     virtual int topScreenLine() const;

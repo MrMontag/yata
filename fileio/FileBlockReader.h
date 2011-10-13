@@ -21,18 +21,20 @@ class FileBlockReader {
 public:
 	FileBlockReader(const QString & filename);
 
-    qint64 readChunk(QString *data, std::vector<qint64> * filePositions,
+    bool readChunk(QString *data, std::vector<qint64> * filePositions,
         qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
-    void readAll(QString * data, std::vector<qint64> * filePositions);
+    bool readAll(QString * data, std::vector<qint64> * filePositions);
     qint64 getStartPosition(qint64 init_pos, qint64 lines_after_start);
 
 	qint64 size() const;
     const QString & filename() const;
+
+    const QString & errorString() const;
 private:
     qint64 beginningOfLine(qint64 start_pos);
     qint64 nextLine(qint64 start_pos);
 
-    qint64 read(QString * data, std::vector<qint64> * filePositions, qint64 start_pos, qint64 num_lines);
+    bool read(QString * data, std::vector<qint64> * filePositions, qint64 start_pos, qint64 num_lines);
 
 private:
     BufferedFile m_file;

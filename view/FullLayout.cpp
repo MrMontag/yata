@@ -17,17 +17,21 @@ FullLayout::FullLayout(TailView * view)
 {
 }
 
-void FullLayout::onFileChanged()
+bool FullLayout::onFileChanged(QString * error)
 {
     QString data;
     std::vector<qint64> lineAddresses;
     FileBlockReader blockReader(view()->filename());
-    blockReader.readAll(&data, &lineAddresses);
+    bool success = blockReader.readAll(&data, &lineAddresses);
     document()->setText(data, lineAddresses);
     if(view()->followTail()) {
         performLayout(); // Need this call to get the scroll bars set correctly.
         view()->verticalScrollBar()->setValue(view()->verticalScrollBar()->maximum());
     }
+
+    if(!success) { *error = blockReader.errorString(); }
+
+    return success;
 }
 
 void FullLayout::performLayout()

@@ -27,7 +27,6 @@ protected:
 
 signals:
     void fileChanged();
-    void fileDeleted();
 
 private:
     QString m_filename;

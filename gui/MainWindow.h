@@ -15,9 +15,10 @@ namespace Ui {
     class MainWindow;
 }
 
+class FileSession;
 class TailView;
 class YTabWidget;
-class FileSession;
+class YStatusBar;
 
 class MainWindow: public QMainWindow {
 	Q_OBJECT
@@ -53,7 +54,7 @@ private slots:
     void on_action_Find_triggered();
     void on_action_Open_triggered();
 	void on_action_Exit_triggered();
-    void onCurrentTabChanged(int index);
+    void onCurrentTabChanged(int oldIndex, int newIndex);
 
     void layoutAction();
     void on_actionPreferences_triggered();
@@ -65,6 +66,7 @@ private:
 	QScopedPointer<Ui::MainWindow> ui;
 
     YObjectPointer<YTabWidget> m_tabWidget;
+    YObjectPointer<YStatusBar> m_statusBar;
     QString m_currentOpenDir;
 
     YObjectPointer<QAction> m_fullLayoutAction;

@@ -16,7 +16,12 @@ BufferedFile::BufferedFile(const QString & filename)
     , m_size(0)
     , m_filename(filename)
 {
-    m_size = QFileInfo(m_filename).size();
+    QFile file(m_filename);
+    if(file.open(QIODevice::ReadOnly)) {
+        m_size = file.size();
+    } else {
+        m_errorString = file.errorString();
+    }
 }
 
 BufferedFile::~BufferedFile()
@@ -33,9 +38,10 @@ qint64 BufferedFile::size() const
     return m_size;
 }
 
-bool BufferedFile::getChar(qint64 pos, char * ch)
+BufferedFile::Status BufferedFile::getChar(qint64 pos, char * ch)
 {
-    if(pos < 0 || pos >= m_size) { return false; }
+    if(!m_errorString.isEmpty()) { return Error; }
+    if(pos < 0 || pos >= m_size) { return Eof; }
     if(m_buffer.empty() || pos < m_buffer_pos || pos >= m_buffer_pos + BUFFER_SIZE) {
         m_buffer_pos = std::max(pos - (BUFFER_SIZE / 2), 0LL);
         qint64 size = std::min(BUFFER_SIZE, m_size - m_buffer_pos);
@@ -43,16 +49,22 @@ bool BufferedFile::getChar(qint64 pos, char * ch)
         if(file.open(QIODevice::ReadOnly)) {
             uchar * buffer = file.map(m_buffer_pos, size);
             m_buffer.assign(buffer, buffer + size);
+            m_errorString = QString();
         } else {
             m_buffer.clear();
+            m_errorString = file.errorString();
         }
     }
 
     if(ch && !m_buffer.empty()) {
        *ch = m_buffer[pos - m_buffer_pos];
-       return true;
+       return Ok;
     }
 
-    return false;
+    return Error;
 }
 
+const QString & BufferedFile::errorString() const
+{
+    return m_errorString;
+}
