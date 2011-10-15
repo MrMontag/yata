@@ -10,8 +10,7 @@
 #include <QtDebug>
 #include <limits>
 
-FileBlockReader::FileBlockReader(const QString & filename)
-	: m_file(filename)
+FileBlockReader::FileBlockReader(const QString & filename): m_file(filename)
 {
 }
 
@@ -24,6 +23,7 @@ bool FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositio
     qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
 {
     start_pos = getStartPosition(start_pos, lines_after_start);
+    if(start_pos < 0) { return false; }
     return read(data, filePositions, start_pos, num_lines);
 }
 
@@ -33,11 +33,13 @@ qint64 FileBlockReader::getStartPosition(qint64 init_pos, qint64 lines_after_sta
 
     while(lines_after_start < 0 && start_pos > 0) {
         start_pos = beginningOfLine(start_pos - 1);
+        if(start_pos < 0) { return -1; }
         ++lines_after_start;
     }
 
     while(lines_after_start > 0 && start_pos < size()) {
         start_pos = nextLine(start_pos);
+        if(start_pos < 0) { return -1; }
         --lines_after_start;
     }
 
@@ -64,7 +66,8 @@ qint64 FileBlockReader::beginningOfLine(qint64 start_pos)
     while(start_pos > 0) {
         char c = 0;
         BufferedFile::Status status = m_file.getChar(start_pos - 1, &c);
-        if(c == '\n') { break; }
+        if(status == BufferedFile::Error) { return -1; }
+        if(status == BufferedFile::Eof || c == '\n') { break; }
         --start_pos;
     }
     return start_pos;
@@ -74,11 +77,10 @@ qint64 FileBlockReader::nextLine(qint64 start_pos)
 {
     while(start_pos < size()) {
         ++start_pos;
-        char c;
+        char c = 0;
         BufferedFile::Status status = m_file.getChar(start_pos - 1, &c);
-        if(c == '\n') {
-            break;
-        }
+        if(status == BufferedFile::Error) { return -1; }
+        if(status == BufferedFile::Eof || c == '\n') { break; }
     }
 
     return start_pos;
