@@ -33,7 +33,7 @@ bool PartialLayout::onFileChanged(QString * error)
 {
     m_blockReader.reset(new FileBlockReader(view()->filename()));
     updateBottomDocument();
-    if(!updateDocumentForPartialLayout(true)) {
+    if(!updateView(true)) {
         *error = m_blockReader->errorString();
         return false;
     }
@@ -43,7 +43,7 @@ bool PartialLayout::onFileChanged(QString * error)
 void PartialLayout::resizeEvent()
 {
     updateBottomDocument();
-    updateDocumentForPartialLayout();
+    updateView(false);
 }
 
 int PartialLayout::topScreenLine() const
@@ -54,7 +54,7 @@ int PartialLayout::topScreenLine() const
 void PartialLayout::scrollTo(int newTopLine)
 {
     int lineChange = newTopLine - topScreenLine();
-    updateDocumentForPartialLayout(false, lineChange);
+    scrollBy(lineChange);
 }
 
 bool PartialLayout::searchFile(bool isForward)
@@ -72,8 +72,12 @@ bool PartialLayout::searchFile(bool isForward)
         YFileCursor cursor(fileSearch.cursor());
         document()->setFileCursor(cursor);
 
-        int line_change = -(view()->numLinesOnScreen()/2);
-        updateDocumentForPartialLayout(false, line_change, document()->fileCursor().lineAddress());
+        bool needs_scroll = false;
+        updateView(false, document()->fileCursor().lineAddress(), &needs_scroll);
+        if(needs_scroll) {
+            int line_change = -(view()->numLinesOnScreen()/2);
+            scrollBy(line_change);
+        }
     }
 
     return matchFound;
@@ -86,8 +90,7 @@ bool PartialLayout::wrapAroundForDocumentSearch() const
 
 void PartialLayout::updateAfterKeyPress()
 {
-    updateDocumentForPartialLayout();
-    view()->viewport()->update();
+    updateView(false);
 }
 
 void PartialLayout::vScrollBarAction(int action)
@@ -112,103 +115,73 @@ void PartialLayout::vScrollBarAction(int action)
         break;
     }
 
-    updateDocumentForPartialLayout(false, line_change);
+    if(line_change) {
+        scrollBy(line_change);
+    } else {
+        updateView(false);
+    }
 }
 
-bool PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_change /* = 0 */, qint64 new_line_address /* = -1 */)
+void PartialLayout::updateScrollBars()
 {
-    if(0 == m_blockReader.get()) { return false; }
+    const qint64 bottom_screen_pos = bottomScreenPosition();
+    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
+    view()->updateScrollBars(approx_lines);
+}
 
-    const int lines_on_screen = view()->numLinesOnScreen();
-    const int visible_lines = lines_on_screen + 1;
-
+bool PartialLayout::updateView(bool file_changed, qint64 new_line_address /*=-1*/, bool * needs_scroll /*=0*/)
+{
+    updateScrollBars();
     const qint64 bottom_screen_pos = bottomScreenPosition();
 
-    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
-
-    view()->updateScrollBars(approx_lines);
+    m_topScreenLine = 0; // TODO: don't reset if scrollbar didn't move
+    m_firstVisibleBlock = 0;
+    m_firstVisibleBlockLine = 0;
 
     QScrollBar * verticalScrollBar = view()->verticalScrollBar();
-
     qint64 file_pos = 0;
-    if(0 == line_change || new_line_address != -1) {
-        m_topScreenLine = 0; // TODO: don't reset if scrollbar didn't move
-        m_firstVisibleBlock = 0;
-        m_firstVisibleBlockLine = 0;
-
-        if(file_changed && view()->followTail()) {
-            file_pos = bottom_screen_pos;
-            verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
-        } else if(new_line_address != -1) {
-            file_pos = new_line_address;
-        } else if(verticalScrollBar->sliderPosition() >= verticalScrollBar->maximum()) {
-            file_pos = bottom_screen_pos;
-        } else {
-            file_pos = static_cast<qint64>(verticalScrollBar->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
-        }
-
-        file_pos = m_blockReader->getStartPosition(file_pos, 0);
-
-        // Don't change the line further if we're at the bottom
-        if(file_pos > bottom_screen_pos) {
-            line_change = 0;
-            verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
-        }
-
-        file_pos = std::min(file_pos, bottom_screen_pos);
-
-        if(!updateDocument(file_pos, 0, visible_lines)) {
-            return false;
-        }
+    if(new_line_address != -1) {
+        file_pos = new_line_address;
+    } else if(file_changed && view()->followTail()) {
+        file_pos = bottom_screen_pos;
+        verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
+    } else if(verticalScrollBar->sliderPosition() >= verticalScrollBar->maximum()) {
+        file_pos = bottom_screen_pos;
+    } else {
+        file_pos = static_cast<qint64>(verticalScrollBar->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
     }
+
+    file_pos = m_blockReader->getStartPosition(file_pos, 0);
+
+    // Don't change the line further if we're at the bottom
+    if(file_pos > bottom_screen_pos) {
+        if(needs_scroll) { *needs_scroll = false; }
+        verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
+    } else {
+        if(needs_scroll) { *needs_scroll = true; }
+    }
+
+    file_pos = std::min(file_pos, bottom_screen_pos);
+
+    bool success = updateDocument(file_pos, 0);
+    if(success) { view()->viewport()->update(); }
+    return success;
+}
+
+bool PartialLayout::scrollBy(int line_change)
+{
+    updateScrollBars();
+
+    const qint64 bottom_screen_pos = bottomScreenPosition();
+    QScrollBar * verticalScrollBar = view()->verticalScrollBar();
 
     if(line_change != 0) {
         const std::vector<qint64> & lineAddresses = document()->lineAddresses();
-        file_pos = lineAddresses[0];
+        qint64 file_pos = lineAddresses[0];
         if(line_change < 0) {
-            if(!updateDocument(file_pos, line_change + m_firstVisibleBlock, visible_lines)) {
-                return false;
-            }
-
-            QTextBlock block = document()->document()->findBlockByNumber(-line_change);
-            while(m_firstVisibleBlockLine + line_change < 0) {
-                line_change += m_firstVisibleBlockLine + 1;
-                block = block.previous();
-                m_firstVisibleBlockLine = block.layout()->lineCount() - 1;
-            }
-
-            m_firstVisibleBlock = block.blockNumber();
-            m_firstVisibleBlockLine += line_change;
-
-            m_topScreenLine = m_firstVisibleBlockLine;
-            for(QTextBlock block = document()->document()->firstBlock();
-                block.blockNumber() < m_firstVisibleBlock;
-                block = block.next()) {
-
-                m_topScreenLine += block.layout()->lineCount();
-            }
-
+            if (!scrollUp(file_pos, line_change)) { return false; }
         } else {
-            line_change += m_firstVisibleBlockLine;
-            int wrapped_line_count = 0;
-            int real_line_count = 0;
-            QTextBlock block = document()->document()->findBlockByNumber(m_firstVisibleBlock);
-            while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
-                wrapped_line_count += block.layout()->lineCount();
-                block = block.next();
-                real_line_count++;
-            }
-
-            m_firstVisibleBlockLine = line_change - wrapped_line_count;
-            m_topScreenLine = m_firstVisibleBlockLine;
-            m_firstVisibleBlock = 0;
-
-            file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
-            file_pos = std::min(file_pos, bottom_screen_pos);
-
-            if(!updateDocument(file_pos, 0, visible_lines)) {
-                return false;
-            }
+            if (!scrollDown(file_pos, line_change, bottom_screen_pos)) { return false; }
         }
         qint64 currentFileAddress = document()->lineAddresses()[0];
         verticalScrollBar->setSliderPosition(currentFileAddress / APPROXIMATE_CHARS_PER_LINE);
@@ -218,10 +191,62 @@ bool PartialLayout::updateDocumentForPartialLayout(bool file_changed, int line_c
     return true;
 }
 
-bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines)
+bool PartialLayout::scrollUp(qint64 file_pos, int line_change)
+{
+    if(!updateDocument(file_pos, line_change + m_firstVisibleBlock)) {
+        return false;
+    }
+
+    QTextBlock block = document()->document()->findBlockByNumber(-line_change);
+    while(m_firstVisibleBlockLine + line_change < 0) {
+        line_change += m_firstVisibleBlockLine + 1;
+        block = block.previous();
+        m_firstVisibleBlockLine = block.layout()->lineCount() - 1;
+    }
+
+    m_firstVisibleBlock = block.blockNumber();
+    m_firstVisibleBlockLine += line_change;
+
+    m_topScreenLine = m_firstVisibleBlockLine;
+    for(QTextBlock block = document()->document()->firstBlock();
+        block.blockNumber() < m_firstVisibleBlock;
+        block = block.next()) {
+
+        m_topScreenLine += block.layout()->lineCount();
+    }
+    return true;
+}
+
+bool PartialLayout::scrollDown(qint64 file_pos, int line_change, qint64 bottom_screen_pos)
+{
+    line_change += m_firstVisibleBlockLine;
+    int wrapped_line_count = 0;
+    int real_line_count = 0;
+    QTextBlock block = document()->document()->findBlockByNumber(m_firstVisibleBlock);
+    while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
+        wrapped_line_count += block.layout()->lineCount();
+        block = block.next();
+        real_line_count++;
+    }
+
+    m_firstVisibleBlockLine = line_change - wrapped_line_count;
+    m_topScreenLine = m_firstVisibleBlockLine;
+    m_firstVisibleBlock = 0;
+
+    file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
+    file_pos = std::min(file_pos, bottom_screen_pos);
+
+    if(!updateDocument(file_pos, 0)) {
+        return false;
+    }
+    return true;
+}
+
+bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start)
 {
     QString data;
     std::vector<qint64> lineAddresses;
+    qint64 num_lines = view()->numLinesOnScreen() + 1;
     bool success = m_blockReader->readChunk(&data, &lineAddresses, start_pos, lines_after_start, num_lines);
     document()->setText(data, lineAddresses);
     performLayout();

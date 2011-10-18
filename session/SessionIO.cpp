@@ -50,5 +50,5 @@ void SessionIO::writeSession(const AppSession & session, std::ostream & out)
 
 const ParsingError * SessionIO::parsingError() const
 {
-    return m_parsingError.get();
+    return m_parsingError.data();
 }

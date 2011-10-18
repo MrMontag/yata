@@ -178,24 +178,19 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
 void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 {
     QTextBlock cursorBlock = cursor.block();
-
     int cursorLineNumber = m_document->blockLayoutPosition(cursorBlock);
-
     int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
-
     cursorLineNumber += blockLine;
 
     int topScreenLine = m_layoutStrategy->topScreenLine();
-
     int numReadableLines = numLinesOnScreen();
 
-    if(topScreenLine <= cursorLineNumber && cursorLineNumber <= topScreenLine + numReadableLines - 1) {
+    if(topScreenLine <= cursorLineNumber && cursorLineNumber < topScreenLine + numReadableLines) {
         // No scrolling needed -- return
         return;
     }
 
     int newTopLine = cursorLineNumber - numReadableLines / 2;
-
     m_layoutStrategy->scrollTo(newTopLine);
 }
 

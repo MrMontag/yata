@@ -9,8 +9,8 @@
 #define PARTIALLAYOUT_H
 
 #include "LayoutStrategy.h"
+#include <QScopedPointer>
 #include <QtGlobal>
-#include <memory>
 
 class YTextDocument;
 class FileBlockReader;
@@ -29,17 +29,20 @@ protected:
     virtual bool searchFile(bool isForward);
     virtual bool wrapAroundForDocumentSearch() const;
 private:
-    bool updateDocumentForPartialLayout(
-        bool file_changed = false, int line_change = 0, qint64 new_line_address = -1);
-    bool updateDocument(qint64 start_pos, qint64 lines_after_start, qint64 num_lines);
+    void updateScrollBars();
+    bool updateView(bool file_changed, qint64 new_line_address = -1, bool * needs_scroll = 0);
+    bool scrollBy(int line_change);
+    bool scrollUp(qint64 file_pos, int line_change);
+    bool scrollDown(qint64 file_pos, int line_change, qint64 bottom_screen_pos);
+    bool updateDocument(qint64 start_pos, qint64 lines_after_start);
     void updateBottomDocument();
     qint64 bottomScreenPosition() const;
 private:
     int m_topScreenLine;
     int m_firstVisibleBlock;
     int m_firstVisibleBlockLine;
-    std::auto_ptr<YTextDocument> m_bottomDocument;
-    std::auto_ptr<FileBlockReader> m_blockReader;
+    QScopedPointer<YTextDocument> m_bottomDocument;
+    QScopedPointer<FileBlockReader> m_blockReader;
 };
 
 #endif // PARTIALLAYOUT_H

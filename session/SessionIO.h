@@ -11,6 +11,7 @@
 #include <string>
 
 #include "SessionCommon.h"
+#include <QScopedPointer>
 
 class AppSession;
 
@@ -24,6 +25,6 @@ public:
 
     const ParsingError * parsingError() const;
 private:
-    std::auto_ptr<ParsingError> m_parsingError;
+    QScopedPointer<ParsingError> m_parsingError;
 };
 #endif
