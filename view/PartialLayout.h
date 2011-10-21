@@ -30,11 +30,13 @@ protected:
     virtual bool wrapAroundForDocumentSearch() const;
 private:
     void updateScrollBars();
-    bool updateView(bool file_changed, qint64 new_line_address = -1, bool * needs_scroll = 0);
+    bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
     bool scrollBy(int line_change);
     bool scrollUp(qint64 file_pos, int line_change);
-    bool scrollDown(qint64 file_pos, int line_change, qint64 bottom_screen_pos);
+    bool scrollDown(qint64 file_pos, int line_change);
     bool updateDocument(qint64 start_pos, qint64 lines_after_start);
+    qint64 topOfScreen() const;
+
     void updateBottomDocument();
     qint64 bottomScreenPosition() const;
 private:
