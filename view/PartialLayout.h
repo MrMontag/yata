@@ -38,7 +38,7 @@ private:
     qint64 topOfScreen() const;
 
     void updateBottomDocument();
-    qint64 bottomScreenPosition() const;
+    qint64 bottomScreenPosition(int * blockLine = 0) const;
 private:
     int m_topScreenLine;
     int m_firstVisibleBlock;
