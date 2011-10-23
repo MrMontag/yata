@@ -148,7 +148,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
-        QTextBlock block = m_document->findBlockAtLayoutPosition(topLine, &layoutLine);
+        QTextBlock block = m_document->findBlockAtLayoutLine(topLine, &layoutLine);
         if(block.isValid()) {
             int blockLine = topLine - layoutLine;
             QTextCursor cursor(block);

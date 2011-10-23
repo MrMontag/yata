@@ -25,7 +25,7 @@ public:
     void setFont(const QFont & font);
     void layout(int width);
 
-    QTextBlock findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos = 0) const;
+    QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
     int blockLayoutPosition(QTextBlock block) const;
     qint64 blockAddress(QTextBlock block) const;
 
@@ -48,7 +48,7 @@ private:
     QScopedPointer<QTextCursor> m_selectedCursor;
 
     int m_numLayoutLines;
-    std::vector<int> m_blockLayoutPositions;
+    std::vector<int> m_blockLayoutLines;
     std::vector<qint64> m_lineAddresses;
     QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;

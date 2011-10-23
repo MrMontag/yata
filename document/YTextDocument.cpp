@@ -58,10 +58,10 @@ void YTextDocument::layout(int width)
 
     m_width = width;
     m_numLayoutLines = 0;
-    m_blockLayoutPositions.clear();
+    m_blockLayoutLines.clear();
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
-        m_blockLayoutPositions.push_back(m_numLayoutLines);
+        m_blockLayoutLines.push_back(m_numLayoutLines);
         m_numLayoutLines += layoutBlock(&block);
     }
 
@@ -93,18 +93,18 @@ int YTextDocument::layoutBlock(QTextBlock * textBlock)
 
 }
 
-QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * closestLayoutPos /* = 0 */) const
+QTextBlock YTextDocument::findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos /* = 0 */) const
 {
     std::vector<int>::const_iterator blockitr = std::upper_bound(
-        m_blockLayoutPositions.begin(),
-        m_blockLayoutPositions.end(),
-        layoutPosition);
-    if(blockitr != m_blockLayoutPositions.begin()) { --blockitr; }
-    if(blockitr != m_blockLayoutPositions.end()) {
+        m_blockLayoutLines.begin(),
+        m_blockLayoutLines.end(),
+        layoutLine);
+    if(blockitr != m_blockLayoutLines.begin()) { --blockitr; }
+    if(blockitr != m_blockLayoutLines.end()) {
         if(closestLayoutPos) {
             *closestLayoutPos = *blockitr;
         }
-        int blockNumber = blockitr - m_blockLayoutPositions.begin();
+        int blockNumber = blockitr - m_blockLayoutLines.begin();
         return m_document->findBlockByNumber(blockNumber);
     } else {
         return QTextBlock();
@@ -114,10 +114,10 @@ QTextBlock YTextDocument::findBlockAtLayoutPosition(int layoutPosition, int * cl
 int YTextDocument::blockLayoutPosition(QTextBlock block) const
 {
     int blockNumber = block.blockNumber();
-    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutPositions.size()) {
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutLines.size()) {
         return -1;
     }
-    return m_blockLayoutPositions[blockNumber];
+    return m_blockLayoutLines[blockNumber];
 }
 
 qint64 YTextDocument::blockAddress(QTextBlock block) const
