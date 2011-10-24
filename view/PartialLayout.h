@@ -41,7 +41,6 @@ private:
     qint64 bottomScreenPosition(int * blockLine = 0) const;
 private:
     int m_topScreenLine;
-    int m_firstVisibleBlock;
     int m_firstVisibleBlockLine;
     QScopedPointer<YTextDocument> m_bottomDocument;
     QScopedPointer<FileBlockReader> m_blockReader;

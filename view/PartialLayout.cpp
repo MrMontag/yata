@@ -23,7 +23,6 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 PartialLayout::PartialLayout(TailView * tailView)
     : LayoutStrategy(tailView)
     , m_topScreenLine(0)
-    , m_firstVisibleBlock(0)
     , m_firstVisibleBlockLine(0)
     , m_bottomDocument(new YTextDocument())
 {
@@ -148,7 +147,6 @@ bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom
         // Scroll bar did not move
         file_pos = new_line_address;
         m_topScreenLine = 0;
-        m_firstVisibleBlock = 0;
         m_firstVisibleBlockLine = 0;
     } else {
         // Scroll bar moved
@@ -197,31 +195,31 @@ bool PartialLayout::scrollBy(int line_change)
 
 bool PartialLayout::scrollUp(qint64 file_pos, int line_change)
 {
-    if(!updateDocument(file_pos, line_change + m_firstVisibleBlock)) {
+    QTextBlock firstVisibleBlock = document()->findBlockAtLayoutLine(m_topScreenLine);
+    if(!updateDocument(file_pos, line_change + firstVisibleBlock.blockNumber())) {
         return false;
     }
 
-    QTextBlock block = document()->document()->findBlockByNumber(-line_change);
+    firstVisibleBlock = document()->document()->findBlockByNumber(-line_change);
     while(m_firstVisibleBlockLine + line_change < 0) {
         line_change += m_firstVisibleBlockLine + 1;
-        block = block.previous();
-        if(!block.isValid()) { break; }
-        m_firstVisibleBlockLine = block.layout()->lineCount() - 1;
+        firstVisibleBlock = firstVisibleBlock.previous();
+        if(!firstVisibleBlock.isValid()) { break; }
+        m_firstVisibleBlockLine = firstVisibleBlock.layout()->lineCount() - 1;
     }
 
-    if(!block.isValid()) { // We're at the top
-        m_firstVisibleBlock = 0;
+    if(!firstVisibleBlock.isValid()) { // We're at the top
         m_firstVisibleBlockLine = 0;
         m_topScreenLine = 0;
         return true;
     }
 
-    m_firstVisibleBlock = block.blockNumber();
+    const int firstVisibleBlockNumber = firstVisibleBlock.blockNumber();
     m_firstVisibleBlockLine += line_change;
 
     m_topScreenLine = m_firstVisibleBlockLine;
     for(QTextBlock block = document()->document()->firstBlock();
-        block.blockNumber() < m_firstVisibleBlock;
+        block.blockNumber() < firstVisibleBlockNumber;
         block = block.next()) {
 
         m_topScreenLine += block.layout()->lineCount();
@@ -236,7 +234,7 @@ bool PartialLayout::scrollDown(qint64 file_pos, int line_change)
     line_change += m_firstVisibleBlockLine;
     int wrapped_line_count = 0;
     int real_line_count = 0;
-    QTextBlock block = document()->document()->findBlockByNumber(m_firstVisibleBlock);
+    QTextBlock block = document()->findBlockAtLayoutLine(m_topScreenLine);
     while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
         wrapped_line_count += block.layout()->lineCount();
         block = block.next();
@@ -245,7 +243,6 @@ bool PartialLayout::scrollDown(qint64 file_pos, int line_change)
 
     m_firstVisibleBlockLine = line_change - wrapped_line_count;
     m_topScreenLine = m_firstVisibleBlockLine;
-    m_firstVisibleBlock = 0;
 
     file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
     if(file_pos >= bottom_screen_pos) {
