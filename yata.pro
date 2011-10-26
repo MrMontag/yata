@@ -20,6 +20,7 @@ INCLUDEPATH += . gui session app document fileio view search watcher
 HEADERS += \
     app/YApplication.h \
     app/YObjectPointer.h \
+    dbg/DebugWindow.h \
     document/YFileCursor.h \
     document/YTextDocument.h \
     fileio/BufferedFile.h \
@@ -49,12 +50,14 @@ HEADERS += \
     watcher/YFileSystemWatcherThread.h
 
 FORMS += \
+    dbg/DebugWindow.ui \
     gui/MainWindow.ui \
     gui/PreferencesDialog.ui \
     gui/SearchWidget.ui
 
 SOURCES += \
     app/YApplication.cpp \
+    dbg/DebugWindow.cpp \
     document/YFileCursor.cpp \
     document/YTextDocument.cpp \
     fileio/BufferedFile.cpp \

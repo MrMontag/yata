@@ -8,13 +8,13 @@
 #define MAINWINDOW_H
 
 #include "app/YObjectPointer.h"
-#include <QScopedPointer>
 #include <QMainWindow>
 
 namespace Ui {
     class MainWindow;
 }
 
+class DebugWindow;
 class FileSession;
 class TailView;
 class YTabWidget;
@@ -54,23 +54,27 @@ private slots:
     void on_action_Find_triggered();
     void on_action_Open_triggered();
 	void on_action_Exit_triggered();
-    void onCurrentTabChanged(int oldIndex, int newIndex);
 
-    void layoutAction();
     void on_actionPreferences_triggered();
 
+    void on_action_Full_Layout_triggered();
+    void on_action_Partial_Layout_triggered();
+    void on_action_Automatic_Layout_triggered();
+    void on_actionDebug_Window_triggered();
+
+    void debugWindowClosed();
+    void onCurrentTabChanged(int oldIndex, int newIndex);
 private:
     TailView * getCurrentView();
-    void addDebugMenu();
+    void setupDebugMenu();
+    void layoutAction(int layoutType); // declared int to avoid having to #include "TailView.h"
 private:
-	QScopedPointer<Ui::MainWindow> ui;
+    Ui::MainWindow * ui;
 
     YObjectPointer<YTabWidget> m_tabWidget;
     YObjectPointer<YStatusBar> m_statusBar;
     QString m_currentOpenDir;
 
-    YObjectPointer<QAction> m_fullLayoutAction;
-    YObjectPointer<QAction> m_partialLayoutAction;
-    YObjectPointer<QAction> m_automaticLayoutAction;
+    YObjectPointer<DebugWindow> m_debugWindow;
 };
 #endif

@@ -7,6 +7,8 @@
 #ifndef YTEXTDOCUMENT_H
 #define YTEXTDOCUMENT_H
 
+#include "app/YObjectPointer.h"
+
 #include <QScopedPointer>
 #include <QString>
 #include <vector>
@@ -44,7 +46,7 @@ private:
     int layoutBlock(QTextBlock * textBlock);
 
 private:
-    QScopedPointer<QTextDocument> m_document;
+    YObjectPointer<QTextDocument> m_document;
     QScopedPointer<QTextCursor> m_selectedCursor;
 
     int m_numLayoutLines;

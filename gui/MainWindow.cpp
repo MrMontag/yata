@@ -14,6 +14,7 @@
 #include "YStatusBar.h"
 #include "YTabWidget.h"
 #include "session/FileSession.h"
+#include "dbg/DebugWindow.h"
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -27,11 +28,7 @@
 
 // TODO: figure out disabling/enabling menu items
 
-MainWindow::MainWindow(): 
-    ui(new Ui::MainWindow()),
-    m_fullLayoutAction(0),
-    m_partialLayoutAction(0),
-    m_automaticLayoutAction(0)
+MainWindow::MainWindow(): ui(new Ui::MainWindow())
 {
     ui->setupUi(this);
     m_tabWidget.reset(new YTabWidget(this));
@@ -50,13 +47,14 @@ MainWindow::MainWindow():
     ui->menu_File->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
     ui->menu_File->insertSeparator(ui->action_Exit);
 
-    addDebugMenu();
+    setupDebugMenu();
 
     setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
 {
+    delete ui;
 }
 
 void MainWindow::addFile(const QString & filename)
@@ -241,9 +239,9 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     if(TailView * tailView = getCurrentView()) {
         QAction * toBeChecked = 0;
         switch(tailView->layoutType()) {
-            case TailView::DebugFullLayout: toBeChecked = m_fullLayoutAction.data(); break;
-            case TailView::DebugPartialLayout: toBeChecked = m_partialLayoutAction.data(); break;
-            case TailView::AutomaticLayout: toBeChecked = m_automaticLayoutAction.data(); break;
+            case TailView::DebugFullLayout: toBeChecked = ui->action_Full_Layout; break;
+            case TailView::DebugPartialLayout: toBeChecked = ui->action_Partial_Layout; break;
+            case TailView::AutomaticLayout: toBeChecked = ui->action_Automatic_Layout; break;
         }
         if (toBeChecked) { toBeChecked->setChecked(true); }
 
@@ -256,50 +254,57 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     }
 }
 
-void MainWindow::addDebugMenu()
+void MainWindow::setupDebugMenu()
 {
-    QMenu * debugMenu = menuBar()->addMenu("&Debug");
     QActionGroup * layoutGroup(new QActionGroup(this));
-
-    m_fullLayoutAction.reset(
-        layoutGroup->addAction(debugMenu->addAction("&Full layout", this, SLOT(layoutAction()))));
-    m_partialLayoutAction.reset(
-        layoutGroup->addAction(debugMenu->addAction("&Partial layout", this, SLOT(layoutAction()))));
-    m_automaticLayoutAction.reset(
-        layoutGroup->addAction(debugMenu->addAction("&Automatic layout", this, SLOT(layoutAction()))));
-
-    QAction * itr = 0;
-    foreach(itr, layoutGroup->actions()) {
-        itr->setCheckable(true);
-    }
+    layoutGroup->addAction(ui->action_Full_Layout);
+    layoutGroup->addAction(ui->action_Partial_Layout);
+    layoutGroup->addAction(ui->action_Automatic_Layout);
 }
 
-void MainWindow::layoutAction()
+void MainWindow::layoutAction(int layoutType)
 {
-    QObject * senderObject = sender();
-    TailView::LayoutType layoutType = TailView::AutomaticLayout;
-    if(senderObject == m_fullLayoutAction.data()) {
-        layoutType = TailView::DebugFullLayout;
-    } else if(senderObject == m_partialLayoutAction.data()) {
-        layoutType = TailView::DebugPartialLayout;
-    } else if(senderObject == m_automaticLayoutAction.data()) {
-        layoutType = TailView::AutomaticLayout;
-    }
-
     if(TailView * tailView = getCurrentView()) {
-        tailView->setLayoutType(layoutType);
+        tailView->setLayoutType(static_cast<TailView::LayoutType>(layoutType));
     }
 }
 
 void MainWindow::on_actionFollow_tail_triggered(bool checked)
 {
-   if(TailView * tailView = getCurrentView()) {
-       tailView->setFollowTail(checked);
-   }
+    if(TailView * tailView = getCurrentView()) {
+        tailView->setFollowTail(checked);
+    }
 }
 
 void MainWindow::on_actionPreferences_triggered()
 {
     PreferencesDialog dialog;
     dialog.exec();
+}
+
+void MainWindow::on_actionDebug_Window_triggered()
+{
+    m_debugWindow.reset(new DebugWindow(m_tabWidget.data()));
+    connect(m_debugWindow.data(), SIGNAL(destroyed()), SLOT(debugWindowClosed()));
+    m_debugWindow->show();
+}
+
+void MainWindow::debugWindowClosed()
+{
+    m_debugWindow.reset();
+}
+
+void MainWindow::on_action_Full_Layout_triggered()
+{
+    layoutAction(TailView::DebugFullLayout);
+}
+
+void MainWindow::on_action_Partial_Layout_triggered()
+{
+    layoutAction(TailView::DebugPartialLayout);
+}
+
+void MainWindow::on_action_Automatic_Layout_triggered()
+{
+    layoutAction(TailView::AutomaticLayout);
 }

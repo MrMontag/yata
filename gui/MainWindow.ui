@@ -55,10 +55,21 @@
     <addaction name="actionRefresh"/>
     <addaction name="actionFollow_tail"/>
    </widget>
+   <widget class="QMenu" name="menuDebug">
+    <property name="title">
+     <string>&amp;Debug</string>
+    </property>
+    <addaction name="action_Full_Layout"/>
+    <addaction name="action_Partial_Layout"/>
+    <addaction name="action_Automatic_Layout"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebug_Window"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Help"/>
+   <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -75,14 +86,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
-   </property>
-  </action>
-  <action name="action_FullLayout">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Full Layout</string>
    </property>
   </action>
   <action name="action_Find">
@@ -141,6 +144,35 @@
   <action name="actionPreferences">
    <property name="text">
     <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="action_Full_Layout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Full Layout</string>
+   </property>
+  </action>
+  <action name="action_Partial_Layout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Partial Layout</string>
+   </property>
+  </action>
+  <action name="action_Automatic_Layout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Automatic Layout</string>
+   </property>
+  </action>
+  <action name="actionDebug_Window">
+   <property name="text">
+    <string>Debug &amp;Window</string>
    </property>
   </action>
  </widget>
