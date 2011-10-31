@@ -95,11 +95,10 @@ int YTextDocument::layoutBlock(QTextBlock * textBlock)
 
 QTextBlock YTextDocument::findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos /* = 0 */) const
 {
-    std::vector<int>::const_iterator blockitr = std::upper_bound(
+    std::vector<int>::const_iterator blockitr = std::lower_bound(
         m_blockLayoutLines.begin(),
         m_blockLayoutLines.end(),
         layoutLine);
-    if(blockitr != m_blockLayoutLines.begin()) { --blockitr; }
     if(blockitr != m_blockLayoutLines.end()) {
         if(closestLayoutPos) {
             *closestLayoutPos = *blockitr;
@@ -113,7 +112,11 @@ QTextBlock YTextDocument::findBlockAtLayoutLine(int layoutLine, int * closestLay
 
 int YTextDocument::blockLayoutPosition(QTextBlock block) const
 {
-    int blockNumber = block.blockNumber();
+    return blockLayoutPosition(block.blockNumber());
+}
+
+int YTextDocument::blockLayoutPosition(int blockNumber) const
+{
     if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutLines.size()) {
         return -1;
     }

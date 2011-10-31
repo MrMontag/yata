@@ -23,7 +23,6 @@ const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 PartialLayout::PartialLayout(TailView * tailView)
     : LayoutStrategy(tailView)
     , m_topScreenLine(0)
-    , m_firstVisibleBlockLine(0)
     , m_bottomDocument(new YTextDocument())
 {
 }
@@ -146,10 +145,9 @@ bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom
     if(new_line_address != -1) {
         // Scroll bar did not move
         file_pos = new_line_address;
-        m_topScreenLine = 0;
-        m_firstVisibleBlockLine = 0;
     } else {
         // Scroll bar moved
+        m_topScreenLine = 0;
         if(verticalScrollBar->sliderPosition() >= verticalScrollBar->maximum()) {
             file_pos = bottom_screen_pos;
         } else {
@@ -162,7 +160,6 @@ bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom
     // Don't change the line further if we're at the bottom
     if(file_pos >= bottom_screen_pos) {
         file_pos = bottom_screen_pos;
-        m_firstVisibleBlockLine = bottomScreenTopBlockLine;
         m_topScreenLine = bottomScreenTopBlockLine;
         if(at_bottom) { *at_bottom = true; }
         verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
@@ -182,78 +179,72 @@ bool PartialLayout::scrollBy(int line_change)
 
     if(line_change != 0) {
         if(line_change < 0) {
-            if (!scrollUp(topOfScreen(), line_change)) { return false; }
+            if (!scrollUp(-line_change)) { return false; }
         } else {
-            if (!scrollDown(topOfScreen(), line_change)) { return false; }
+            if (!scrollDown(line_change)) { return false; }
         }
-        verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE);
+        verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE + m_topScreenLine);
+        //verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE);
     }
 
     view()->viewport()->update();
     return true;
 }
 
-bool PartialLayout::scrollUp(qint64 file_pos, int line_change)
+bool PartialLayout::scrollUp(int line_change)
 {
-    QTextBlock firstVisibleBlock = document()->findBlockAtLayoutLine(m_topScreenLine);
-    if(!updateDocument(file_pos, line_change + firstVisibleBlock.blockNumber())) {
-        return false;
-    }
-
-    firstVisibleBlock = document()->document()->findBlockByNumber(-line_change);
-    while(m_firstVisibleBlockLine + line_change < 0) {
-        line_change += m_firstVisibleBlockLine + 1;
-        firstVisibleBlock = firstVisibleBlock.previous();
-        if(!firstVisibleBlock.isValid()) { break; }
-        m_firstVisibleBlockLine = firstVisibleBlock.layout()->lineCount() - 1;
-    }
-
-    if(!firstVisibleBlock.isValid()) { // We're at the top
-        m_firstVisibleBlockLine = 0;
-        m_topScreenLine = 0;
+    if (m_topScreenLine >= line_change) {
+        m_topScreenLine -= line_change;
         return true;
     }
 
-    const int firstVisibleBlockNumber = firstVisibleBlock.blockNumber();
-    m_firstVisibleBlockLine += line_change;
-
-    m_topScreenLine = m_firstVisibleBlockLine;
-    for(QTextBlock block = document()->document()->firstBlock();
-        block.blockNumber() < firstVisibleBlockNumber;
-        block = block.next()) {
-
-        m_topScreenLine += block.layout()->lineCount();
+    line_change -= m_topScreenLine;
+    if(!updateDocument(topOfScreen(), -line_change)) {
+        m_topScreenLine = 0;
+        return false;
     }
+    QTextBlock firstBlock = document()->document()->firstBlock();
+    qint64 file_pos = document()->blockAddress(firstBlock);
+    if(file_pos == 0) {
+        m_topScreenLine = 0;
+    } else {
+        int oldTopBlock = document()->blockLayoutPosition(line_change);
+        m_topScreenLine = oldTopBlock - line_change;
+    }
+
     return true;
 }
 
-bool PartialLayout::scrollDown(qint64 file_pos, int line_change)
+bool PartialLayout::scrollDown(int line_change)
 {
+    QTextBlock firstBlock = document()->document()->firstBlock();
+    if(m_topScreenLine + line_change < firstBlock.layout()->lineCount()) {
+        m_topScreenLine += line_change;
+        keepToLowerBound(firstBlock, &m_topScreenLine);
+        return true;
+    }
+    int topLineOfNewBlock = 0;
+    QTextBlock newTopBlock = document()->findBlockAtLayoutLine(m_topScreenLine + line_change, &topLineOfNewBlock);
+    if(!newTopBlock.isValid()) { return false; }
+
+    m_topScreenLine = topLineOfNewBlock - (m_topScreenLine + line_change);
+    qint64 file_pos = keepToLowerBound(newTopBlock, &m_topScreenLine);
+    return updateDocument(file_pos, 0);
+}
+
+qint64 PartialLayout::keepToLowerBound(const QTextBlock & block, int * blockLine)
+{
+    qint64 file_pos = document()->blockAddress(block);
+
     int bottomScreenTopBlockLine = 0;
     const qint64 bottom_screen_pos = bottomScreenPosition(&bottomScreenTopBlockLine);
-    line_change += m_firstVisibleBlockLine;
-    int wrapped_line_count = 0;
-    int real_line_count = 0;
-    QTextBlock block = document()->findBlockAtLayoutLine(m_topScreenLine);
-    while(line_change - wrapped_line_count >= block.layout()->lineCount()) {
-        wrapped_line_count += block.layout()->lineCount();
-        block = block.next();
-        real_line_count++;
-    }
 
-    m_firstVisibleBlockLine = line_change - wrapped_line_count;
-    m_topScreenLine = m_firstVisibleBlockLine;
-
-    file_pos = m_blockReader->getStartPosition(file_pos, real_line_count);
     if(file_pos >= bottom_screen_pos) {
         file_pos = bottom_screen_pos;
-        m_topScreenLine = bottomScreenTopBlockLine;
+        *blockLine = bottomScreenTopBlockLine;
     }
 
-    if(!updateDocument(file_pos, 0)) {
-        return false;
-    }
-    return true;
+    return file_pos;
 }
 
 bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start)

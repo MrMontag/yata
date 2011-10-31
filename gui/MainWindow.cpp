@@ -146,6 +146,7 @@ void MainWindow::dropEvent(QDropEvent * event)
 void MainWindow::closeEvent(QCloseEvent * e)
 {
     SessionLoader::writeSession(this);
+    if(m_debugWindow) { m_debugWindow->close(); }
     e->accept();
 }
 

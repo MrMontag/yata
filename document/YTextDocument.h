@@ -29,6 +29,7 @@ public:
 
     QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
     int blockLayoutPosition(QTextBlock block) const;
+    int blockLayoutPosition(int blockNumber) const;
     qint64 blockAddress(QTextBlock block) const;
 
     QTextDocument * document();

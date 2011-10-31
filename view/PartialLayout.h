@@ -14,6 +14,7 @@
 
 class YTextDocument;
 class FileBlockReader;
+class QTextBlock;
 
 class PartialLayout: public LayoutStrategy {
 public:
@@ -32,8 +33,9 @@ private:
     void updateScrollBars();
     bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
     bool scrollBy(int line_change);
-    bool scrollUp(qint64 file_pos, int line_change);
-    bool scrollDown(qint64 file_pos, int line_change);
+    bool scrollUp(int line_change);
+    bool scrollDown(int line_change);
+    qint64 keepToLowerBound(const QTextBlock & block, int * blockLine);
     bool updateDocument(qint64 start_pos, qint64 lines_after_start);
     qint64 topOfScreen() const;
 
@@ -41,7 +43,6 @@ private:
     qint64 bottomScreenPosition(int * blockLine = 0) const;
 private:
     int m_topScreenLine;
-    int m_firstVisibleBlockLine;
     QScopedPointer<YTextDocument> m_bottomDocument;
     QScopedPointer<FileBlockReader> m_blockReader;
 };
