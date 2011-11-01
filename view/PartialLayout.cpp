@@ -276,6 +276,7 @@ void PartialLayout::updateBottomDocument()
     const int numLines = view()->numLinesOnScreen();
     bottomReader.readChunk(
         &data, &lineAddresses, bottomReader.size(), -numLines, numLines);
+    m_bottomDocument->setFont(document()->document()->defaultFont());
     m_bottomDocument->setText(data, lineAddresses);
     m_bottomDocument->layout(view()->viewport()->width());
     updateScrollBars();
