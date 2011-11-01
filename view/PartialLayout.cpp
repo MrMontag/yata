@@ -35,6 +35,7 @@ bool PartialLayout::onFileChanged(QString * error)
     if(view()->followTail()) {
         QScrollBar * vScrollBar = view()->verticalScrollBar();
         vScrollBar->setSliderPosition(vScrollBar->maximum());
+        // TODO: scrollbar didn't move, but updateView() assumes it did with default arguments.
         success = updateView();
     } else {
         success = updateView(topOfScreen());
@@ -241,7 +242,9 @@ qint64 PartialLayout::keepToLowerBound(const QTextBlock & block, int * blockLine
 
     if(file_pos >= bottom_screen_pos) {
         file_pos = bottom_screen_pos;
-        *blockLine = bottomScreenTopBlockLine;
+        if(*blockLine > bottomScreenTopBlockLine) {
+            *blockLine = bottomScreenTopBlockLine;
+        }
     }
 
     return file_pos;
@@ -280,8 +283,6 @@ void PartialLayout::updateBottomDocument()
 
 qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
 {
-    //TODO: Account for when top line of bottom screen is wrapped.
-
     int lines = 0;
     qint64 line_address = 0;
 
