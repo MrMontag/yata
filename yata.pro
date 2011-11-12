@@ -56,6 +56,7 @@ FORMS += \
     gui/SearchWidget.ui
 
 SOURCES += \
+    app/main.cpp \
     app/YApplication.cpp \
     dbg/DebugWindow.cpp \
     document/YFileCursor.cpp \
@@ -68,7 +69,6 @@ SOURCES += \
     gui/YStatusBar.cpp \
     gui/YTabMenuButton.cpp \
     gui/YTabWidget.cpp \
-    main.cpp \
     preferences/Preferences.cpp \
     search/BaseSearch.cpp \
     search/DocumentSearch.cpp \
