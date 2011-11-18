@@ -4,6 +4,10 @@
 
 !define APPNAME "Yata"
 !define REGISTRYKEY "Software\${APPNAME}"
+!define EXEDIR "..\release"
+!define QTDIR "C:\QtSDK"
+!define MINGWDIR "${QTDIR}\mingw\bin"
+!define QTBINDIR "${QTDIR}\Desktop\Qt\4.7.4\mingw\bin"
 
 ;--------------------------------
 ;Include Modern UI
@@ -34,15 +38,15 @@
 
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "..\license.txt"
-  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
+  !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_INSTFILES
-  !insertmacro MUI_PAGE_FINISH
+  ;!insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
-  !insertmacro MUI_UNPAGE_FINISH
+  ;!insertmacro MUI_UNPAGE_FINISH
 
 ;--------------------------------
 ;Languages
@@ -60,15 +64,24 @@ SectionEnd
 
 ShowInstDetails show
 Section
-  SetOutPath "$INSTDIR"
+    SetOutPath "$INSTDIR"
+    File "${MINGWDIR}\mingwm10.dll"
+    File "${MINGWDIR}\libgcc_s_dw2-1.dll"
 
-  ;ADD YOUR OWN FILES HERE...
+    File "${QTBINDIR}\QtCore4.dll"
+    File "${QTBINDIR}\QtGui4.dll"
 
-  ;Store installation folder
-  WriteRegStr HKCU ${REGISTRYKEY} "" $INSTDIR
+    File "${EXEDIR}\yata.exe"
 
-  ;Create uninstaller
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
+    ;Create Start Menu shortcuts
+    CreateDirectory "$SMPROGRAMS\${APPNAME}"
+    CreateShortCut "$SMPROGRAMS\${APPNAME}\Yata.lnk" "$INSTDIR\yata.exe"
+
+    ;Store installation folder
+    WriteRegStr HKCU ${REGISTRYKEY} "" $INSTDIR
+
+    ;Create uninstaller
+    WriteUninstaller "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 ;--------------------------------
@@ -89,11 +102,21 @@ SectionEnd
 
 Section "Uninstall"
 
-  ;ADD YOUR OWN FILES HERE...
+    Delete "$INSTDIR\mingwm10.dll"
+    Delete "$INSTDIR\libgcc_s_dw2-1.dll"
 
-  Delete "$INSTDIR\Uninstall.exe"
-  RMDir "$INSTDIR"
+    Delete "$INSTDIR\QtCore4.dll"
+    Delete "$INSTDIR\QtGui4.dll"
 
-  DeleteRegKey /ifempty HKCU ${REGISTRYKEY}
+    Delete "$INSTDIR\Yata.exe"
+
+    Delete "$INSTDIR\Uninstall.exe"
+
+    RMDir "$INSTDIR"
+
+    Delete "$SMPROGRAMS\${APPNAME}\Yata.lnk"
+    RMDir "$SMPROGRAMS\${APPNAME}"
+
+    DeleteRegKey /ifempty HKCU ${REGISTRYKEY}
 
 SectionEnd
