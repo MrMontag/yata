@@ -4,7 +4,7 @@
 
 !define APPNAME "Yata"
 !define REGISTRYKEY "Software\${APPNAME}"
-!define EXEDIR "..\release"
+!define EXESRCDIR "..\release"
 !define QTDIR "C:\QtSDK"
 !define MINGWDIR "${QTDIR}\mingw\bin"
 !define QTBINDIR "${QTDIR}\Desktop\Qt\4.7.4\mingw\bin"
@@ -57,9 +57,11 @@
 ;Installer Sections
 
 Section /o "Add shortcut to desktop" AddShortcutToDesktop
+    CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
 SectionEnd
 
 Section /o "Add shortcut to quickstart menu" AddShortcutToQuickstart
+    ;CreateShortCut "$SM\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
 SectionEnd
 
 ShowInstDetails show
@@ -71,17 +73,19 @@ Section
     File "${QTBINDIR}\QtCore4.dll"
     File "${QTBINDIR}\QtGui4.dll"
 
-    File "${EXEDIR}\yata.exe"
-
-    ;Create Start Menu shortcuts
-    CreateDirectory "$SMPROGRAMS\${APPNAME}"
-    CreateShortCut "$SMPROGRAMS\${APPNAME}\Yata.lnk" "$INSTDIR\yata.exe"
+    File "${EXESRCDIR}\${APPNAME}.exe"
 
     ;Store installation folder
     WriteRegStr HKCU ${REGISTRYKEY} "" $INSTDIR
 
     ;Create uninstaller
     WriteUninstaller "$INSTDIR\Uninstall.exe"
+
+    ;Create Start Menu shortcuts
+    CreateDirectory "$SMPROGRAMS\${APPNAME}"
+    CreateShortCut "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
+    CreateShortCut "$SMPROGRAMS\${APPNAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+
 SectionEnd
 
 ;--------------------------------
@@ -114,8 +118,11 @@ Section "Uninstall"
 
     RMDir "$INSTDIR"
 
-    Delete "$SMPROGRAMS\${APPNAME}\Yata.lnk"
+    Delete "$SMPROGRAMS\${APPNAME}\${APPNAME}.lnk"
+    Delete "$SMPROGRAMS\${APPNAME}\Uninstall.lnk"
     RMDir "$SMPROGRAMS\${APPNAME}"
+
+    Delete "$DESKTOP\${APPNAME}.lnk"
 
     DeleteRegKey /ifempty HKCU ${REGISTRYKEY}
 
