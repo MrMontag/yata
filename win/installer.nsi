@@ -61,7 +61,7 @@ Section /o "Add shortcut to desktop" AddShortcutToDesktop
 SectionEnd
 
 Section /o "Add shortcut to quickstart menu" AddShortcutToQuickstart
-    ;CreateShortCut "$SM\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
+    CreateShortCut "$QUICKLAUNCH\${APPNAME}.lnk" "$INSTDIR\${APPNAME}.exe"
 SectionEnd
 
 ShowInstDetails show
@@ -123,6 +123,7 @@ Section "Uninstall"
     RMDir "$SMPROGRAMS\${APPNAME}"
 
     Delete "$DESKTOP\${APPNAME}.lnk"
+    Delete "$QUICKLAUNCH\${APPNAME}.lnk"
 
     DeleteRegKey /ifempty HKCU ${REGISTRYKEY}
 
