@@ -6,6 +6,7 @@
  */
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "preferences/Preferences.h"
 #include "PreferencesDialog.h"
 #include "TailView.h"
 #include "SearchWidget.h"
@@ -257,10 +258,14 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
 
 void MainWindow::setupDebugMenu()
 {
-    QActionGroup * layoutGroup(new QActionGroup(this));
-    layoutGroup->addAction(ui->action_Full_Layout);
-    layoutGroup->addAction(ui->action_Partial_Layout);
-    layoutGroup->addAction(ui->action_Automatic_Layout);
+    if(Preferences::instance()->debugMenu()) {
+        QActionGroup * layoutGroup(new QActionGroup(this));
+        layoutGroup->addAction(ui->action_Full_Layout);
+        layoutGroup->addAction(ui->action_Partial_Layout);
+        layoutGroup->addAction(ui->action_Automatic_Layout);
+    } else {
+        menuBar()->removeAction(ui->menuDebug->menuAction());
+    }
 }
 
 void MainWindow::layoutAction(int layoutType)

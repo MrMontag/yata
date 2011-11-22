@@ -16,15 +16,15 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/yata.png"));
+    Preferences::instance()->read();
     QScopedPointer<MainWindow> win(new MainWindow);
 
     QDir dir;
     dir.mkpath(YApplication::settingsPath());
 
-    Preferences::instance()->read();
     SessionLoader::readSession(win.data());
 
-    if (argc > 1) {
+    if(argc > 1) {
         for(int i = 1; i < argc; i++) {
             win->addFile(argv[i]);
         }

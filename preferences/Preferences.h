@@ -24,6 +24,8 @@ public:
     const QFont & font() const;
     void setFont(const QFont & font);
 
+    bool debugMenu() const;
+
     ~Preferences();
 
 signals:
@@ -34,6 +36,7 @@ private:
 
 private:
     QScopedPointer<QFont> m_font;
+    QScopedPointer<bool> m_debugMenu;
 
     static Preferences * m_instance;
 };

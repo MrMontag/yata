@@ -16,6 +16,7 @@
 Preferences * Preferences::m_instance;
 
 const std::string FONT_KEY = "font";
+const std::string DEBUG_MENU_KEY = "debug-menu";
 
 Preferences * Preferences::instance()
 {
@@ -30,7 +31,13 @@ void Preferences::write()
     YAML::Emitter emitter;
 
     emitter << YAML::BeginMap;
+
     emitter << YAML::Key << FONT_KEY << YAML::Value << m_font->toString().toStdString();
+
+    if(m_debugMenu.data()) {
+        emitter << YAML::Key << DEBUG_MENU_KEY << YAML::Value << *m_debugMenu;
+    }
+
     emitter << YAML::EndMap;
 
     std::ofstream out(YApplication::preferencesFilePath().toStdString().c_str());
@@ -49,6 +56,11 @@ void Preferences::read()
                 *font >> fontStr;
                 m_font->fromString(fontStr.c_str());
             }
+            if (const YAML::Node * debugMenuNode = document.FindValue(DEBUG_MENU_KEY)) {
+                bool debugMenu;
+                *debugMenuNode >> debugMenu;
+                m_debugMenu.reset(new bool(debugMenu));
+            }
         }
     } catch(YAML::Exception & ex) {
     }
@@ -63,6 +75,11 @@ void Preferences::setFont(const QFont & font)
 {
     m_font.reset(new QFont(font));
     emit preferencesChanged();
+}
+
+bool Preferences::debugMenu() const
+{
+    return m_debugMenu.data() ? *m_debugMenu : false;
 }
 
 Preferences::Preferences():

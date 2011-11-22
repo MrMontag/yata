@@ -23,7 +23,7 @@
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
@@ -31,7 +31,7 @@
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
-   <widget class="QMenu" name="menu_Edit">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
@@ -41,14 +41,14 @@
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
    </widget>
-   <widget class="QMenu" name="menu_Help">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout_Qt"/>
     <addaction name="action_About_Yata"/>
    </widget>
-   <widget class="QMenu" name="menu_View">
+   <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
     </property>
@@ -65,10 +65,10 @@
     <addaction name="separator"/>
     <addaction name="actionDebug_Window"/>
    </widget>
-   <addaction name="menu_File"/>
-   <addaction name="menu_Edit"/>
-   <addaction name="menu_View"/>
-   <addaction name="menu_Help"/>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuHelp"/>
    <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -152,6 +152,9 @@
    </property>
    <property name="text">
     <string>&amp;Full Layout</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="action_Partial_Layout">
