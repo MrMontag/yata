@@ -45,8 +45,8 @@ MainWindow::MainWindow(): ui(new Ui::MainWindow())
 
     connect(m_tabWidget.data(), SIGNAL(currentChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
 
-    ui->menu_File->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
-    ui->menu_File->insertSeparator(ui->action_Exit);
+    ui->menuFile->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
+    ui->menuFile->insertSeparator(ui->action_Exit);
 
     setupDebugMenu();
 

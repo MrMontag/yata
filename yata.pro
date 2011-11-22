@@ -96,4 +96,10 @@ win32 {
     RC_FILE += win/yata.rc
 }
 
+unix {
+    isEmpty(INSTALLDIR): INSTALLDIR = /usr/local/bin
+    target.path = $$INSTALLDIR
+    INSTALLS += target
+}
+
 LIBS += -lyaml-cpp

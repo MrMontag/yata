@@ -5,13 +5,20 @@ Building requirements:
 - yaml-cpp 0.2.6
 - C++ compiler capable of building Qt (GNU gcc is recommended)
 
-To build on Linux:
+To build on Unix:
 
 - Ensure yaml-cpp is built and installed in a standard place (i.e., /usr/lib or
   /usr/local/lib)
-- Change to the root of the yata source tree the following commands:
-qmake
-make
+- Change to the root of the yata source tree and run the following commands:
+    qmake
+    make
+    make install
+  Note that you may need to be root to run the last command.
+
+By default, yata will install to /usr/local/bin. To change the default, specify
+the desired directory with INSTALLDIR as an argument to qmake. For example, to
+install to /usr/bin, use:
+    qmake INSTALLDIR=/usr/bin
 
 To build on Windows:
 
