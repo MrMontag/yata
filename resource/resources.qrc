@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>yata.png</file>
+        <file>version.txt</file>
     </qresource>
 </RCC>

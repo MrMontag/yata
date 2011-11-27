@@ -4,6 +4,7 @@
  * 
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
+
 #include <QObject>
 #include <QString>
 #include <QDir>
@@ -12,6 +13,14 @@
 QString YApplication::displayAppName()
 {
     return QObject::tr("Yata");
+}
+
+QString YApplication::appVersion()
+{
+    QFile version(":/version.txt");
+    version.open(QFile::ReadOnly);
+    QString versionStr = version.readAll();
+    return versionStr;
 }
 
 QString YApplication::settingsPath()

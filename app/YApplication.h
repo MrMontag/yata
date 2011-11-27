@@ -9,10 +9,10 @@
 
 class QString;
 
-class YApplication
-{
+class YApplication {
 public:
     static QString displayAppName();
+    static QString appVersion();
     static QString settingsPath();
     static QString sessionFilePath();
     static QString preferencesFilePath();

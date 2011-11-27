@@ -87,7 +87,7 @@ SOURCES += \
     watcher/YFileSystemWatcherThread.cpp
 
 RESOURCES += \
-    resource/TailViewResources.qrc
+    resource/resources.qrc
 
 win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
