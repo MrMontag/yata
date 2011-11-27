@@ -1,8 +1,15 @@
+; This file is part of yata -- Yet Another Tail Application
+; Copyright 2010-2011 James Smith
+;
+; Licensed under the GNU General Public License.  See license.txt for details.
+
 ;NSIS Modern User Interface
 ;Welcome/Finish Page Example Script
 ;Written by Joost Verburg
 
 !define APPNAME "Yata"
+!define VERSION "0.1"
+!define FULLAPPNAME "${APPNAME} ${VERSION}"
 !define REGISTRYKEY "Software\${APPNAME}"
 !define EXESRCDIR "..\release"
 !define QTDIR "C:\QtSDK"
@@ -18,8 +25,8 @@
 ;General
 
   ;Name and file
-  Name ${APPNAME}
-  OutFile "Yata Setup.exe"
+  Name "${FULLAPPNAME}"
+  OutFile "${FULLAPPNAME} Setup.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\${APPNAME}"
