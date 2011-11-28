@@ -2,7 +2,8 @@ Yata -- Yet Another Tail Application
 
 Building requirements:
 - Qt 4.7 or later
-- yaml-cpp 0.2.6
+- yaml-cpp 0.2.6 (see http://code.google.com/p/yaml-cpp for downloads and
+  instructions)
 - C++ compiler capable of building Qt (GNU gcc is recommended)
 
 To build on Unix:
