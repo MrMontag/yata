@@ -25,6 +25,7 @@ HEADERS += \
     document/YTextDocument.h \
     fileio/BufferedFile.h \
     fileio/FileBlockReader.h \
+    gui/ColorButton.h \
     gui/MainWindow.h \
     gui/PreferencesDialog.h \
     gui/SearchWidget.h \
@@ -47,7 +48,7 @@ HEADERS += \
     view/PartialLayout.h \
     view/TailView.h \
     watcher/YFileSystemWatcher.h \
-    watcher/YFileSystemWatcherThread.h
+    watcher/YFileSystemWatcherThread.h \
 
 FORMS += \
     dbg/DebugWindow.ui \
@@ -63,6 +64,7 @@ SOURCES += \
     document/YTextDocument.cpp \
     fileio/BufferedFile.cpp \
     fileio/FileBlockReader.cpp \
+    gui/ColorButton.cpp \
     gui/MainWindow.cpp \
     gui/PreferencesDialog.cpp \
     gui/SearchWidget.cpp \
@@ -84,7 +86,7 @@ SOURCES += \
     view/PartialLayout.cpp \
     view/TailView.cpp \
     watcher/YFileSystemWatcher.cpp \
-    watcher/YFileSystemWatcherThread.cpp
+    watcher/YFileSystemWatcherThread.cpp \
 
 RESOURCES += \
     resource/resources.qrc
