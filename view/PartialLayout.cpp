@@ -302,8 +302,11 @@ qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
         *blockLine = lines - linesOnScreen;
     }
 
-    // in case YTextDocument::blockAddress() returns -1
-    line_address = std::max(line_address, 0LL);
+    // In case YTextDocument::blockAddress() returns -1 (this could happen if resizing the TailView widget hasn't
+    // occurred yet), just return the last character's address so follow tail on start up can happen correctly.
+    if(line_address < 0) {
+        line_address = m_blockReader->size();
+    }
 
     return line_address;
 }

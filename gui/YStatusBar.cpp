@@ -14,6 +14,7 @@ YStatusBar::YStatusBar(QWidget *parent):
     QStatusBar(parent),
     m_leftLabel(new QLabel(this))
 {
+    m_leftLabel->setMinimumSize(QSize(1,1));
     addWidget(m_leftLabel.data());
 }
 
