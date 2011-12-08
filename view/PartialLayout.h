@@ -24,6 +24,7 @@ public:
     virtual void resizeEvent();
     virtual int topScreenLine() const;
     virtual void scrollTo(int newTopLine);
+    virtual bool scrollBy(int line_change);
     virtual void updateAfterKeyPress();
     virtual void vScrollBarAction(int action);
 protected:
@@ -32,7 +33,6 @@ protected:
 private:
     void updateScrollBars();
     bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
-    bool scrollBy(int line_change);
     bool scrollUp(int line_change);
     bool scrollDown(int line_change);
     qint64 keepToLowerBound(const QTextBlock & block, int * blockLine);
