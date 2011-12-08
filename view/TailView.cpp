@@ -310,6 +310,20 @@ void TailView::keyPressEvent(QKeyEvent * event)
     }
 }
 
+void TailView::wheelEvent(QWheelEvent * event)
+{
+    if(event->orientation() == Qt::Horizontal) {
+        QAbstractScrollArea::wheelEvent(event);
+        return;
+    }
+
+    const int SCROLL_STEP_SIZE = 120;
+    int scrollSteps = event->delta() / SCROLL_STEP_SIZE;
+    int linesToScroll = -(scrollSteps * qApp->wheelScrollLines());
+    m_layoutStrategy->scrollBy(linesToScroll);
+    event->accept();
+}
+
 void TailView::updateScrollBars(int newMax)
 {
     if(verticalScrollBar()->maximum() != newMax) {
@@ -323,6 +337,14 @@ void TailView::updateScrollBars(int newMax)
 void TailView::vScrollBarAction(int action)
 {
     QScrollBar * vsb = verticalScrollBar();
+
+    if(action == QAbstractSlider::SliderMove && !vsb->isSliderDown()) {
+        // The slider moved, but wasn't by a keystroke (since isSliderDown() returned false),
+        // so assume a wheel event triggered this action (which gets handled by wheelEvent()),
+        // and simply return.
+        return;
+    }
+
     if(vsb->sliderPosition() > vsb->maximum()) {
         vsb->setSliderPosition(vsb->maximum());
     }

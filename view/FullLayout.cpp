@@ -55,6 +55,13 @@ void FullLayout::scrollTo(int newTopLine)
     view()->verticalScrollBar()->setValue(newTopLine);
 }
 
+bool FullLayout::scrollBy(int line_change)
+{
+    QScrollBar * vsb = view()->verticalScrollBar();
+    vsb->setSliderPosition(vsb->sliderPosition() + line_change);
+    return true;
+}
+
 bool FullLayout::searchFile(bool /*isForward*/)
 {
     // Called when searching the document failed.

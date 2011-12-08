@@ -185,7 +185,6 @@ bool PartialLayout::scrollBy(int line_change)
             if (!scrollDown(line_change)) { return false; }
         }
         verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE + m_topScreenLine);
-        //verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE);
     }
 
     view()->viewport()->update();

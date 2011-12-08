@@ -18,6 +18,7 @@ public:
     virtual void resizeEvent();
     virtual int topScreenLine() const;
     virtual void scrollTo(int newTopLine);
+    virtual bool scrollBy(int line_change);
     virtual void updateAfterKeyPress();
     virtual void vScrollBarAction(int action);
     virtual bool searchFile(bool isForward);

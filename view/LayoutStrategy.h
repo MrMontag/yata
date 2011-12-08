@@ -20,6 +20,7 @@ public:
     virtual void resizeEvent() = 0;
     virtual int topScreenLine() const = 0;
     virtual void scrollTo(int newTopLine) = 0;
+    virtual bool scrollBy(int lineChange) = 0;
     virtual void updateAfterKeyPress() = 0;
     virtual void vScrollBarAction(int action) = 0;
     virtual bool searchFile(bool isForward) = 0;

@@ -78,6 +78,7 @@ protected:
     void paintEvent(QPaintEvent * event);
     void resizeEvent(QResizeEvent *);
     void keyPressEvent(QKeyEvent * event);
+    void wheelEvent(QWheelEvent * event);
 
 private slots:
     void vScrollBarAction(int action);
