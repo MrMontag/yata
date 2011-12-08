@@ -14,6 +14,7 @@ YStatusBar::YStatusBar(QWidget *parent):
     QStatusBar(parent),
     m_leftLabel(new QLabel(this))
 {
+    // Set a small minimum size so the label won't prevent the window from resizing smaller that its text.
     m_leftLabel->setMinimumSize(QSize(1,1));
     addWidget(m_leftLabel.data());
 }
