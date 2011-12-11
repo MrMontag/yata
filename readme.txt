@@ -9,7 +9,11 @@ Building requirements:
 To build on Unix:
 
 - Ensure yaml-cpp is built and installed in a standard place (i.e., /usr/lib or
-  /usr/local/lib)
+  /usr/local/lib). Instructions for building yaml-cpp are in its source package.
+- Ensure that development libraries for Qt are installed. Qt4 is available in
+  the repositories of most major Linux distributions. For example, on Ubuntu,
+  you would run the following command on a terminal:
+    sudo apt-get install libqt4-dev
 - Change to the root of the yata source tree and run the following commands:
     qmake
     make
@@ -28,7 +32,7 @@ http://qt.nokia.com. (This will give you the Qt toolkit, plus MinGW, a version
 of GNU gcc for windows. You will still need to download yaml-cpp from
 code.google.com/p/yaml-cpp.) Here are the steps:
 
-- Ensure yaml-cpp is built and installed. (You may need to download cmake for
+- Ensure yaml-cpp is built and installed. (You will need to download cmake for
   windows for this step.) Make a note of where the libraries and headers are
   installed.
 - Open a command window, or open Qt Creator. (The rest of the directions
@@ -39,19 +43,20 @@ code.google.com/p/yaml-cpp.) Here are the steps:
   you have installed it elsewhere, you should set the YAML-CPP variable on the
   command line. For instance, if yaml-cpp is installed in C:\yaml-cpp, you
   would run qmake like this:
+    qmake YAML-CPP=C:/yaml-cpp
+  Note that you should use forward slashes ("/") for directory separators, *not* 
+  backslashes ("\").
+- Run this command:
+    mingw32-make release
 
-  qmake YAML-CPP=C:/yaml-cpp
+Note that you may need to add the directories in which qmake and mingw32-make
+are located to your %PATH% environment variable in order for the commands to
+succeed.
 
-  Note the use of forward slashes for directory separators.
-- Run mingw32-make.
-
-Note that you may need to add qmake and mingw32-make to your %PATH% environment
-variable in order for the commands to succeed.
-
-To run:
+To run from the command line:
 yata [file[s]]
 
-Please note that this software is alpha quality software,
-and is not intended for general use yet.
+Please be aware that this software is *alpha* quality software, and is not
+intended for general use yet.
 
 Have fun!
