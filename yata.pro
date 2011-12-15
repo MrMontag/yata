@@ -5,7 +5,7 @@
 
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
-CONFIG(debug, debug|release) {
+build_pass:CONFIG(debug, debug|release) {
     TARGET = yatad
 } else {
     TARGET = yata
