@@ -17,10 +17,7 @@ QString YApplication::displayAppName()
 
 QString YApplication::appVersion()
 {
-    QFile version(":/version.txt");
-    version.open(QFile::ReadOnly);
-    QString versionStr = version.readAll();
-    return versionStr;
+    return APPVERSION;
 }
 
 QString YApplication::settingsPath()

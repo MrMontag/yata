@@ -8,7 +8,9 @@
 ;Written by Joost Verburg
 
 !define APPNAME "Yata"
-!define VERSION "0.1"
+!ifndef VERSION
+    !define VERSION "x.x"
+!endif
 !define FULLAPPNAME "${APPNAME} ${VERSION}"
 !define REGISTRYKEY "Software\${APPNAME}"
 !ifndef EXESRCDIR

@@ -3,6 +3,9 @@
 # 
 # Licensed under the GNU General Public License.  See license.txt for details.
 
+VERSION = 0.1.0
+DEFINES += 'APPVERSION=\\"$$VERSION\\"'
+
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
 build_pass:CONFIG(release, debug|release) {
@@ -96,7 +99,8 @@ win32 {
     RC_FILE += win/yata.rc
     build_pass:CONFIG(release, debug|release) {
         target.path = $$OUT_PWD
-        target.commands = makensis /DEXESRCDIR=$$OUT_PWD\\release /DOUTDIR=$$OUT_PWD $$PWD\\win\\installer.nsi
+        target.commands = makensis /DEXESRCDIR=$$OUT_PWD\\release /DOUTDIR=$$OUT_PWD \
+            /DVERSION=$$VERSION $$PWD\\win\\installer.nsi
         INSTALLS += target
     }
 }
