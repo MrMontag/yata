@@ -3,12 +3,15 @@
 # 
 # Licensed under the GNU General Public License.  See license.txt for details.
 
+VERSION = 0.1.0
+DEFINES += 'APPVERSION=\\"$$VERSION\\"'
+
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
-CONFIG(debug, debug|release) {
-    TARGET = yatad
-} else {
+build_pass:CONFIG(release, debug|release) {
     TARGET = yata
+} else {
+    TARGET = yatad
 }
 
 DEPENDPATH += . app document fileio gui resource search session view watcher
@@ -96,6 +99,12 @@ win32 {
     INCLUDEPATH += $$YAMLCPP/include
     LIBS += -L$$YAMLCPP/lib
     RC_FILE += win/yata.rc
+    build_pass:CONFIG(release, debug|release) {
+        target.path = $$OUT_PWD
+        target.commands = makensis /DEXESRCDIR=$$OUT_PWD\\release /DOUTDIR=$$OUT_PWD \
+            /DVERSION=$$VERSION $$PWD\\win\\installer.nsi
+        INSTALLS += target
+    }
 }
 
 unix {

@@ -8,10 +8,17 @@
 ;Written by Joost Verburg
 
 !define APPNAME "Yata"
-!define VERSION "0.1"
+!ifndef VERSION
+    !define VERSION "x.x"
+!endif
 !define FULLAPPNAME "${APPNAME} ${VERSION}"
 !define REGISTRYKEY "Software\${APPNAME}"
-!define EXESRCDIR "..\release"
+!ifndef EXESRCDIR
+    !define EXESRCDIR "..\release"
+!endif
+!ifndef OUTDIR
+    !define OUTDIR "."
+!endif
 !define QTDIR "C:\QtSDK"
 !define MINGWDIR "${QTDIR}\mingw\bin"
 !define QTBINDIR "${QTDIR}\Desktop\Qt\4.7.4\mingw\bin"
@@ -26,7 +33,7 @@
 
   ;Name and file
   Name "${FULLAPPNAME}"
-  OutFile "${FULLAPPNAME} Setup.exe"
+  OutFile "${OUTDIR}\${FULLAPPNAME} Setup.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\${APPNAME}"
