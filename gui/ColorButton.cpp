@@ -1,3 +1,10 @@
+/*
+ * This file is part of yata -- Yet Another Tail Application
+ * Copyright 2010-2011 James Smith
+ *
+ * Licensed under the GNU General Public License.  See license.txt for details.
+ */
+
 #include "ColorButton.h"
 #include <QBrush>
 #include <QColorDialog>
@@ -7,8 +14,7 @@
 #include <QStyleOptionButton>
 
 ColorButton::ColorButton(QWidget *parent):
-    QPushButton(parent),
-    m_currentColor(0, 0xff, 0)
+    QPushButton(parent)
 {
     connect(this, SIGNAL(clicked()), SLOT(onClick()));
 }

@@ -12,6 +12,7 @@
 #include <QScopedPointer>
 
 class QFont;
+class TextColor;
 
 class Preferences: public QObject {
     Q_OBJECT
@@ -23,6 +24,12 @@ public:
 
     const QFont & font() const;
     void setFont(const QFont & font);
+
+    const TextColor & normalTextColor() const;
+    void setNormalTextColor(const TextColor & color) const;
+
+    const TextColor & selectedTextColor() const;
+    void setSelectedTextColor(const TextColor & color);
 
     bool debugMenu() const;
 
@@ -36,6 +43,8 @@ private:
 
 private:
     QScopedPointer<QFont> m_font;
+    QScopedPointer<TextColor> m_normalTextColor;
+    QScopedPointer<TextColor> m_selectedTextColor;
     QScopedPointer<bool> m_debugMenu;
 
     static Preferences * m_instance;

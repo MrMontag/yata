@@ -1,6 +1,8 @@
 #ifndef SESSION_COMMON_H
 #define SESSION_COMMON_H
 
+// TODO: move this to a yaml subdirectory, since it's being used by preferences serialization, not just session.
+
 #include <yaml-cpp/yaml.h>
 #include <string>
 

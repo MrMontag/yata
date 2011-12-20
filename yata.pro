@@ -32,10 +32,12 @@ HEADERS += \
     gui/MainWindow.h \
     gui/PreferencesDialog.h \
     gui/SearchWidget.h \
+    gui/TextColorWidget.h \
     gui/YStatusBar.h \
     gui/YTabMenuButton.h \
     gui/YTabWidget.h \
     preferences/Preferences.h \
+    preferences/TextColor.h \
     search/BaseSearch.h \
     search/DocumentSearch.h \
     search/FileSearch.h \
@@ -57,11 +59,12 @@ FORMS += \
     dbg/DebugWindow.ui \
     gui/MainWindow.ui \
     gui/PreferencesDialog.ui \
-    gui/SearchWidget.ui
+    gui/SearchWidget.ui \
+    gui/TextColorWidget.ui \
 
 SOURCES += \
-    app/main.cpp \
     app/YApplication.cpp \
+    app/main.cpp \
     dbg/DebugWindow.cpp \
     document/YFileCursor.cpp \
     document/YTextDocument.cpp \
@@ -71,10 +74,12 @@ SOURCES += \
     gui/MainWindow.cpp \
     gui/PreferencesDialog.cpp \
     gui/SearchWidget.cpp \
+    gui/TextColorWidget.cpp \
     gui/YStatusBar.cpp \
     gui/YTabMenuButton.cpp \
     gui/YTabWidget.cpp \
     preferences/Preferences.cpp \
+    preferences/TextColor.cpp \
     search/BaseSearch.cpp \
     search/DocumentSearch.cpp \
     search/FileSearch.cpp \

@@ -9,6 +9,7 @@
 #include "ui_PreferencesDialog.h"
 
 #include "preferences/Preferences.h"
+#include "preferences/TextColor.h"
 #include <QtDebug>
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
@@ -16,7 +17,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     ui(new Ui::PreferencesDialog)
 {
     ui->setupUi(this);
-    updateFont(Preferences::instance()->font());
+    ui->normalTextColor->setText(tr("Normal Text:"));
+    ui->selectedTextColor->setText(tr("Selection:"));
+
+    Preferences * pref = Preferences::instance();
+
+    updateFont(pref->font());
+    ui->normalTextColor->setTextColor(pref->normalTextColor());
+    ui->selectedTextColor->setTextColor(pref->selectedTextColor());
 }
 
 PreferencesDialog::~PreferencesDialog()
@@ -29,8 +37,11 @@ void PreferencesDialog::on_buttonBox_accepted()
     font.setBold(ui->boldCheckBox->isChecked());
     font.setItalic(ui->italicCheckBox->isChecked());
     font.setPointSize(ui->fontSizeComboBox->currentText().toInt());
-    Preferences::instance()->setFont(font);
-    Preferences::instance()->write();
+    Preferences * pref = Preferences::instance();
+    pref->setFont(font);
+    pref->setNormalTextColor(ui->normalTextColor->textColor());
+    pref->setSelectedTextColor(ui->selectedTextColor->textColor());
+    pref->write();
 }
 
 void PreferencesDialog::on_fontComboBox_currentFontChanged(const QFont & font)
