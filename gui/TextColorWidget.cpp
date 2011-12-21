@@ -11,7 +11,8 @@
 
 TextColorWidget::TextColorWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::TextColorWidget)
+    ui(new Ui::TextColorWidget),
+    m_defaultTextColor(new TextColor)
 {
     ui->setupUi(this);
 }
@@ -40,4 +41,14 @@ void TextColorWidget::setTextColor(const TextColor & tc)
 {
     ui->foregroundColor->setCurrentColor(tc.foreground());
     ui->backgroundColor->setCurrentColor(tc.background());
+}
+
+void TextColorWidget::setDefaultTextColor(const TextColor & dtc)
+{
+    *m_defaultTextColor = dtc;
+}
+
+void TextColorWidget::on_defaultButton_clicked()
+{
+    setTextColor(*m_defaultTextColor);
 }

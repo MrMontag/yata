@@ -25,6 +25,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
     updateFont(pref->font());
     ui->normalTextColor->setTextColor(pref->normalTextColor());
     ui->selectedTextColor->setTextColor(pref->selectedTextColor());
+
+    QPalette palette = QApplication::palette();
+    ui->normalTextColor->setDefaultTextColor(
+        TextColor(palette.text().color(), palette.base().color()));
+    ui->selectedTextColor->setDefaultTextColor(
+        TextColor(palette.highlightedText().color(), palette.highlight().color()));
 }
 
 PreferencesDialog::~PreferencesDialog()

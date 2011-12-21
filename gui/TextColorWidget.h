@@ -9,6 +9,7 @@
 #define TEXTCOLORWIDGET_H
 
 #include <QWidget>
+#include <QScopedPointer>
 
 namespace Ui {
     class TextColorWidget;
@@ -29,8 +30,14 @@ public:
     TextColor textColor() const;
     void setTextColor(const TextColor & tc);
 
+    void setDefaultTextColor(const TextColor & dtc);
+
+private slots:
+    void on_defaultButton_clicked();
+
 private:
     Ui::TextColorWidget *ui;
+    QScopedPointer<TextColor> m_defaultTextColor;
 };
 
 #endif // TEXTCOLORWIDGET_H
