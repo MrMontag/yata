@@ -17,6 +17,7 @@ class QFont;
 class QTextBlock;
 class QTextDocument;
 class QTextCursor;
+class TextColor;
 class YFileCursor;
 
 class YTextDocument {
@@ -24,8 +25,8 @@ public:
     YTextDocument();
     ~YTextDocument();
     void setText(const QString & text, const std::vector<qint64> & newAddresses);
-    void setFont(const QFont & font);
     void layout(int width);
+    void markDirty();
 
     QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
     int blockLayoutPosition(QTextBlock block) const;
@@ -45,6 +46,8 @@ public:
 
 private:
     int layoutBlock(QTextBlock * textBlock);
+    void updateFont();
+    void setColors(QTextCursor * cursor, const TextColor & textColor);
 
 private:
     YObjectPointer<QTextDocument> m_document;

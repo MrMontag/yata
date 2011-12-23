@@ -13,6 +13,7 @@
 #include "FullLayout.h"
 #include "PartialLayout.h"
 #include "preferences/Preferences.h"
+#include "preferences/TextColor.h"
 #include "SearchInfo.h"
 #include "YApplication.h"
 #include "YFileCursor.h"
@@ -52,7 +53,6 @@ TailView::TailView(QWidget * parent)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
-    m_document->setFont(Preferences::instance()->font());
 }
 
 TailView::~TailView()
@@ -256,10 +256,12 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 {
     m_layoutStrategy->performLayout();
 
+    QPainter painter(viewport());
+    QRectF viewrect(viewport()->rect());
+    painter.fillRect(viewrect, Preferences::instance()->normalTextColor().background());
+
     qreal dy = 0;
-
     QTextDocument * document = m_document->document();
-
     for(QTextBlock block = document->begin(); block != document->end(); block = block.next()) {
         QTextLayout & layout(*block.layout());
         QFontMetrics fontMetrics(layout.font());
@@ -270,9 +272,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout.boundingRect());
         layoutRect.moveTo(start);
-        QRectF viewrect(viewport()->rect());
         if(viewrect.intersects(layoutRect)) {
-            QPainter painter(viewport());
             layout.draw(
                 &painter,
                 start,
@@ -358,8 +358,7 @@ void TailView::vScrollBarAction(int action)
 
 void TailView::onPreferencesChanged()
 {
-    m_document->setFont(Preferences::instance()->font());
-    onFileChanged();
+    m_document->markDirty();
 }
 
 int TailView::numLinesOnScreen() const

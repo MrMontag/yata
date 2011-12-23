@@ -6,6 +6,8 @@
  */
 #include "YTextDocument.h"
 #include "YFileCursor.h"
+#include "preferences/TextColor.h"
+#include "preferences/Preferences.h"
 
 #include <QApplication>
 #include <QFontMetrics>
@@ -17,16 +19,17 @@
 
 #include <algorithm>
 
-YTextDocument::YTextDocument()
-    : m_document(new QTextDocument())
-    , m_selectedCursor(new QTextCursor())
-    , m_numLayoutLines(0)
-    , m_fileCursor(new YFileCursor())
-    , m_width(0)
-    , m_needs_layout(false)
+YTextDocument::YTextDocument():
+    m_document(new QTextDocument()),
+    m_selectedCursor(new QTextCursor()),
+    m_numLayoutLines(0),
+    m_fileCursor(new YFileCursor()),
+    m_width(0),
+    m_needs_layout(false)
 {
     m_document->setUndoRedoEnabled(false);
     m_document->setUseDesignMetrics(true);
+    updateFont();
 }
 
 YTextDocument::~YTextDocument()
@@ -40,14 +43,6 @@ void YTextDocument::setText(const QString & text, const std::vector<qint64> & ne
 
     select(m_fileCursor->qTextCursor(this));
     m_needs_layout = true;
-}
-
-void YTextDocument::setFont(const QFont & font)
-{
-    if (font != m_document->defaultFont()) {
-        m_document->setDefaultFont(font);
-        m_needs_layout = true;
-    }
 }
 
 void YTextDocument::layout(int width)
@@ -65,7 +60,30 @@ void YTextDocument::layout(int width)
         m_numLayoutLines += layoutBlock(&block);
     }
 
+    QTextCursor cursor(m_document.data());
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    setColors(&cursor, Preferences::instance()->normalTextColor());
+
+    select(*m_selectedCursor);
+
     m_needs_layout = false;
+}
+
+void YTextDocument::markDirty()
+{
+    select(*m_selectedCursor);
+    updateFont();
+    m_needs_layout = true;
+}
+
+void YTextDocument::updateFont()
+{
+    const QFont & font = Preferences::instance()->font();
+    if (font != m_document->defaultFont()) {
+        m_document->setDefaultFont(font);
+        m_needs_layout = true;
+    }
 }
 
 int YTextDocument::layoutBlock(QTextBlock * textBlock)
@@ -150,17 +168,20 @@ int YTextDocument::numLayoutLines() const
 void YTextDocument::select(const QTextCursor & cursor)
 {
     // Clear current selection first
-    QTextCharFormat format;
-    m_selectedCursor->setCharFormat(format);
-    *m_selectedCursor = cursor;
+    setColors(m_selectedCursor.data(), Preferences::instance()->normalTextColor());
 
+    *m_selectedCursor = cursor;
     if(!m_selectedCursor->isNull()) {
-        // TODO: make the palette customizable (for now use the system palette)
-        QPalette palette = QApplication::palette();
-        format.setBackground(palette.highlight());
-        format.setForeground(palette.highlightedText());
-        m_selectedCursor->setCharFormat(format);
+        setColors(m_selectedCursor.data(), Preferences::instance()->selectedTextColor());
     }
+}
+
+void YTextDocument::setColors(QTextCursor * cursor, const TextColor & textColor)
+{
+    QTextCharFormat format;
+    format.setForeground(textColor.foreground());
+    format.setBackground(textColor.background());
+    cursor->setCharFormat(format);
 }
 
 void YTextDocument::setFileCursor(const YFileCursor & cursor)
