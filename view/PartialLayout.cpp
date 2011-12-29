@@ -227,7 +227,7 @@ bool PartialLayout::scrollDown(int line_change)
     QTextBlock newTopBlock = document()->findBlockAtLayoutLine(m_topScreenLine + line_change, &topLineOfNewBlock);
     if(!newTopBlock.isValid()) { return false; }
 
-    m_topScreenLine = topLineOfNewBlock - (m_topScreenLine + line_change);
+    m_topScreenLine += line_change - topLineOfNewBlock;
     qint64 file_pos = keepToLowerBound(newTopBlock, &m_topScreenLine);
     return updateDocument(file_pos, 0);
 }

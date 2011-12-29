@@ -111,17 +111,21 @@ int YTextDocument::layoutBlock(QTextBlock * textBlock)
 
 }
 
+namespace { struct FindBlockCmp { bool operator()(const int & x, const int & y) { return x > y; } }; }
 QTextBlock YTextDocument::findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos /* = 0 */) const
 {
-    std::vector<int>::const_iterator blockitr = std::lower_bound(
-        m_blockLayoutLines.begin(),
-        m_blockLayoutLines.end(),
-        layoutLine);
-    if(blockitr != m_blockLayoutLines.end()) {
+    // Find the value in m_blockLayoutLines closest to layoutLine such that *blockitr <= layoutLine
+    // (i.e., find the block that layoutLine is in)
+    std::vector<int>::const_reverse_iterator blockitr = std::lower_bound(
+        m_blockLayoutLines.rbegin(),
+        m_blockLayoutLines.rend(),
+        layoutLine,
+        FindBlockCmp());
+    if(blockitr != m_blockLayoutLines.rend()) {
         if(closestLayoutPos) {
             *closestLayoutPos = *blockitr;
         }
-        int blockNumber = blockitr - m_blockLayoutLines.begin();
+        int blockNumber = (m_blockLayoutLines.rend() - blockitr) - 1;
         return m_document->findBlockByNumber(blockNumber);
     } else {
         return QTextBlock();
