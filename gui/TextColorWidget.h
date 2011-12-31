@@ -27,17 +27,18 @@ public:
     QString text() const;
     void setText(const QString & text) const;
 
-    TextColor textColor() const;
+    const TextColor & textColor() const;
     void setTextColor(const TextColor & tc);
 
-    void setDefaultTextColor(const TextColor & dtc);
-
 private slots:
-    void on_defaultButton_clicked();
+    void on_defaultCheckBox_clicked(bool checked);
+    void currentColorChanged(const QColor & color);
 
 private:
+    void updateColorButtons();
+
     Ui::TextColorWidget *ui;
-    QScopedPointer<TextColor> m_defaultTextColor;
+    QScopedPointer<TextColor> m_textColor;
 };
 
 #endif // TEXTCOLORWIDGET_H

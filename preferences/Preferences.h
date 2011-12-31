@@ -13,6 +13,7 @@
 
 class QFont;
 class TextColor;
+namespace YAML { class Node; }
 
 class Preferences: public QObject {
     Q_OBJECT
@@ -41,6 +42,7 @@ signals:
 private:
     Preferences();
 
+    void readColor(TextColor * dest, const YAML::Node & src, const std::string & key);
 private:
     QScopedPointer<QFont> m_font;
     QScopedPointer<TextColor> m_normalTextColor;

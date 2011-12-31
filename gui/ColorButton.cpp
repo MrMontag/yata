@@ -56,5 +56,6 @@ void ColorButton::onClick()
     if(result == QColorDialog::Accepted) {
         m_currentColor = dialog.currentColor();
         update();
+        emit currentColorChanged(m_currentColor);
     }
 }

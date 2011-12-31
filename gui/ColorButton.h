@@ -19,6 +19,8 @@ public:
 
     const QColor & currentColor() const;
     void setCurrentColor(const QColor & color);
+signals:
+    void currentColorChanged(const QColor & color);
 
 protected:
     virtual void paintEvent(QPaintEvent *e);

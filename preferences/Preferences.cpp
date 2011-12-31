@@ -9,8 +9,11 @@
 #include "YApplication.h"
 #include "TextColor.h"
 #include "session/SessionCommon.h"
+#include <QApplication>
 #include <QColor>
 #include <QFont>
+#include <QPalette>
+#include <QtGlobal>
 #include <yaml-cpp/yaml.h>
 #include <fstream>
 
@@ -66,8 +69,8 @@ void Preferences::read()
                 std::string fontStr = getValue<std::string>(*text, FONT_KEY);
                 m_font->fromString(fontStr.c_str());
 
-                *m_normalTextColor = getValue<TextColor>(*text, NORMAL_KEY);
-                *m_selectedTextColor = getValue<TextColor>(*text, SELECTED_KEY);
+                readColor(m_normalTextColor.data(), *text, NORMAL_KEY);
+                readColor(m_selectedTextColor.data(), *text, SELECTED_KEY);
             }
             if (const YAML::Node * debugMenuNode = document.FindValue(DEBUG_MENU_KEY)) {
                 bool debugMenu;
@@ -98,6 +101,8 @@ const TextColor & Preferences::normalTextColor() const
 
 void Preferences::setNormalTextColor(const TextColor & color) const
 {
+    Q_ASSERT(m_normalTextColor->defaultForeground() == color.defaultForeground());
+    Q_ASSERT(m_normalTextColor->defaultBackground() == color.defaultBackground());
     *m_normalTextColor = color;
 }
 
@@ -108,6 +113,8 @@ const TextColor & Preferences::selectedTextColor() const
 
 void Preferences::setSelectedTextColor(const TextColor & color)
 {
+    Q_ASSERT(m_selectedTextColor->defaultForeground() == color.defaultForeground());
+    Q_ASSERT(m_selectedTextColor->defaultBackground() == color.defaultBackground());
     *m_selectedTextColor = color;
 }
 
@@ -118,12 +125,23 @@ bool Preferences::debugMenu() const
 
 Preferences::Preferences():
     m_font(new QFont()),
-    m_normalTextColor(new TextColor),
-    m_selectedTextColor(new TextColor)
+    m_normalTextColor(new TextColor(QPalette::Text, QPalette::Base)),
+    m_selectedTextColor(new TextColor(QPalette::HighlightedText, QPalette::Highlight))
 {
 }
 
 Preferences::~Preferences()
 {
     m_instance = 0;
+}
+
+void Preferences::readColor(TextColor * dest, const YAML::Node & src, const std::string & key)
+{
+    TextColor color = getValue<TextColor>(src, key);
+    if(color.isValid()) {
+        dest->setForeground(color.foreground());
+        dest->setBackground(color.background());
+    } else {
+        dest->setToDefault();
+    }
 }

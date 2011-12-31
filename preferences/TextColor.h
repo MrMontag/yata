@@ -9,6 +9,7 @@
 #define TEXTCOLOR_H
 
 #include <QScopedPointer>
+#include <QPalette>
 
 class QColor;
 namespace YAML {
@@ -19,6 +20,7 @@ namespace YAML {
 class TextColor {
 public:
     TextColor(const QColor & foreground, const QColor & background);
+    TextColor(QPalette::ColorRole defaultForeground, QPalette::ColorRole defaultBackground);
     TextColor(const TextColor & other);
     TextColor();
     ~TextColor();
@@ -26,13 +28,23 @@ public:
     TextColor & operator=(const TextColor & other);
 
     const QColor & foreground() const;
-    void setForeground(const QColor &) const;
+    void setForeground(const QColor &);
+    QPalette::ColorRole defaultForeground() const;
+    void setDefaultForeground(QPalette::ColorRole colorRole);
 
     const QColor & background() const;
-    void setBackground(const QColor &) const;
+    void setBackground(const QColor &);
+    QPalette::ColorRole defaultBackground() const;
+    void setDefaultBackground(QPalette::ColorRole colorRole);
+
+    void setToDefault(bool toDefault = true);
+    bool isDefault() const;
+    bool isValid() const;
 private:
     QScopedPointer<QColor> m_foreground;
     QScopedPointer<QColor> m_background;
+    QPalette::ColorRole m_defaultForeground;
+    QPalette::ColorRole m_defaultBackground;
 };
 
 YAML::Emitter & operator<<(YAML::Emitter & out, const TextColor & textColor);

@@ -12,9 +12,11 @@
 TextColorWidget::TextColorWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TextColorWidget),
-    m_defaultTextColor(new TextColor)
+    m_textColor(new TextColor)
 {
     ui->setupUi(this);
+    connect(ui->foregroundColor, SIGNAL(currentColorChanged(QColor)), SLOT(currentColorChanged(QColor)));
+    connect(ui->backgroundColor, SIGNAL(currentColorChanged(QColor)), SLOT(currentColorChanged(QColor)));
 }
 
 TextColorWidget::~TextColorWidget()
@@ -32,23 +34,37 @@ void TextColorWidget::setText(const QString & text) const
     ui->titleLabel->setText(text);
 }
 
-TextColor TextColorWidget::textColor() const
+const TextColor & TextColorWidget::textColor() const
 {
-    return TextColor(ui->foregroundColor->currentColor(), ui->backgroundColor->currentColor());
+    return *m_textColor;
 }
 
 void TextColorWidget::setTextColor(const TextColor & tc)
 {
-    ui->foregroundColor->setCurrentColor(tc.foreground());
-    ui->backgroundColor->setCurrentColor(tc.background());
+    *m_textColor = tc;
+    updateColorButtons();
 }
 
-void TextColorWidget::setDefaultTextColor(const TextColor & dtc)
+void TextColorWidget::on_defaultCheckBox_clicked(bool checked)
 {
-    *m_defaultTextColor = dtc;
+    m_textColor->setToDefault(checked);
+    updateColorButtons();
 }
 
-void TextColorWidget::on_defaultButton_clicked()
+void TextColorWidget::currentColorChanged(const QColor & color)
 {
-    setTextColor(*m_defaultTextColor);
+    if (sender() == ui->foregroundColor) {
+        m_textColor->setForeground(color);
+    } else {
+        m_textColor->setBackground(color);
+    }
+
+    ui->defaultCheckBox->setChecked(false);
+}
+
+void TextColorWidget::updateColorButtons()
+{
+    ui->foregroundColor->setCurrentColor(m_textColor->foreground());
+    ui->backgroundColor->setCurrentColor(m_textColor->background());
+    ui->defaultCheckBox->setChecked(m_textColor->isDefault());
 }

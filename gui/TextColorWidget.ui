@@ -45,7 +45,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="defaultButton">
+    <widget class="QCheckBox" name="defaultCheckBox">
      <property name="toolTip">
       <string>Restores default colors.</string>
      </property>
