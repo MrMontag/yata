@@ -20,6 +20,13 @@ class QTextCursor;
 class TextColor;
 class YFileCursor;
 
+struct BlockData {
+    int layoutLine;
+    double ypos;
+
+    BlockData(int ll = 0, double pos = 0.0): layoutLine(ll), ypos(pos) {}
+};
+
 class YTextDocument {
 public:
     YTextDocument();
@@ -29,8 +36,9 @@ public:
     void markDirty();
 
     QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
-    int blockLayoutPosition(QTextBlock block) const;
+    int blockLayoutPosition(const QTextBlock & block) const;
     int blockLayoutPosition(int blockNumber) const;
+    double yPosition(const QTextBlock & block) const;
     qint64 blockAddress(QTextBlock block) const;
 
     QTextDocument * document();
@@ -45,7 +53,7 @@ public:
     void setFileCursor(const YFileCursor & cursor);
 
 private:
-    int layoutBlock(QTextBlock * textBlock);
+    qreal layoutBlock(QTextBlock * textBlock);
     void updateFont();
     void setColors(QTextCursor * cursor, const TextColor & textColor);
 
@@ -54,7 +62,7 @@ private:
     QScopedPointer<QTextCursor> m_selectedCursor;
 
     int m_numLayoutLines;
-    std::vector<int> m_blockLayoutLines;
+    std::vector<BlockData> m_documentData;
     std::vector<qint64> m_lineAddresses;
     QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;

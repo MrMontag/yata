@@ -53,11 +53,14 @@ void YTextDocument::layout(int width)
 
     m_width = width;
     m_numLayoutLines = 0;
-    m_blockLayoutLines.clear();
+    qreal dy = 0;
+    m_documentData.clear();
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
-        m_blockLayoutLines.push_back(m_numLayoutLines);
-        m_numLayoutLines += layoutBlock(&block);
+        qreal height = layoutBlock(&block);
+        m_documentData.push_back(BlockData(m_numLayoutLines, dy));
+        m_numLayoutLines += block.lineCount();
+        dy += height;
     }
 
     QTextCursor cursor(m_document.data());
@@ -86,63 +89,72 @@ void YTextDocument::updateFont()
     }
 }
 
-int YTextDocument::layoutBlock(QTextBlock * textBlock)
+qreal YTextDocument::layoutBlock(QTextBlock * textBlock)
 {
-    QTextLayout & layout(*textBlock->layout());
-    layout.setFont(m_document->defaultFont());
-    QFontMetrics fontMetrics(layout.font());
+    QTextLayout * layout = textBlock->layout();
+    layout->setFont(m_document->defaultFont());
+    QFontMetrics fontMetrics(layout->font());
 
     qreal height = 0;
-    int numLines = 0;
 
-    layout.beginLayout();
+    layout->beginLayout();
     while(true) {
-        QTextLine line = layout.createLine();
+        QTextLine line = layout->createLine();
         if(!line.isValid()) { break; }
-        numLines++;
         line.setLineWidth(m_width);
         height += fontMetrics.leading();
         line.setPosition(QPointF(0, height));
         height += line.height();
     }
 
-    layout.endLayout();
-    return numLines;
-
+    layout->endLayout();
+    return height;
 }
 
-namespace { struct FindBlockCmp { bool operator()(const int & x, const int & y) { return x > y; } }; }
+namespace {
+struct FindBlockCmp {
+    bool operator()(const BlockData & x, const BlockData & y) { return x.layoutLine > y.layoutLine; } };
+}
 QTextBlock YTextDocument::findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos /* = 0 */) const
 {
     // Find the value in m_blockLayoutLines closest to layoutLine such that *blockitr <= layoutLine
     // (i.e., find the block that layoutLine is in)
-    std::vector<int>::const_reverse_iterator blockitr = std::lower_bound(
-        m_blockLayoutLines.rbegin(),
-        m_blockLayoutLines.rend(),
+    std::vector<BlockData>::const_reverse_iterator blockitr = std::lower_bound(
+        m_documentData.rbegin(),
+        m_documentData.rend(),
         layoutLine,
         FindBlockCmp());
-    if(blockitr != m_blockLayoutLines.rend()) {
+    if(blockitr != m_documentData.rend()) {
         if(closestLayoutPos) {
-            *closestLayoutPos = *blockitr;
+            *closestLayoutPos = blockitr->layoutLine;
         }
-        int blockNumber = (m_blockLayoutLines.rend() - blockitr) - 1;
+        int blockNumber = (m_documentData.rend() - blockitr) - 1;
         return m_document->findBlockByNumber(blockNumber);
     } else {
         return QTextBlock();
     }
 }
 
-int YTextDocument::blockLayoutPosition(QTextBlock block) const
+int YTextDocument::blockLayoutPosition(const QTextBlock & block) const
 {
     return blockLayoutPosition(block.blockNumber());
 }
 
 int YTextDocument::blockLayoutPosition(int blockNumber) const
 {
-    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_blockLayoutLines.size()) {
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_documentData.size()) {
         return -1;
     }
-    return m_blockLayoutLines[blockNumber];
+    return m_documentData[blockNumber].layoutLine;
+}
+
+double YTextDocument::yPosition(const QTextBlock & block) const
+{
+    int blockNumber = block.blockNumber();
+    if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_documentData.size()) {
+        return -1;
+    }
+    return m_documentData[blockNumber].ypos;
 }
 
 qint64 YTextDocument::blockAddress(QTextBlock block) const
