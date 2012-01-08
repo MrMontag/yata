@@ -45,22 +45,22 @@ protected:
 
     void closeEvent(QCloseEvent *);
 private slots:
-    void on_actionFollow_tail_triggered(bool checked);
+    void on_actionFollowTail_triggered(bool checked);
     void on_actionRefresh_triggered();
-    void on_action_About_Yata_triggered();
-    void on_actionAbout_Qt_triggered();
-    void on_actionFind_previous_triggered();
-    void on_actionFind_next_triggered();
-    void on_action_Find_triggered();
-    void on_action_Open_triggered();
-	void on_action_Exit_triggered();
+    void on_actionAboutYata_triggered();
+    void on_actionAboutQt_triggered();
+    void on_actionFindPrevious_triggered();
+    void on_actionFindNext_triggered();
+    void on_actionFind_triggered();
+    void on_actionOpen_triggered();
+	void on_actionExit_triggered();
 
     void on_actionPreferences_triggered();
 
-    void on_action_Full_Layout_triggered();
-    void on_action_Partial_Layout_triggered();
-    void on_action_Automatic_Layout_triggered();
-    void on_actionDebug_Window_triggered();
+    void on_actionFullLayout_triggered();
+    void on_actionPartialLayout_triggered();
+    void on_actionAutomaticLayout_triggered();
+    void on_actionDebugWindow_triggered();
 
     void debugWindowClosed();
     void onCurrentTabChanged(int oldIndex, int newIndex);
@@ -68,6 +68,7 @@ private:
     TailView * getCurrentView();
     void setupDebugMenu();
     void layoutAction(int layoutType); // declared int to avoid having to #include "TailView.h"
+    void updateMenus();
 private:
     Ui::MainWindow * ui;
 
