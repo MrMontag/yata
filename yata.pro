@@ -8,6 +8,7 @@ DEFINES += 'APPVERSION=\\"$$VERSION\\"'
 
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
+QMAKE_CXXFLAGS += -pedantic -Wno-long-long
 build_pass:CONFIG(release, debug|release) {
     TARGET = yata
 } else {

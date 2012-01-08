@@ -23,7 +23,7 @@ namespace ParsingStatus {
         PossibleDataLoss,
         IncompatibleVersion,
         Error,
-        FileNotFound,
+        FileNotFound
     };
 }
 
