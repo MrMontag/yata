@@ -63,7 +63,7 @@ void YTextDocument::layout(int width)
         qreal height = layoutBlock(&block);
         m_blockLayoutLines.push_back(m_numLayoutLines);
         m_blockGraphicalPositions.push_back(dy);
-        m_numLayoutLines += block.lineCount();
+        m_numLayoutLines += block.layout()->lineCount();
         dy += height;
     }
 

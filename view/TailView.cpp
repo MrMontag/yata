@@ -263,17 +263,17 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
 
     QTextDocument * document = m_document->document();
     for(QTextBlock block = document->begin(); block != document->end(); block = block.next()) {
-        QTextLayout & layout(*block.layout());
-        QFontMetrics fontMetrics(layout.font());
+        const QTextLayout * layout = block.layout();
+        QFontMetrics fontMetrics(layout->font());
 
         qreal dy = m_document->blockGraphicalPositions().at(block.blockNumber());
 
         int scrollValue = m_layoutStrategy->topScreenLine();
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
-        QRectF layoutRect(layout.boundingRect());
+        QRectF layoutRect(layout->boundingRect());
         layoutRect.moveTo(start);
         if(viewrect.intersects(layoutRect)) {
-            layout.draw(&painter, start);
+            layout->draw(&painter, start);
         }
     }
 }
