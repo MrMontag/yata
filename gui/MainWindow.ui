@@ -20,24 +20,24 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="action_Open"/>
+    <addaction name="actionOpen"/>
     <addaction name="separator"/>
-    <addaction name="action_Exit"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="action_Find"/>
-    <addaction name="actionFind_next"/>
-    <addaction name="actionFind_previous"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionFindNext"/>
+    <addaction name="actionFindPrevious"/>
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
    </widget>
@@ -45,25 +45,25 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionAbout_Qt"/>
-    <addaction name="action_About_Yata"/>
+    <addaction name="actionAboutQt"/>
+    <addaction name="actionAboutYata"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>&amp;View</string>
     </property>
     <addaction name="actionRefresh"/>
-    <addaction name="actionFollow_tail"/>
+    <addaction name="actionFollowTail"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="title">
      <string>&amp;Debug</string>
     </property>
-    <addaction name="action_Full_Layout"/>
-    <addaction name="action_Partial_Layout"/>
-    <addaction name="action_Automatic_Layout"/>
+    <addaction name="actionFullLayout"/>
+    <addaction name="actionPartialLayout"/>
+    <addaction name="actionAutomaticLayout"/>
     <addaction name="separator"/>
-    <addaction name="actionDebug_Window"/>
+    <addaction name="actionDebugWindow"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -72,7 +72,7 @@
    <addaction name="menuDebug"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_Open">
+  <action name="actionOpen">
    <property name="text">
     <string>&amp;Open</string>
    </property>
@@ -80,7 +80,7 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_Exit">
+  <action name="actionExit">
    <property name="text">
     <string>&amp;Exit</string>
    </property>
@@ -88,7 +88,7 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="action_Find">
+  <action name="actionFind">
    <property name="text">
     <string>&amp;Find</string>
    </property>
@@ -96,7 +96,7 @@
     <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionFind_next">
+  <action name="actionFindNext">
    <property name="text">
     <string>Find &amp;next</string>
    </property>
@@ -104,7 +104,7 @@
     <string>F3</string>
    </property>
   </action>
-  <action name="actionFind_previous">
+  <action name="actionFindPrevious">
    <property name="text">
     <string>Find p&amp;revious</string>
    </property>
@@ -112,12 +112,12 @@
     <string>Shift+F3</string>
    </property>
   </action>
-  <action name="actionAbout_Qt">
+  <action name="actionAboutQt">
    <property name="text">
     <string>About &amp;Qt...</string>
    </property>
   </action>
-  <action name="action_About_Yata">
+  <action name="actionAboutYata">
    <property name="text">
     <string>&amp;About $APPNAME$...</string>
    </property>
@@ -130,7 +130,7 @@
     <string>F5</string>
    </property>
   </action>
-  <action name="actionFollow_tail">
+  <action name="actionFollowTail">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -146,7 +146,7 @@
     <string>&amp;Preferences</string>
    </property>
   </action>
-  <action name="action_Full_Layout">
+  <action name="actionFullLayout">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -157,7 +157,7 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="action_Partial_Layout">
+  <action name="actionPartialLayout">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -165,7 +165,7 @@
     <string>&amp;Partial Layout</string>
    </property>
   </action>
-  <action name="action_Automatic_Layout">
+  <action name="actionAutomaticLayout">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -173,7 +173,7 @@
     <string>&amp;Automatic Layout</string>
    </property>
   </action>
-  <action name="actionDebug_Window">
+  <action name="actionDebugWindow">
    <property name="text">
     <string>Debug &amp;Window</string>
    </property>

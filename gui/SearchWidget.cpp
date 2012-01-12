@@ -9,6 +9,7 @@
 
 #include "SearchInfo.h"
 
+#include <QCompleter>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QRegExp>
@@ -31,6 +32,7 @@ SearchWidget::SearchWidget(QWidget *parent)
     const SearchCriteria & sc = si.search();
 
     ui->comboBox_search->lineEdit()->selectAll();
+    ui->comboBox_search->completer()->setCaseSensitivity(Qt::CaseSensitive);
     ui->checkBox_regex->setChecked(sc.isRegex);
     ui->checkBox_caseSensitive->setChecked(sc.isCaseSensitive);
 }

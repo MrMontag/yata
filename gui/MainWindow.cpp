@@ -27,8 +27,6 @@
 #include <QTextStream>
 #include <QUrl>
 
-// TODO: figure out disabling/enabling menu items
-
 MainWindow::MainWindow(): ui(new Ui::MainWindow())
 {
     ui->setupUi(this);
@@ -39,18 +37,18 @@ MainWindow::MainWindow(): ui(new Ui::MainWindow())
     setStatusBar(m_statusBar.data());
 
     setWindowTitle(YApplication::displayAppName());
-    QString aboutYataText = ui->action_About_Yata->text();
+    QString aboutYataText = ui->actionAboutYata->text();
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
-    ui->action_About_Yata->setText(aboutYataText);
+    ui->actionAboutYata->setText(aboutYataText);
 
     connect(m_tabWidget.data(), SIGNAL(currentChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
 
-    ui->menuFile->insertActions(ui->action_Exit, m_tabWidget->contextMenu()->actions());
-    ui->menuFile->insertSeparator(ui->action_Exit);
+    ui->menuFile->insertActions(ui->actionExit, m_tabWidget->contextMenu()->actions());
+    ui->menuFile->insertSeparator(ui->actionExit);
 
     setupDebugMenu();
-
     setAcceptDrops(true);
+    updateMenus();
 }
 
 MainWindow::~MainWindow()
@@ -151,7 +149,7 @@ void MainWindow::closeEvent(QCloseEvent * e)
     e->accept();
 }
 
-void MainWindow::on_action_Open_triggered()
+void MainWindow::on_actionOpen_triggered()
 {
     QStringList filenames = QFileDialog::getOpenFileNames(
         this,
@@ -166,37 +164,37 @@ void MainWindow::on_action_Open_triggered()
     }
 }
 
-void MainWindow::on_action_Exit_triggered()
+void MainWindow::on_actionExit_triggered()
 {
     close();
 }
 
-void MainWindow::on_action_Find_triggered()
+void MainWindow::on_actionFind_triggered()
 {
     SearchWidget widget(this);
     widget.exec();
 }
 
-void MainWindow::on_actionFind_next_triggered()
+void MainWindow::on_actionFindNext_triggered()
 {
     if(TailView * tailView = getCurrentView()) {
         tailView->searchForward();
     }
 }
 
-void MainWindow::on_actionFind_previous_triggered()
+void MainWindow::on_actionFindPrevious_triggered()
 {
     if(TailView * tailView = getCurrentView()) {
         tailView->searchBackward();
     }
 }
 
-void MainWindow::on_actionAbout_Qt_triggered()
+void MainWindow::on_actionAboutQt_triggered()
 {
    QApplication::aboutQt();
 }
 
-void MainWindow::on_action_About_Yata_triggered()
+void MainWindow::on_actionAboutYata_triggered()
 {
     QString title;
     QTextStream(&title) << tr("About ") << YApplication::displayAppName();
@@ -227,6 +225,7 @@ TailView * MainWindow::getCurrentView()
 void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
 {
     m_statusBar->clearErrorMessage();
+    updateMenus();
     if(oldIndex != -1) {
         if(TailView * tailView = dynamic_cast<TailView*>(m_tabWidget->widget(oldIndex))) {
             disconnect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
@@ -244,13 +243,13 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     if(TailView * tailView = getCurrentView()) {
         QAction * toBeChecked = 0;
         switch(tailView->layoutType()) {
-            case TailView::DebugFullLayout: toBeChecked = ui->action_Full_Layout; break;
-            case TailView::DebugPartialLayout: toBeChecked = ui->action_Partial_Layout; break;
-            case TailView::AutomaticLayout: toBeChecked = ui->action_Automatic_Layout; break;
+            case TailView::DebugFullLayout: toBeChecked = ui->actionFullLayout; break;
+            case TailView::DebugPartialLayout: toBeChecked = ui->actionPartialLayout; break;
+            case TailView::AutomaticLayout: toBeChecked = ui->actionAutomaticLayout; break;
         }
         if (toBeChecked) { toBeChecked->setChecked(true); }
 
-        ui->actionFollow_tail->setChecked(tailView->followTail());
+        ui->actionFollowTail->setChecked(tailView->followTail());
         connect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
         connect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearErrorMessage()));
         if(!tailView->currentFileError().isEmpty()) {
@@ -263,9 +262,9 @@ void MainWindow::setupDebugMenu()
 {
     if(Preferences::instance()->debugMenu()) {
         QActionGroup * layoutGroup(new QActionGroup(this));
-        layoutGroup->addAction(ui->action_Full_Layout);
-        layoutGroup->addAction(ui->action_Partial_Layout);
-        layoutGroup->addAction(ui->action_Automatic_Layout);
+        layoutGroup->addAction(ui->actionFullLayout);
+        layoutGroup->addAction(ui->actionPartialLayout);
+        layoutGroup->addAction(ui->actionAutomaticLayout);
     } else {
         menuBar()->removeAction(ui->menuDebug->menuAction());
     }
@@ -278,7 +277,18 @@ void MainWindow::layoutAction(int layoutType)
     }
 }
 
-void MainWindow::on_actionFollow_tail_triggered(bool checked)
+void MainWindow::updateMenus()
+{
+    bool enabled = getCurrentView();
+    ui->actionFind->setEnabled(enabled);
+    ui->actionFindNext->setEnabled(enabled);
+    ui->actionFindPrevious->setEnabled(enabled);
+    ui->actionPreferences->setEnabled(enabled);
+    ui->actionRefresh->setEnabled(enabled);
+    ui->actionFollowTail->setEnabled(enabled);
+}
+
+void MainWindow::on_actionFollowTail_triggered(bool checked)
 {
     if(TailView * tailView = getCurrentView()) {
         tailView->setFollowTail(checked);
@@ -291,7 +301,7 @@ void MainWindow::on_actionPreferences_triggered()
     dialog.exec();
 }
 
-void MainWindow::on_actionDebug_Window_triggered()
+void MainWindow::on_actionDebugWindow_triggered()
 {
     m_debugWindow.reset(new DebugWindow(m_tabWidget.data()));
     connect(m_debugWindow.data(), SIGNAL(destroyed()), SLOT(debugWindowClosed()));
@@ -303,17 +313,17 @@ void MainWindow::debugWindowClosed()
     m_debugWindow.reset();
 }
 
-void MainWindow::on_action_Full_Layout_triggered()
+void MainWindow::on_actionFullLayout_triggered()
 {
     layoutAction(TailView::DebugFullLayout);
 }
 
-void MainWindow::on_action_Partial_Layout_triggered()
+void MainWindow::on_actionPartialLayout_triggered()
 {
     layoutAction(TailView::DebugPartialLayout);
 }
 
-void MainWindow::on_action_Automatic_Layout_triggered()
+void MainWindow::on_actionAutomaticLayout_triggered()
 {
     layoutAction(TailView::AutomaticLayout);
 }
