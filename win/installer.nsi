@@ -19,9 +19,9 @@
 !ifndef OUTDIR
     !define OUTDIR "."
 !endif
-!define QTDIR "C:\QtSDK"
-!define MINGWDIR "${QTDIR}\mingw\bin"
-!define QTBINDIR "${QTDIR}\Desktop\Qt\4.7.4\mingw\bin"
+!define QTDIR "C:\Qt\4.8.0"
+!define MINGWDIR "C:\QtSDK\mingw\bin"
+!define QTBINDIR "${QTDIR}\bin"
 
 ;--------------------------------
 ;Include Modern UI
