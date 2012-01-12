@@ -18,7 +18,8 @@
 #include "YApplication.h"
 #include "YFileCursor.h"
 #include "YFileSystemWatcherThread.h"
-#include "YTextDocument.h"
+#include "document/YTextDocument.h"
+#include "document/BlockDataVector.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -148,7 +149,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
-        QTextBlock block = m_document->findBlockAtLayoutLine(topLine, &layoutLine);
+        QTextBlock block = m_document->blockLayoutLines().findContainingBlock(topLine, &layoutLine);
         if(block.isValid()) {
             int blockLine = topLine - layoutLine;
             QTextCursor cursor(block);
@@ -178,7 +179,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
 void TailView::scrollToIfNecessary(const QTextCursor & cursor)
 {
     QTextBlock cursorBlock = cursor.block();
-    int cursorLineNumber = m_document->blockLayoutPosition(cursorBlock);
+    int cursorLineNumber = m_document->blockLayoutLines().at(cursorBlock.blockNumber());
     int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
     cursorLineNumber += blockLine;
 
@@ -265,7 +266,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
         QTextLayout & layout(*block.layout());
         QFontMetrics fontMetrics(layout.font());
 
-        qreal dy = m_document->yPosition(block);
+        qreal dy = m_document->blockGraphicalPositions().at(block.blockNumber());
 
         int scrollValue = m_layoutStrategy->topScreenLine();
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());

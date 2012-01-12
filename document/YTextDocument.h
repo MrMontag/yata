@@ -7,6 +7,7 @@
 #ifndef YTEXTDOCUMENT_H
 #define YTEXTDOCUMENT_H
 
+#include "BlockDataVector.h"
 #include "app/YObjectPointer.h"
 
 #include <QScopedPointer>
@@ -20,13 +21,6 @@ class QTextCursor;
 class TextColor;
 class YFileCursor;
 
-struct BlockData {
-    int layoutLine;
-    double ypos;
-
-    BlockData(int ll = 0, double pos = 0.0): layoutLine(ll), ypos(pos) {}
-};
-
 class YTextDocument {
 public:
     YTextDocument();
@@ -36,9 +30,6 @@ public:
     void markDirty();
 
     QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
-    int blockLayoutPosition(const QTextBlock & block) const;
-    int blockLayoutPosition(int blockNumber) const;
-    double yPosition(const QTextBlock & block) const;
     qint64 blockAddress(QTextBlock block) const;
 
     QTextDocument * document();
@@ -48,6 +39,8 @@ public:
     void select(const QTextCursor & cursor);
 
     const std::vector<qint64> & lineAddresses() const { return m_lineAddresses; }
+    const BlockDataVector<int> & blockLayoutLines() const { return m_blockLayoutLines; }
+    const BlockDataVector<double> & blockGraphicalPositions() const { return m_blockGraphicalPositions; }
 
     const YFileCursor & fileCursor() const { return *m_fileCursor; }
     void setFileCursor(const YFileCursor & cursor);
@@ -62,7 +55,8 @@ private:
     QScopedPointer<QTextCursor> m_selectedCursor;
 
     int m_numLayoutLines;
-    std::vector<BlockData> m_documentData;
+    BlockDataVector<int> m_blockLayoutLines;
+    BlockDataVector<double> m_blockGraphicalPositions;
     std::vector<qint64> m_lineAddresses;
     QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;

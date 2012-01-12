@@ -10,7 +10,7 @@
 #include "FileSearch.h"
 #include "FileBlockReader.h"
 #include "TailView.h"
-#include "YTextDocument.h"
+#include "document/YTextDocument.h"
 
 #include <QScrollBar>
 #include <QTextBlock>
@@ -208,7 +208,7 @@ bool PartialLayout::scrollUp(int line_change)
     if(file_pos == 0) {
         m_topScreenLine = 0;
     } else {
-        int oldTopBlock = document()->blockLayoutPosition(line_change);
+        int oldTopBlock = document()->blockLayoutLines().at(line_change);
         m_topScreenLine = oldTopBlock - line_change;
     }
 
@@ -224,7 +224,7 @@ bool PartialLayout::scrollDown(int line_change)
         return true;
     }
     int topLineOfNewBlock = 0;
-    QTextBlock newTopBlock = document()->findBlockAtLayoutLine(m_topScreenLine + line_change, &topLineOfNewBlock);
+    QTextBlock newTopBlock = document()->blockLayoutLines().findContainingBlock(m_topScreenLine + line_change, &topLineOfNewBlock);
     if(!newTopBlock.isValid()) { return false; }
 
     m_topScreenLine += line_change - topLineOfNewBlock;

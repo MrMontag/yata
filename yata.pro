@@ -24,6 +24,8 @@ HEADERS += \
     app/YApplication.h \
     app/YObjectPointer.h \
     dbg/DebugWindow.h \
+    document/BlockDataVector.h \
+    document/BlockDataVector.inl \
     document/YFileCursor.h \
     document/YTextDocument.h \
     fileio/BufferedFile.h \
