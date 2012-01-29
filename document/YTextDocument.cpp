@@ -25,6 +25,7 @@ YTextDocument::YTextDocument():
     m_numLayoutLines(0),
     m_blockLayoutLines(m_document.data()),
     m_blockGraphicalPositions(m_document.data()),
+    m_lineAddresses(m_document.data()),
     m_fileCursor(new YFileCursor()),
     m_width(0),
     m_needs_layout(false)
@@ -41,7 +42,7 @@ YTextDocument::~YTextDocument()
 void YTextDocument::setText(const QString & text, const std::vector<qint64> & newAddresses)
 {
     m_document->setPlainText(text);
-    m_lineAddresses = newAddresses;
+    m_lineAddresses.assign(newAddresses);
 
     select(m_fileCursor->qTextCursor(this));
     m_needs_layout = true;
@@ -121,7 +122,7 @@ qint64 YTextDocument::blockAddress(QTextBlock block) const
     if(blockNumber < 0 || static_cast<unsigned int>(blockNumber) >= m_lineAddresses.size()) {
         return -1;
     }
-    return m_lineAddresses[blockNumber];
+    return m_lineAddresses.at(blockNumber);
 }
 
 QTextDocument * YTextDocument::document()

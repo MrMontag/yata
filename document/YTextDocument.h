@@ -38,7 +38,7 @@ public:
 
     void select(const QTextCursor & cursor);
 
-    const std::vector<qint64> & lineAddresses() const { return m_lineAddresses; }
+    const BlockDataVector<qint64> & lineAddresses() const { return m_lineAddresses; }
     const BlockDataVector<int> & blockLayoutLines() const { return m_blockLayoutLines; }
     const BlockDataVector<double> & blockGraphicalPositions() const { return m_blockGraphicalPositions; }
 
@@ -57,7 +57,7 @@ private:
     int m_numLayoutLines;
     BlockDataVector<int> m_blockLayoutLines;
     BlockDataVector<double> m_blockGraphicalPositions;
-    std::vector<qint64> m_lineAddresses;
+    BlockDataVector<qint64> m_lineAddresses;
     QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;
     bool m_needs_layout;

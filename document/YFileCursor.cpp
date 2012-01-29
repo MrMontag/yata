@@ -35,18 +35,12 @@ QTextCursor YFileCursor::qTextCursor(YTextDocument * document) const
 {
     if(isNull()) { return QTextCursor(); }
 
-    const std::vector<qint64> & lineAddresses = document->lineAddresses();
+    const BlockDataVector<qint64> & lineAddresses = document->lineAddresses();
 
-    std::vector<qint64>::const_iterator itr =
-        std::lower_bound(lineAddresses.begin(), lineAddresses.end(), m_lineAddress);
-
-    if(itr == lineAddresses.end() || *itr != m_lineAddress) {
-        return QTextCursor();
-    }
-
-    int blockNum = itr - lineAddresses.begin();
-
-    QTextCursor cursor(document->document()->findBlockByNumber(blockNum));
+    qint64 closest = 0;
+    QTextBlock block = lineAddresses.findContainingBlock(m_lineAddress, &closest);
+    if(closest != m_lineAddress) { return QTextCursor(); }
+    QTextCursor cursor(block);
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_charPos);
     cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_length);

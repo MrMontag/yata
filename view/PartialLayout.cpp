@@ -262,9 +262,8 @@ bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start)
 
 qint64 PartialLayout::topOfScreen() const
 {
-    const std::vector<qint64> & lineAddresses = document()->lineAddresses();
-    if (lineAddresses.empty()) { return 0; }
-    return lineAddresses.front();
+    const BlockDataVector<qint64> & lineAddresses = document()->lineAddresses();
+    return lineAddresses.empty() ? 0 : lineAddresses.at(0);
 }
 
 void PartialLayout::updateBottomDocument()
