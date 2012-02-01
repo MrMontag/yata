@@ -14,7 +14,10 @@ public:
     void push_back(const T & t);
     void clear();
     QTextBlock findContainingBlock(T item, T * closestItem = 0) const;
-    T at(std::size_t i) const;
+    const T & at(std::size_t i) const;
+    const T & front() const;
+    const T & back() const;
+
     std::size_t size() const;
     bool empty() const;
 private:

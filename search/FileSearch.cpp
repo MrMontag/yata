@@ -10,8 +10,8 @@
 #include <QRegExp>
 #include <QtDebug>
 
-FileSearch::FileSearch(const QString & filename)
-    : m_filename(filename)
+FileSearch::FileSearch(const QString & filename):
+    m_filename(filename)
 {
 }
 

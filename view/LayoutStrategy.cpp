@@ -1,19 +1,14 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010 James Smith
+ * Copyright 2010-2012 James Smith
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
+
 #include "LayoutStrategy.h"
 
-#include "DocumentSearch.h"
 #include "TailView.h"
 #include "YTextDocument.h"
-#include "YApplication.h"
-
-#include <QMessageBox>
-#include <QScrollBar>
-#include <QTextStream>
 
 LayoutStrategy::LayoutStrategy(TailView * tailView)
     : m_view(tailView)

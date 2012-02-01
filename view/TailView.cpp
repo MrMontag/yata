@@ -33,7 +33,6 @@
 #include <QStringBuilder>
 #include <QTextBlock>
 #include <QTextCursor>
-#include <QTextDocument>
 #include <QTextLayout>
 #include <QTextStream>
 
@@ -50,7 +49,7 @@ TailView::TailView(QWidget * parent)
     , m_partialLayoutStrategy(new PartialLayout(this))
     , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
-    , m_documentSearch(new DocumentSearch(m_document->document()))
+    , m_documentSearch(new DocumentSearch(m_document.data()))
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
@@ -137,6 +136,7 @@ void TailView::searchFile(bool isForward)
             << documentSearch()->lastSearchString()
             << QObject::tr("\" not found");
         QMessageBox::information(this, YApplication::displayAppName(), message);
+		m_document->clearSelection();
     }
 
     viewport()->update();
@@ -145,7 +145,7 @@ void TailView::searchFile(bool isForward)
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(!m_document->fileCursor().isNull()) {
-        m_documentSearch->setCursor(m_document->fileCursor().qTextCursor(m_document.data()));
+        m_documentSearch->setCursor(m_document->fileCursor());
     } else {
         const int topLine = verticalScrollBar()->value();
         int layoutLine = 0;
@@ -154,30 +154,34 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
             int blockLine = topLine - layoutLine;
             QTextCursor cursor(block);
             cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
-            m_documentSearch->setCursor(cursor);
+	    YFileCursor ycursor = m_document->yFileCursor(cursor);
+            m_documentSearch->setCursor(ycursor);
         } else {
-            m_documentSearch->setCursor(QTextCursor(m_document->document()));
+            m_documentSearch->setCursor(YFileCursor());
         }
     }
 
     bool foundMatch = m_documentSearch->searchDocument(isForward, wrapAround);
 
     if(foundMatch) {
-        const QTextCursor & searchCursor = m_documentSearch->cursor();
+        const YFileCursor & searchCursor = m_documentSearch->cursor();
         m_document->select(searchCursor);
-        int blockNum = searchCursor.block().blockNumber();
-        int cursorBeginPos = std::min(searchCursor.position(), searchCursor.anchor());
-        YFileCursor newCursor(m_document->lineAddresses().at(blockNum),
-            cursorBeginPos - searchCursor.block().position(),
-            std::abs(searchCursor.anchor() - searchCursor.position()));
+        QTextCursor qcursor = searchCursor.qTextCursor(m_document.data());
+        int blockNum = qcursor.block().blockNumber();
+        int cursorBeginPos = std::min(qcursor.position(), qcursor.anchor());
+        YFileCursor newCursor(
+            m_document->lineAddresses().at(blockNum),
+            cursorBeginPos - qcursor.block().position(),
+            std::abs(qcursor.anchor() - qcursor.position()));
         m_document->setFileCursor(newCursor);
     }
 
     return foundMatch;
 }
 
-void TailView::scrollToIfNecessary(const QTextCursor & cursor)
+void TailView::scrollToIfNecessary(const YFileCursor & ycursor)
 {
+    QTextCursor cursor(ycursor.qTextCursor(m_document.data()));
     QTextBlock cursorBlock = cursor.block();
     int cursorLineNumber = m_document->blockLayoutLines().at(cursorBlock.blockNumber());
     int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
@@ -261,8 +265,7 @@ void TailView::paintEvent(QPaintEvent * /*event*/)
     QRectF viewrect(viewport()->rect());
     painter.fillRect(viewrect, Preferences::instance()->normalTextColor().background());
 
-    QTextDocument * document = m_document->document();
-    for(QTextBlock block = document->begin(); block != document->end(); block = block.next()) {
+    for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
         const QTextLayout * layout = block.layout();
         QFontMetrics fontMetrics(layout->font());
 
@@ -358,7 +361,7 @@ void TailView::onPreferencesChanged()
 
 int TailView::numLinesOnScreen() const
 {
-    QFont font = m_document->document()->defaultFont();
+    const QFont & font = Preferences::instance()->font();
     QFontMetrics fontMetrics(font);
     int lineHeight = fontMetrics.lineSpacing();
     int windowHeight = viewport()->height();

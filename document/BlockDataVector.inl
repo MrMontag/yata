@@ -54,12 +54,21 @@ QTextBlock BlockDataVector<T>::findContainingBlock(T item, T * closestItem) cons
 }
 
 template <class T>
-T BlockDataVector<T>::at(size_t i) const
+const T & BlockDataVector<T>::at(size_t i) const
 {
-    if(i >= m_data.size()) {
-        return -1;
-    }
     return m_data.at(i);
+}
+
+template <class T>
+const T & BlockDataVector<T>::front() const
+{
+    return m_data.front();
+}
+
+template <class T>
+const T & BlockDataVector<T>::back() const
+{
+    return m_data.back();
 }
 
 template <class T>

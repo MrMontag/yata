@@ -31,7 +31,7 @@ void YFileCursor::makeNull()
     m_length = 0;
 }
 
-QTextCursor YFileCursor::qTextCursor(YTextDocument * document) const
+QTextCursor YFileCursor::qTextCursor(const YTextDocument * document) const
 {
     if(isNull()) { return QTextCursor(); }
 

@@ -11,26 +11,26 @@
 #include <QString>
 #include "BaseSearch.h"
 
-class QTextDocument;
-class QTextCursor;
+class YTextDocument;
+class YFileCursor;
 
 class DocumentSearch: public BaseSearch {
 public:
-    DocumentSearch(QTextDocument * document);
+    DocumentSearch(YTextDocument * document);
 
     ~DocumentSearch();
 
     bool searchDocument(bool isForward, bool wrapAround = true);
 
-    void setCursor(const QTextCursor & cursor);
-    const QTextCursor & cursor() const;
+    void setCursor(const YFileCursor & cursor);
+    const YFileCursor & cursor() const;
 
 private:
     void resetSearchCursor(bool isTop);
 private:
-    QTextDocument * m_document;
+    YTextDocument * m_document;
 
-    QScopedPointer<QTextCursor> m_textCursor;
+    QScopedPointer<YFileCursor> m_textCursor;
 };
 
 #endif // DOCUMENTSEARCH_H

@@ -26,13 +26,14 @@ YTextDocument::YTextDocument():
     m_blockLayoutLines(m_document.data()),
     m_blockGraphicalPositions(m_document.data()),
     m_lineAddresses(m_document.data()),
-    m_fileCursor(new YFileCursor()),
+    m_fileCursor(new YFileCursor),
     m_width(0),
     m_needs_layout(false)
 {
     m_document->setUndoRedoEnabled(false);
     m_document->setUseDesignMetrics(true);
     updateFont();
+    connect(m_document.data(), SIGNAL(contentsChanged()), SIGNAL(contentsChanged()));
 }
 
 YTextDocument::~YTextDocument()
@@ -44,7 +45,7 @@ void YTextDocument::setText(const QString & text, const std::vector<qint64> & ne
     m_document->setPlainText(text);
     m_lineAddresses.assign(newAddresses);
 
-    select(m_fileCursor->qTextCursor(this));
+    select(*m_fileCursor);
     m_needs_layout = true;
 }
 
@@ -73,14 +74,14 @@ void YTextDocument::layout(int width)
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
     setColors(&cursor, Preferences::instance()->normalTextColor());
 
-    select(*m_selectedCursor);
+    select(yFileCursor(*m_selectedCursor));
 
     m_needs_layout = false;
 }
 
 void YTextDocument::markDirty()
 {
-    select(*m_selectedCursor);
+    select(yFileCursor(*m_selectedCursor));
     updateFont();
     m_needs_layout = true;
 }
@@ -125,30 +126,35 @@ qint64 YTextDocument::blockAddress(QTextBlock block) const
     return m_lineAddresses.at(blockNumber);
 }
 
-QTextDocument * YTextDocument::document()
-{
-    return m_document.data();
-}
-
-const QTextDocument * YTextDocument::document() const
-{
-    return m_document.data();
-}
-
 int YTextDocument::numLayoutLines() const
 {
     return m_numLayoutLines;
 }
 
-void YTextDocument::select(const QTextCursor & cursor)
+YFileCursor YTextDocument::find(const QRegExp & regex, const YFileCursor & cursor, bool isForward) const
+{
+    QTextDocument::FindFlags flags = 0;
+    if(!isForward) {
+        flags |= QTextDocument::FindBackward;
+    }
+    QTextCursor qcursor = m_document->find(regex, cursor.qTextCursor(this), flags);
+    return yFileCursor(qcursor);
+}
+
+void YTextDocument::select(const YFileCursor & cursor)
 {
     // Clear current selection first
     setColors(m_selectedCursor.data(), Preferences::instance()->normalTextColor());
 
-    *m_selectedCursor = cursor;
+    *m_selectedCursor = cursor.qTextCursor(this);
     if(!m_selectedCursor->isNull()) {
         setColors(m_selectedCursor.data(), Preferences::instance()->selectedTextColor());
     }
+}
+
+void YTextDocument::clearSelection()
+{
+    select(YFileCursor());
 }
 
 void YTextDocument::setColors(QTextCursor * cursor, const TextColor & textColor)
@@ -157,6 +163,20 @@ void YTextDocument::setColors(QTextCursor * cursor, const TextColor & textColor)
     format.setForeground(textColor.foreground());
     format.setBackground(textColor.background());
     cursor->setCharFormat(format);
+}
+
+YFileCursor YTextDocument::yFileCursor(const QTextCursor & qcursor) const
+{
+    if(qcursor.isNull()) { return YFileCursor(); }
+    qint64 topAddress = m_lineAddresses.size() ? m_lineAddresses.at(0) : YFileCursor::NULL_VALUE;
+    int anchor = qcursor.anchor();
+    int pos = qcursor.position();
+    if(anchor > pos) { std::swap(anchor, pos); }
+    qint64 cursorAddress = topAddress + anchor;
+    qint64 lineAddress = 0;
+    m_lineAddresses.findContainingBlock(cursorAddress, &lineAddress);
+    YFileCursor ycursor(lineAddress, cursorAddress - lineAddress, pos - anchor);
+    return ycursor;
 }
 
 void YTextDocument::setFileCursor(const YFileCursor & cursor)

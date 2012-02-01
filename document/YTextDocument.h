@@ -21,7 +21,9 @@ class QTextCursor;
 class TextColor;
 class YFileCursor;
 
-class YTextDocument {
+class YTextDocument: public QObject {
+    Q_OBJECT
+
 public:
     YTextDocument();
     ~YTextDocument();
@@ -32,11 +34,12 @@ public:
     QTextBlock findBlockAtLayoutLine(int layoutLine, int * closestLayoutPos = 0) const;
     qint64 blockAddress(QTextBlock block) const;
 
-    QTextDocument * document();
-    const QTextDocument * document() const;
     int numLayoutLines() const;
 
-    void select(const QTextCursor & cursor);
+    YFileCursor find(const QRegExp & regex, const YFileCursor & cursor, bool isForward) const;
+
+    void select(const YFileCursor & cursor);
+    void clearSelection();
 
     const BlockDataVector<qint64> & lineAddresses() const { return m_lineAddresses; }
     const BlockDataVector<int> & blockLayoutLines() const { return m_blockLayoutLines; }
@@ -45,10 +48,20 @@ public:
     const YFileCursor & fileCursor() const { return *m_fileCursor; }
     void setFileCursor(const YFileCursor & cursor);
 
+    QTextBlock begin() const { return m_document->begin(); }
+    QTextBlock end() const { return m_document->end(); }
+    QTextBlock lastBlock() const { return m_document->lastBlock(); }
+
+signals:
+    void contentsChanged();
+
 private:
     qreal layoutBlock(QTextBlock * textBlock);
     void updateFont();
     void setColors(QTextCursor * cursor, const TextColor & textColor);
+public:
+    // TODO: make yFileCursor() private
+    YFileCursor yFileCursor(const QTextCursor & qcursor) const;
 
 private:
     YObjectPointer<QTextDocument> m_document;

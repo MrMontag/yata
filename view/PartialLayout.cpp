@@ -14,7 +14,6 @@
 
 #include <QScrollBar>
 #include <QTextBlock>
-#include <QTextDocument>
 #include <QTextLayout>
 #include <QtDebug>
 
@@ -203,7 +202,7 @@ bool PartialLayout::scrollUp(int line_change)
         m_topScreenLine = 0;
         return false;
     }
-    QTextBlock firstBlock = document()->document()->firstBlock();
+    QTextBlock firstBlock = document()->begin();
     qint64 file_pos = document()->blockAddress(firstBlock);
     if(file_pos == 0) {
         m_topScreenLine = 0;
@@ -217,7 +216,7 @@ bool PartialLayout::scrollUp(int line_change)
 
 bool PartialLayout::scrollDown(int line_change)
 {
-    QTextBlock firstBlock = document()->document()->firstBlock();
+    QTextBlock firstBlock = document()->begin();
     if(m_topScreenLine + line_change < firstBlock.layout()->lineCount()) {
         m_topScreenLine += line_change;
         keepToLowerBound(firstBlock, &m_topScreenLine);
@@ -285,7 +284,7 @@ qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
     int lines = 0;
     qint64 line_address = 0;
 
-    QTextBlock block = m_bottomDocument->document()->lastBlock();
+    QTextBlock block = m_bottomDocument->lastBlock();
     const int linesOnScreen = view()->numLinesOnScreen();
     while(block.isValid()) {
         lines += block.layout()->lineCount();

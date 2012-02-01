@@ -5,12 +5,13 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "DocumentSearch.h"
-#include <QTextCursor>
-#include <QTextDocument>
+#include "document/YFileCursor.h"
+#include "document/YTextDocument.h"
+#include <QTextFormat>
 
-DocumentSearch::DocumentSearch(QTextDocument * document)
+DocumentSearch::DocumentSearch(YTextDocument *document)
     : m_document(document)
-    , m_textCursor(new QTextCursor)
+    , m_textCursor(new YFileCursor)
 {
 }
 
@@ -18,48 +19,43 @@ DocumentSearch::~DocumentSearch()
 {
 }
 
-void DocumentSearch::setCursor(const QTextCursor & cursor)
+void DocumentSearch::setCursor(const YFileCursor & cursor)
 {
     *m_textCursor = cursor;
 }
 
-const QTextCursor & DocumentSearch::cursor() const
+const YFileCursor & DocumentSearch::cursor() const
 {
     return *m_textCursor;
 }
 
 void DocumentSearch::resetSearchCursor(bool isTop)
 {
-    *m_textCursor = QTextCursor(m_document);
-    m_textCursor->movePosition(isTop ? QTextCursor::Start : QTextCursor::End);
+    const BlockDataVector<qint64> & lineAddresses = m_document->lineAddresses();
+    if(isTop) {
+	    *m_textCursor = YFileCursor(lineAddresses.front(), 0, 0);
+    } else {
+		m_textCursor->setLineAddress(lineAddresses.back());
+		m_textCursor->setCharPos(m_document->lastBlock().length() - 1);
+		m_textCursor->setLength(0);
+    }
 }
 
 bool DocumentSearch::searchDocument(bool isForward, bool wrapAround)
 {
     if(m_textCursor->isNull()) {
-        *m_textCursor = QTextCursor(m_document);
-    } else {
-        QTextCharFormat clear;
-        m_textCursor->setCharFormat(clear);
+        *m_textCursor = YFileCursor();
     }
 
     QRegExp regex(getRegex());
 
-    QTextDocument::FindFlags flags = 0;
-    if(!isForward) {
-        flags |= QTextDocument::FindBackward;
-    }
-
-    QTextCursor match = m_document->find(regex, *m_textCursor, flags);
+    YFileCursor match = m_document->find(regex, *m_textCursor, isForward);
 
     if(wrapAround && match.isNull()) {
         resetSearchCursor(isForward);
-        match = m_document->find(regex, *m_textCursor, flags);
+	    match = m_document->find(regex, *m_textCursor, isForward);
     }
 
-    if(!match.isNull()) {
-        *m_textCursor = match;
-    }
-
+    *m_textCursor = match;
     return !match.isNull();
 }

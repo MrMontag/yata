@@ -18,7 +18,6 @@ class LayoutStrategy;
 class PartialLayout;
 class QString;
 class QTextBlock;
-class QTextCursor;
 class SearchCriteria;
 class YFileCursor;
 class YFileSystemWatcherThread;
@@ -60,7 +59,7 @@ public:
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
     const QString & filename() const { return m_filename; }
     bool searchDocument(bool isForward, bool wrapAround = true);
-    void scrollToIfNecessary(const QTextCursor & cursor);
+    void scrollToIfNecessary(const YFileCursor & ycursor);
 
     const QString & currentFileError() const { return m_currentFileError; }
 
