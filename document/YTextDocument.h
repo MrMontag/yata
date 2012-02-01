@@ -45,7 +45,7 @@ public:
     const BlockDataVector<int> & blockLayoutLines() const { return m_blockLayoutLines; }
     const BlockDataVector<double> & blockGraphicalPositions() const { return m_blockGraphicalPositions; }
 
-    const YFileCursor & fileCursor() const { return *m_fileCursor; }
+    const YFileCursor & fileCursor() const { return *m_selectedCursor; }
     void setFileCursor(const YFileCursor & cursor);
 
     QTextBlock begin() const { return m_document->begin(); }
@@ -58,20 +58,20 @@ signals:
 private:
     qreal layoutBlock(QTextBlock * textBlock);
     void updateFont();
-    void setColors(QTextCursor * cursor, const TextColor & textColor);
+    void setColors(const YFileCursor * cursor, const TextColor & textColor);
+    void setColors(QTextCursor *cursor, const TextColor & textColor);
 public:
     // TODO: make yFileCursor() private
     YFileCursor yFileCursor(const QTextCursor & qcursor) const;
 
 private:
     YObjectPointer<QTextDocument> m_document;
-    QScopedPointer<QTextCursor> m_selectedCursor;
+    QScopedPointer<YFileCursor> m_selectedCursor;
 
     int m_numLayoutLines;
     BlockDataVector<int> m_blockLayoutLines;
     BlockDataVector<double> m_blockGraphicalPositions;
     BlockDataVector<qint64> m_lineAddresses;
-    QScopedPointer<YFileCursor> m_fileCursor;
     int m_width;
     bool m_needs_layout;
 };

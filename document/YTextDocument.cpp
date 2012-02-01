@@ -21,12 +21,11 @@
 
 YTextDocument::YTextDocument():
     m_document(new QTextDocument()),
-    m_selectedCursor(new QTextCursor()),
+    m_selectedCursor(new YFileCursor),
     m_numLayoutLines(0),
     m_blockLayoutLines(m_document.data()),
     m_blockGraphicalPositions(m_document.data()),
     m_lineAddresses(m_document.data()),
-    m_fileCursor(new YFileCursor),
     m_width(0),
     m_needs_layout(false)
 {
@@ -45,7 +44,7 @@ void YTextDocument::setText(const QString & text, const std::vector<qint64> & ne
     m_document->setPlainText(text);
     m_lineAddresses.assign(newAddresses);
 
-    select(*m_fileCursor);
+    select(*m_selectedCursor);
     m_needs_layout = true;
 }
 
@@ -74,14 +73,14 @@ void YTextDocument::layout(int width)
     cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
     setColors(&cursor, Preferences::instance()->normalTextColor());
 
-    select(yFileCursor(*m_selectedCursor));
+    select(*m_selectedCursor);
 
     m_needs_layout = false;
 }
 
 void YTextDocument::markDirty()
 {
-    select(yFileCursor(*m_selectedCursor));
+    select(*m_selectedCursor);
     updateFont();
     m_needs_layout = true;
 }
@@ -146,7 +145,7 @@ void YTextDocument::select(const YFileCursor & cursor)
     // Clear current selection first
     setColors(m_selectedCursor.data(), Preferences::instance()->normalTextColor());
 
-    *m_selectedCursor = cursor.qTextCursor(this);
+    *m_selectedCursor = cursor;
     if(!m_selectedCursor->isNull()) {
         setColors(m_selectedCursor.data(), Preferences::instance()->selectedTextColor());
     }
@@ -155,6 +154,12 @@ void YTextDocument::select(const YFileCursor & cursor)
 void YTextDocument::clearSelection()
 {
     select(YFileCursor());
+}
+
+void YTextDocument::setColors(const YFileCursor *cursor, const TextColor & textColor)
+{
+    QTextCursor qcursor(cursor->qTextCursor(this));
+    setColors(&qcursor, textColor);
 }
 
 void YTextDocument::setColors(QTextCursor * cursor, const TextColor & textColor)
@@ -181,5 +186,5 @@ YFileCursor YTextDocument::yFileCursor(const QTextCursor & qcursor) const
 
 void YTextDocument::setFileCursor(const YFileCursor & cursor)
 {
-    *m_fileCursor = cursor;
+    *m_selectedCursor = cursor;
 }
