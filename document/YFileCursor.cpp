@@ -43,7 +43,11 @@ QTextCursor YFileCursor::qTextCursor(const YTextDocument * document) const
     QTextCursor cursor(block);
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_charPos);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, m_length);
+    int absLength = std::abs(m_length);
+    if(m_length < 0) {
+        cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, absLength);
+    }
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, absLength);
 
     return cursor;
 }

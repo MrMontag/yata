@@ -22,21 +22,13 @@
 #include "document/BlockDataVector.h"
 
 #include <QApplication>
-#include <QDebug>
 #include <QDir>
-#include <QFile>
-#include <QFileInfo>
 #include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
-#include <QString>
 #include <QStringBuilder>
-#include <QTextBlock>
-#include <QTextCursor>
 #include <QTextLayout>
 #include <QTextStream>
-
-#include <algorithm>
 
 const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 
@@ -257,12 +249,39 @@ bool TailView::followTail() const
     return m_followTail;
 }
 
-void TailView::paintEvent(QPaintEvent * /*event*/)
+void TailView::mousePressEvent(QMouseEvent * event)
+{
+    int lineSpacing = QFontMetrics(m_document->begin().layout()->font()).lineSpacing();
+    double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
+    double doc_y = event->y() + docTop;
+    m_document->startSelect(QPoint(event->x(), doc_y));
+    viewport()->update();
+}
+
+void TailView::mouseReleaseEvent(QMouseEvent * event)
+{
+    mouseMoveEvent(event);
+}
+
+void TailView::mouseMoveEvent(QMouseEvent * event)
+{
+    int lineSpacing = QFontMetrics(m_document->begin().layout()->font()).lineSpacing();
+    double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
+    double doc_y = event->y() + docTop;
+    m_document->moveSelect(QPoint(event->x(), doc_y));
+    viewport()->update();
+}
+
+void TailView::mouseDoubleClickEvent(QMouseEvent * /*event*/)
+{
+}
+
+void TailView::paintEvent(QPaintEvent * event)
 {
     m_layoutStrategy->performLayout();
 
     QPainter painter(viewport());
-    QRectF viewrect(viewport()->rect());
+    QRectF viewrect(event->rect());
     painter.fillRect(viewrect, Preferences::instance()->normalTextColor().background());
 
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {

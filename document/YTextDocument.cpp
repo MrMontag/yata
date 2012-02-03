@@ -19,6 +19,8 @@
 
 #include <algorithm>
 
+#include <QtDebug>
+
 YTextDocument::YTextDocument():
     m_document(new QTextDocument()),
     m_selectedCursor(new YFileCursor),
@@ -184,7 +186,36 @@ YFileCursor YTextDocument::yFileCursor(const QTextCursor & qcursor) const
     return ycursor;
 }
 
+int YTextDocument::qdocPosition(const QPoint point) const
+{
+    double blockTop = 0;
+    QTextBlock block = m_blockGraphicalPositions.findContainingBlock(point.y(), &blockTop);
+    if(!block.isValid()) { return 0; }
+    int lineSpacing = QFontMetrics(block.layout()->font()).lineSpacing();
+    int block_y = point.y() - blockTop;
+    QTextLine line = block.layout()->lineAt(block_y / lineSpacing);
+    int blockPos = line.xToCursor(point.x());
+    return block.position() + blockPos;
+}
+
 void YTextDocument::setFileCursor(const YFileCursor & cursor)
 {
     *m_selectedCursor = cursor;
+}
+
+void YTextDocument::startSelect(const QPoint & point)
+{
+    int docPos = qdocPosition(point);
+    QTextCursor cursor(m_document.data());
+    cursor.setPosition(docPos);
+    select(yFileCursor(cursor));
+    m_needs_layout = true;
+}
+
+void YTextDocument::moveSelect(const QPoint & point)
+{
+    qint64 docPos = qdocPosition(point) + m_lineAddresses.at(0);
+    m_selectedCursor->setLength(docPos - (m_selectedCursor->lineAddress() + m_selectedCursor->charPos()));
+    select(*m_selectedCursor);
+    m_needs_layout = true;
 }

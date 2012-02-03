@@ -48,6 +48,9 @@ public:
     const YFileCursor & fileCursor() const { return *m_selectedCursor; }
     void setFileCursor(const YFileCursor & cursor);
 
+    void startSelect(const QPoint & point);
+    void moveSelect(const QPoint & point);
+
     QTextBlock begin() const { return m_document->begin(); }
     QTextBlock end() const { return m_document->end(); }
     QTextBlock lastBlock() const { return m_document->lastBlock(); }
@@ -60,6 +63,7 @@ private:
     void updateFont();
     void setColors(const YFileCursor * cursor, const TextColor & textColor);
     void setColors(QTextCursor *cursor, const TextColor & textColor);
+    int qdocPosition(const QPoint point) const;
 public:
     // TODO: make yFileCursor() private
     YFileCursor yFileCursor(const QTextCursor & qcursor) const;
