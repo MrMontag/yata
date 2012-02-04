@@ -11,6 +11,7 @@
 #include <QTextBlock>
 #include <QTextDocument>
 #include <algorithm>
+#include <QtDebug>
 
 YFileCursor::YFileCursor(qint64 linePosition /*= NULL_VALUE*/, int lineOffset /*= NULL_VALUE*/, int length /*= NULL_VALUE*/)
     : m_lineAddress(linePosition)
@@ -36,20 +37,30 @@ QTextCursor YFileCursor::qTextCursor(const YTextDocument * document) const
     if(isNull()) { return QTextCursor(); }
 
     const BlockDataVector<qint64> & lineAddresses = document->lineAddresses();
+    qint64 docBegin = lineAddresses.front();
 
-    qint64 closest = 0;
-    QTextBlock block = lineAddresses.findContainingBlock(m_lineAddress, &closest);
-    if(!block.isValid()) {
+    int pos = m_lineAddress + m_charPos - docBegin;
+    if(m_length < 0) {
+	pos -= -m_length;
+    }
+
+    if(pos >= document->characterCount()) {
 	return QTextCursor();
     }
-    QTextCursor cursor(block);
 
-    cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_charPos);
-    int absLength = std::abs(m_length);
-    if(m_length < 0) {
-        cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, absLength);
+    int length = std::abs(m_length);
+    if(pos < 0) {
+	if (length >= -pos) {
+	    length -= -pos;
+	    pos = 0;
+	} else {
+	    return QTextCursor();
+	}
     }
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, absLength);
+
+    QTextCursor cursor(document->begin());
+    cursor.setPosition(pos);
+    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, length);
 
     return cursor;
 }

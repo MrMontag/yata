@@ -54,6 +54,7 @@ public:
     QTextBlock begin() const { return m_document->begin(); }
     QTextBlock end() const { return m_document->end(); }
     QTextBlock lastBlock() const { return m_document->lastBlock(); }
+    int characterCount() const { return m_document->characterCount(); }
 
     const QFont & font() const;
 
