@@ -55,6 +55,8 @@ public:
     QTextBlock end() const { return m_document->end(); }
     QTextBlock lastBlock() const { return m_document->lastBlock(); }
 
+    const QFont & font() const;
+
 signals:
     void contentsChanged();
 

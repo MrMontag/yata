@@ -89,6 +89,7 @@ private slots:
 
 private:
     void searchFile(bool isForward);
+    QPoint docGraphicalPosition(const QPoint & viewPoint);
 
 private:
     QString m_filename;

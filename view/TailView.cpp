@@ -134,6 +134,14 @@ void TailView::searchFile(bool isForward)
     viewport()->update();
 }
 
+QPoint TailView::docGraphicalPosition(const QPoint & viewPoint)
+{
+    int lineSpacing = QFontMetrics(m_document->font()).lineSpacing();
+    double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
+    double doc_y = viewPoint.y() + docTop;
+    return QPoint(viewPoint.x(), doc_y);
+}
+
 bool TailView::searchDocument(bool isForward, bool wrapAround)
 {
     if(!m_document->fileCursor().isNull()) {
@@ -251,10 +259,8 @@ bool TailView::followTail() const
 
 void TailView::mousePressEvent(QMouseEvent * event)
 {
-    int lineSpacing = QFontMetrics(m_document->begin().layout()->font()).lineSpacing();
-    double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
-    double doc_y = event->y() + docTop;
-    m_document->startSelect(QPoint(event->x(), doc_y));
+    QPoint docPos(docGraphicalPosition(event->pos()));
+    m_document->startSelect(docPos);
     viewport()->update();
 }
 
@@ -265,10 +271,8 @@ void TailView::mouseReleaseEvent(QMouseEvent * event)
 
 void TailView::mouseMoveEvent(QMouseEvent * event)
 {
-    int lineSpacing = QFontMetrics(m_document->begin().layout()->font()).lineSpacing();
-    double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
-    double doc_y = event->y() + docTop;
-    m_document->moveSelect(QPoint(event->x(), doc_y));
+    QPoint docPos(docGraphicalPosition(event->pos()));
+    m_document->moveSelect(docPos);
     viewport()->update();
 }
 

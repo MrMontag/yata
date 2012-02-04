@@ -35,9 +35,9 @@ void DocumentSearch::resetSearchCursor(bool isTop)
     if(isTop) {
 	    *m_textCursor = YFileCursor(lineAddresses.front(), 0, 0);
     } else {
-		m_textCursor->setLineAddress(lineAddresses.back());
-		m_textCursor->setCharPos(m_document->lastBlock().length() - 1);
-		m_textCursor->setLength(0);
+	m_textCursor->setLineAddress(lineAddresses.back());
+	m_textCursor->setCharPos(m_document->lastBlock().length() - 1);
+	m_textCursor->setLength(0);
     }
 }
 

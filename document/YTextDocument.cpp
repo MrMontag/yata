@@ -219,3 +219,8 @@ void YTextDocument::moveSelect(const QPoint & point)
     select(*m_selectedCursor);
     m_needs_layout = true;
 }
+
+const QFont & YTextDocument::font() const
+{
+    return Preferences::instance()->font();
+}

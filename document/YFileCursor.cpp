@@ -39,7 +39,9 @@ QTextCursor YFileCursor::qTextCursor(const YTextDocument * document) const
 
     qint64 closest = 0;
     QTextBlock block = lineAddresses.findContainingBlock(m_lineAddress, &closest);
-    if(closest != m_lineAddress) { return QTextCursor(); }
+    if(!block.isValid()) {
+	return QTextCursor();
+    }
     QTextCursor cursor(block);
 
     cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, m_charPos);
