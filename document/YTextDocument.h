@@ -11,7 +11,6 @@
 #include "app/YObjectPointer.h"
 
 #include <QScopedPointer>
-#include <QString>
 #include <vector>
 
 class QFont;
@@ -49,6 +48,7 @@ public:
 
     void startSelect(const QPoint & point);
     void moveSelect(const QPoint & point);
+    void copySelected();
 
     QTextBlock begin() const { return m_document->begin(); }
     QTextBlock end() const { return m_document->end(); }

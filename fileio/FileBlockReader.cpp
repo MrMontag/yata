@@ -27,6 +27,20 @@ bool FileBlockReader::readChunk(QString *data, std::vector<qint64> * filePositio
     return read(data, filePositions, start_pos, num_lines);
 }
 
+bool FileBlockReader::readChunk(QString *data, qint64 start_pos, qint64 length)
+{
+    data->clear();
+
+    char ch = 0;
+    for(qint64 i = 0; i < length; i++) {
+        BufferedFile::Status status = m_file.getChar(start_pos + i, &ch);
+        if(status == BufferedFile::Error) { return false; }
+        if(status == BufferedFile::Eof) { break; }
+        data->append(ch);
+    }
+    return true;
+}
+
 qint64 FileBlockReader::getStartPosition(qint64 init_pos, qint64 lines_after_start)
 {
     qint64 start_pos = beginningOfLine(init_pos);
@@ -48,7 +62,7 @@ qint64 FileBlockReader::getStartPosition(qint64 init_pos, qint64 lines_after_sta
 
 qint64 FileBlockReader::size() const
 {
-	return m_file.size();
+    return m_file.size();
 }
 
 const QString & FileBlockReader::filename() const

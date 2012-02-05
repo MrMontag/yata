@@ -85,6 +85,11 @@ void YFileCursor::setCharPos(int cp)
     m_charPos = cp;
 }
 
+qint64 YFileCursor::charAddress() const
+{
+    return m_lineAddress + m_charPos;
+}
+
 int YFileCursor::length() const
 {
     return m_length;

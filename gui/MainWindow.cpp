@@ -327,3 +327,10 @@ void MainWindow::on_actionAutomaticLayout_triggered()
 {
     layoutAction(TailView::AutomaticLayout);
 }
+
+void MainWindow::on_actionCopy_triggered()
+{
+    if(TailView * view = getCurrentView()) {
+	view->onCopy();
+    }
+}

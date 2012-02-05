@@ -63,6 +63,8 @@ public:
 
     const QString & currentFileError() const { return m_currentFileError; }
 
+    void onCopy();
+
 signals:
     void fileError(const QString &);
     void fileErrorCleared();

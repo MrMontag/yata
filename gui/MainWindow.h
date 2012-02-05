@@ -64,6 +64,8 @@ private slots:
 
     void debugWindowClosed();
     void onCurrentTabChanged(int oldIndex, int newIndex);
+    void on_actionCopy_triggered();
+
 private:
     TailView * getCurrentView();
     void setupDebugMenu();

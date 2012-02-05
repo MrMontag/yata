@@ -29,6 +29,8 @@ public:
     int charPos() const;
     void setCharPos(int cp);
 
+    qint64 charAddress() const;
+
     int length() const;
     void setLength(int l);
 

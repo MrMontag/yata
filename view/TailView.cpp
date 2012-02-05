@@ -22,6 +22,7 @@
 #include "document/BlockDataVector.h"
 
 #include <QApplication>
+#include <QClipboard>
 #include <QDir>
 #include <QMessageBox>
 #include <QPainter>
@@ -188,6 +189,27 @@ void TailView::scrollToIfNecessary(const YFileCursor & ycursor)
 
     int newTopLine = cursorLineNumber - numReadableLines / 2;
     m_layoutStrategy->scrollTo(newTopLine);
+}
+
+void TailView::onCopy()
+{
+    const YFileCursor & cursor = m_document->fileCursor();
+    if(cursor.length() == 0) {
+	    return;
+    }
+
+    qint64 startAddress = cursor.charAddress();
+    qint64 length = cursor.length();
+    if(length < 0) {
+		length = -length;
+		startAddress -= length;
+    }
+
+    FileBlockReader reader(m_filename);
+    QString data;
+    if(reader.readChunk(&data, startAddress, length)) {
+		QApplication::clipboard()->setText(data);
+    }
 }
 
 void TailView::setActive(bool active)

@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -35,6 +35,8 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <addaction name="actionCopy"/>
+    <addaction name="separator"/>
     <addaction name="actionFind"/>
     <addaction name="actionFindNext"/>
     <addaction name="actionFindPrevious"/>
@@ -176,6 +178,14 @@
   <action name="actionDebugWindow">
    <property name="text">
     <string>Debug &amp;Window</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>
