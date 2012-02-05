@@ -173,10 +173,9 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
 
 void TailView::scrollToIfNecessary(const YFileCursor & ycursor)
 {
-    QTextCursor cursor(ycursor.qTextCursor(m_document.data()));
-    QTextBlock cursorBlock = cursor.block();
+    QTextBlock cursorBlock = m_document->lineAddresses().findContainingBlock(ycursor.lineAddress());
     int cursorLineNumber = m_document->blockLayoutLines().at(cursorBlock.blockNumber());
-    int blockLine = cursorBlock.layout()->lineForTextPosition(cursor.position() - cursorBlock.position()).lineNumber();
+    int blockLine = cursorBlock.layout()->lineForTextPosition(ycursor.charPos()).lineNumber();
     cursorLineNumber += blockLine;
 
     int topScreenLine = m_layoutStrategy->topScreenLine();
