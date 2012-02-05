@@ -129,7 +129,7 @@ void TailView::searchFile(bool isForward)
             << documentSearch()->lastSearchString()
             << QObject::tr("\" not found");
         QMessageBox::information(this, YApplication::displayAppName(), message);
-		m_document->clearSelection();
+        m_document->clearSelection();
     }
 
     viewport()->update();
@@ -155,7 +155,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
             int blockLine = topLine - layoutLine;
             QTextCursor cursor(block);
             cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, blockLine);
-	    YFileCursor ycursor = m_document->yFileCursor(cursor);
+            YFileCursor ycursor = m_document->yFileCursor(cursor);
             m_documentSearch->setCursor(ycursor);
         } else {
             m_documentSearch->setCursor(YFileCursor());
@@ -191,24 +191,24 @@ void TailView::scrollToIfNecessary(const YFileCursor & ycursor)
     m_layoutStrategy->scrollTo(newTopLine);
 }
 
-void TailView::onCopy()
+void TailView::onCopy(bool x11Selection)
 {
     const YFileCursor & cursor = m_document->fileCursor();
     if(cursor.length() == 0) {
-	    return;
+        return;
     }
 
     qint64 startAddress = cursor.charAddress();
     qint64 length = cursor.length();
     if(length < 0) {
-		length = -length;
-		startAddress -= length;
+        length = -length;
+        startAddress -= length;
     }
 
     FileBlockReader reader(m_filename);
     QString data;
     if(reader.readChunk(&data, startAddress, length)) {
-		QApplication::clipboard()->setText(data);
+        QApplication::clipboard()->setText(data, x11Selection ? QClipboard::Selection: QClipboard::Clipboard);
     }
 }
 
@@ -280,6 +280,7 @@ void TailView::mousePressEvent(QMouseEvent * event)
 void TailView::mouseReleaseEvent(QMouseEvent * event)
 {
     mouseMoveEvent(event);
+    onCopy(true);
 }
 
 void TailView::mouseMoveEvent(QMouseEvent * event)

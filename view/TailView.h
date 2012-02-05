@@ -63,7 +63,7 @@ public:
 
     const QString & currentFileError() const { return m_currentFileError; }
 
-    void onCopy();
+    void onCopy(bool x11Selection = false);
 
 signals:
     void fileError(const QString &);
