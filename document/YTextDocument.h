@@ -46,7 +46,6 @@ public:
     const BlockDataVector<double> & blockGraphicalPositions() const { return m_blockGraphicalPositions; }
 
     const YFileCursor & fileCursor() const { return *m_selectedCursor; }
-    void setFileCursor(const YFileCursor & cursor);
 
     void startSelect(const QPoint & point);
     void moveSelect(const QPoint & point);

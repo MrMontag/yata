@@ -76,7 +76,7 @@ bool PartialLayout::searchFile(bool isForward)
     if(fileSearch.searchFile(isForward, true)) {
         matchFound = true;
         YFileCursor cursor(fileSearch.cursor());
-        document()->setFileCursor(cursor);
+        document()->select(cursor);
 
         bool at_bottom = false;
         updateView(document()->fileCursor().lineAddress(), &at_bottom);

@@ -166,14 +166,6 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     if(foundMatch) {
         const YFileCursor & searchCursor = m_documentSearch->cursor();
         m_document->select(searchCursor);
-        QTextCursor qcursor = searchCursor.qTextCursor(m_document.data());
-        int blockNum = qcursor.block().blockNumber();
-        int cursorBeginPos = std::min(qcursor.position(), qcursor.anchor());
-        YFileCursor newCursor(
-            m_document->lineAddresses().at(blockNum),
-            cursorBeginPos - qcursor.block().position(),
-            std::abs(qcursor.anchor() - qcursor.position()));
-        m_document->setFileCursor(newCursor);
     }
 
     return foundMatch;

@@ -198,11 +198,6 @@ int YTextDocument::qdocPosition(const QPoint point) const
     return block.position() + blockPos;
 }
 
-void YTextDocument::setFileCursor(const YFileCursor & cursor)
-{
-    *m_selectedCursor = cursor;
-}
-
 void YTextDocument::startSelect(const QPoint & point)
 {
     int docPos = qdocPosition(point);
