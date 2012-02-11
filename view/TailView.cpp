@@ -273,7 +273,11 @@ bool TailView::followTail() const
 void TailView::mousePressEvent(QMouseEvent * event)
 {
     QPoint docPos(docGraphicalPosition(event->pos()));
-    m_document->startSelect(docPos);
+    if(event->modifiers() == Qt::ShiftModifier) {
+        m_document->moveSelect(docPos);
+    } else if (event->modifiers() == 0) {
+        m_document->startSelect(docPos);
+    }
     viewport()->update();
 }
 
