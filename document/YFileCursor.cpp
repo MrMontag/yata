@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010-2011 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 
@@ -11,7 +11,6 @@
 #include <QTextBlock>
 #include <QTextDocument>
 #include <algorithm>
-#include <QtDebug>
 
 YFileCursor::YFileCursor(qint64 linePosition /*= NULL_VALUE*/, int lineOffset /*= NULL_VALUE*/, int length /*= NULL_VALUE*/)
     : m_lineAddress(linePosition)
@@ -32,35 +31,29 @@ void YFileCursor::makeNull()
     m_length = 0;
 }
 
+int fileToDocPos(qint64 filePos, const YTextDocument * document)
+{
+    const BlockDataVector<qint64> & lineAddresses = document->lineAddresses();
+    qint64 closest = 0;
+    QTextBlock block = lineAddresses.findContainingBlock(filePos, &closest);
+    if(!block.isValid()) { return 0; }
+    int blockPosition = filePos - closest;
+    int docPos = block.position() + blockPosition;
+    return std::min(docPos, document->characterCount() - 1);
+}
+
 QTextCursor YFileCursor::qTextCursor(const YTextDocument * document) const
 {
     if(isNull()) { return QTextCursor(); }
 
-    const BlockDataVector<qint64> & lineAddresses = document->lineAddresses();
-    qint64 docBegin = lineAddresses.front();
+    int anchor = fileToDocPos(charAddress(), document);
+    int position = fileToDocPos(selectionEnd(), document);
 
-    int pos = m_lineAddress + m_charPos - docBegin;
-    if(m_length < 0) {
-	pos -= -m_length;
-    }
-
-    if(pos >= document->characterCount()) {
-	return QTextCursor();
-    }
-
-    int length = std::abs(m_length);
-    if(pos < 0) {
-	if (length >= -pos) {
-	    length -= -pos;
-	    pos = 0;
-	} else {
-	    return QTextCursor();
-	}
-    }
+    if(position < anchor) { std::swap(position, anchor); }
 
     QTextCursor cursor(document->begin());
-    cursor.setPosition(pos);
-    cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, length);
+    cursor.setPosition(anchor);
+    cursor.setPosition(position, QTextCursor::KeepAnchor);
 
     return cursor;
 }
@@ -100,3 +93,12 @@ void YFileCursor::setLength(int l)
     m_length = l;
 }
 
+void YFileCursor::setSelectionEnd(qint64 end)
+{
+    m_length = end - charAddress();
+}
+
+qint64 YFileCursor::selectionEnd() const
+{
+    return charAddress() + m_length;
+}

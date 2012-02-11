@@ -15,7 +15,6 @@
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QTextLayout>
-#include <QtDebug>
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 

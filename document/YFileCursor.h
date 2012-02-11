@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef YFILECURSOR_H
@@ -33,6 +33,9 @@ public:
 
     int length() const;
     void setLength(int l);
+
+    void setSelectionEnd(qint64 end);
+    qint64 selectionEnd() const;
 
 private:
     qint64 m_lineAddress;

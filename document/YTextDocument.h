@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef YTEXTDOCUMENT_H
@@ -66,6 +66,7 @@ private:
     void setColors(const YFileCursor * cursor, const TextColor & textColor);
     void setColors(QTextCursor *cursor, const TextColor & textColor);
     int qdocPosition(const QPoint point) const;
+    YFileCursor yFileCursor(int docPos) const;
 public:
     // TODO: make yFileCursor() private
     YFileCursor yFileCursor(const QTextCursor & qcursor) const;

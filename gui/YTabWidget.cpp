@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010-2011 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YTabWidget.h"
@@ -15,7 +15,6 @@
 #include <QDir>
 #include <QMenu>
 #include <QTabBar>
-#include <QtDebug>
 
 // TODO: icons
 

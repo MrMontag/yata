@@ -19,8 +19,6 @@
 
 #include <algorithm>
 
-#include <QtDebug>
-
 YTextDocument::YTextDocument():
     m_document(new QTextDocument()),
     m_selectedCursor(new YFileCursor),
@@ -175,14 +173,11 @@ void YTextDocument::setColors(QTextCursor * cursor, const TextColor & textColor)
 YFileCursor YTextDocument::yFileCursor(const QTextCursor & qcursor) const
 {
     if(qcursor.isNull()) { return YFileCursor(); }
-    qint64 topAddress = m_lineAddresses.size() ? m_lineAddresses.at(0) : YFileCursor::NULL_VALUE;
-    int anchor = qcursor.anchor();
-    int pos = qcursor.position();
-    if(anchor > pos) { std::swap(anchor, pos); }
-    qint64 cursorAddress = topAddress + anchor;
-    qint64 lineAddress = 0;
-    m_lineAddresses.findContainingBlock(cursorAddress, &lineAddress);
-    YFileCursor ycursor(lineAddress, cursorAddress - lineAddress, pos - anchor);
+    YFileCursor ycursor = yFileCursor(qcursor.anchor());
+    YFileCursor selectionEnd = yFileCursor(qcursor.position());
+
+    ycursor.setSelectionEnd(selectionEnd.charAddress());
+
     return ycursor;
 }
 
@@ -198,6 +193,15 @@ int YTextDocument::qdocPosition(const QPoint point) const
     return block.position() + blockPos;
 }
 
+YFileCursor YTextDocument::yFileCursor(int docPos) const
+{
+    QTextCursor cursor(m_document.data());
+    cursor.setPosition(docPos);
+    QTextBlock block = cursor.block();
+    qint64 linePos = m_lineAddresses.at(block.blockNumber());
+    return YFileCursor(linePos, cursor.positionInBlock());
+}
+
 void YTextDocument::startSelect(const QPoint & point)
 {
     int docPos = qdocPosition(point);
@@ -209,8 +213,9 @@ void YTextDocument::startSelect(const QPoint & point)
 
 void YTextDocument::moveSelect(const QPoint & point)
 {
-    qint64 docPos = qdocPosition(point) + m_lineAddresses.at(0);
-    m_selectedCursor->setLength(docPos - (m_selectedCursor->lineAddress() + m_selectedCursor->charPos()));
+    int docPos = qdocPosition(point);
+    qint64 selectionEnd = yFileCursor(docPos).charAddress();
+    m_selectedCursor->setSelectionEnd(selectionEnd);
     select(*m_selectedCursor);
     m_needs_layout = true;
 }

@@ -1,14 +1,13 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "FileSearch.h"
 #include "FileBlockReader.h"
 
 #include <QRegExp>
-#include <QtDebug>
 
 FileSearch::FileSearch(const QString & filename):
     m_filename(filename)

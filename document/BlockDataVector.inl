@@ -35,7 +35,7 @@ namespace {
 template <class T>
 QTextBlock BlockDataVector<T>::findContainingBlock(T item, T * closestItem) const
 {
-    // Find the value in m_data closest to item such that *blockitr <= layoutLine
+    // Find the value in m_data closest to item such that *blockitr <= item
     // (i.e., find the block that layoutLine is in)
     typename std::vector<T>::const_reverse_iterator itr = std::lower_bound(
         m_data.rbegin(),

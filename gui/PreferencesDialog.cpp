@@ -10,7 +10,6 @@
 
 #include "preferences/Preferences.h"
 #include "preferences/TextColor.h"
-#include <QtDebug>
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
     QDialog(parent),

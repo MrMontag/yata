@@ -1,13 +1,12 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "FileBlockReader.h"
 #include <QString>
 #include <QTextStream>
-#include <QtDebug>
 #include <limits>
 
 FileBlockReader::FileBlockReader(const QString & filename): m_file(filename)
