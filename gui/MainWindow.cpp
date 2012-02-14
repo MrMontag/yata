@@ -228,6 +228,7 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     updateMenus();
     if(oldIndex != -1) {
         if(TailView * tailView = dynamic_cast<TailView*>(m_tabWidget->widget(oldIndex))) {
+            // disconnect file error slots
             disconnect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
             disconnect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearMessage()));
         }
@@ -241,6 +242,7 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
     QString filename = m_tabWidget->tabText(newIndex);
     setWindowTitle(filename + " - " + YApplication::displayAppName());
     if(TailView * tailView = getCurrentView()) {
+        // Set debugging menu
         QAction * toBeChecked = 0;
         switch(tailView->layoutType()) {
             case TailView::DebugFullLayout: toBeChecked = ui->actionFullLayout; break;
@@ -249,7 +251,10 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
         }
         if (toBeChecked) { toBeChecked->setChecked(true); }
 
+        // Follow tail setting
         ui->actionFollowTail->setChecked(tailView->followTail());
+
+        // Connect error signals
         connect(tailView, SIGNAL(fileError(QString)), m_statusBar.data(), SLOT(errorMessage(QString)));
         connect(tailView, SIGNAL(fileErrorCleared()), m_statusBar.data(), SLOT(clearErrorMessage()));
         if(!tailView->currentFileError().isEmpty()) {
@@ -279,13 +284,28 @@ void MainWindow::layoutAction(int layoutType)
 
 void MainWindow::updateMenus()
 {
-    bool enabled = getCurrentView();
+    rebuildEditMenu();
+    bool enabled = (getCurrentView() != 0);
     ui->actionFind->setEnabled(enabled);
     ui->actionFindNext->setEnabled(enabled);
     ui->actionFindPrevious->setEnabled(enabled);
-    ui->actionPreferences->setEnabled(enabled);
     ui->actionRefresh->setEnabled(enabled);
     ui->actionFollowTail->setEnabled(enabled);
+}
+
+void MainWindow::rebuildEditMenu()
+{
+    ui->menuEdit->clear();
+    if(TailView * view = getCurrentView()) {
+        ui->menuEdit->addActions(view->actions());
+        ui->menuEdit->addSeparator();
+    }
+
+    ui->menuEdit->addAction(ui->actionFind);
+    ui->menuEdit->addAction(ui->actionFindNext);
+    ui->menuEdit->addAction(ui->actionFindPrevious);
+    ui->menuEdit->addSeparator();
+    ui->menuEdit->addAction(ui->actionPreferences);
 }
 
 void MainWindow::on_actionFollowTail_triggered(bool checked)
@@ -326,11 +346,4 @@ void MainWindow::on_actionPartialLayout_triggered()
 void MainWindow::on_actionAutomaticLayout_triggered()
 {
     layoutAction(TailView::AutomaticLayout);
-}
-
-void MainWindow::on_actionCopy_triggered()
-{
-    if(TailView * view = getCurrentView()) {
-	view->onCopy();
-    }
 }

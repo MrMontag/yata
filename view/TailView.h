@@ -63,8 +63,6 @@ public:
 
     const QString & currentFileError() const { return m_currentFileError; }
 
-    void onCopy(bool x11Selection = false);
-
 signals:
     void fileError(const QString &);
     void fileErrorCleared();
@@ -74,6 +72,7 @@ public slots:
     void searchForward();
     void searchBackward();
     void onFileChanged();
+    void onCopy(bool x11Selection = false);
 
 protected:
     void mousePressEvent(QMouseEvent * event);

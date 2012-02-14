@@ -35,13 +35,6 @@
     <property name="title">
      <string>&amp;Edit</string>
     </property>
-    <addaction name="actionCopy"/>
-    <addaction name="separator"/>
-    <addaction name="actionFind"/>
-    <addaction name="actionFindNext"/>
-    <addaction name="actionFindPrevious"/>
-    <addaction name="separator"/>
-    <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -178,14 +171,6 @@
   <action name="actionDebugWindow">
    <property name="text">
     <string>Debug &amp;Window</string>
-   </property>
-  </action>
-  <action name="actionCopy">
-   <property name="text">
-    <string>Copy</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>

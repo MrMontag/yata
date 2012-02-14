@@ -21,12 +21,12 @@ class YTabWidget;
 class YStatusBar;
 
 class MainWindow: public QMainWindow {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	MainWindow();
+    MainWindow();
     ~MainWindow();
 
-	void addFile(const QString & filename);
+    void addFile(const QString & filename);
 
     void fileSessions(std::vector<FileSession> * sessions) const;
     int currentFileIndex() const;
@@ -53,7 +53,7 @@ private slots:
     void on_actionFindNext_triggered();
     void on_actionFind_triggered();
     void on_actionOpen_triggered();
-	void on_actionExit_triggered();
+    void on_actionExit_triggered();
 
     void on_actionPreferences_triggered();
 
@@ -64,13 +64,13 @@ private slots:
 
     void debugWindowClosed();
     void onCurrentTabChanged(int oldIndex, int newIndex);
-    void on_actionCopy_triggered();
 
 private:
     TailView * getCurrentView();
     void setupDebugMenu();
     void layoutAction(int layoutType); // declared int to avoid having to #include "TailView.h"
     void updateMenus();
+    void rebuildEditMenu();
 private:
     Ui::MainWindow * ui;
 

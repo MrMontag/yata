@@ -21,9 +21,12 @@
 #include "document/YTextDocument.h"
 #include "document/BlockDataVector.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
+#include <QKeySequence>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
 #include <QScrollBar>
@@ -46,6 +49,20 @@ TailView::TailView(QWidget * parent)
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
+
+    QAction * copy = new QAction(tr("&Copy"), this);
+    copy->setShortcut(QKeySequence(QKeySequence::Copy));
+    connect(copy, SIGNAL(triggered()), SLOT(onCopy()));
+    addAction(copy);
+
+    QAction * separator = new QAction(this);
+    separator->setSeparator(true);
+    addAction(separator);
+
+    QAction * selectAll = new QAction(tr("Select &All"), this);
+    selectAll->setShortcut(QKeySequence(QKeySequence::SelectAll));
+    addAction(selectAll);
+    setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 TailView::~TailView()
@@ -272,11 +289,13 @@ bool TailView::followTail() const
 
 void TailView::mousePressEvent(QMouseEvent * event)
 {
-    QPoint docPos(docGraphicalPosition(event->pos()));
-    if(event->modifiers() == Qt::ShiftModifier) {
-        m_document->moveSelect(docPos);
-    } else if (event->modifiers() == 0) {
-        m_document->startSelect(docPos);
+    if(event->button() == Qt::LeftButton) {
+        QPoint docPos(docGraphicalPosition(event->pos()));
+        if(event->modifiers() == Qt::ShiftModifier) {
+            m_document->moveSelect(docPos);
+        } else if (event->modifiers() == 0) {
+            m_document->startSelect(docPos);
+        }
     }
     viewport()->update();
 }
