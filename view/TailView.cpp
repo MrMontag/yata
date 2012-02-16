@@ -40,6 +40,7 @@ TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
     , m_document(new YTextDocument)
     , m_isActive(false)
+    , m_leftMouseIsDown(false)
     , m_layoutType(AutomaticLayout)
     , m_fullLayoutStrategy(new FullLayout(this))
     , m_partialLayoutStrategy(new PartialLayout(this))
@@ -290,27 +291,34 @@ bool TailView::followTail() const
 void TailView::mousePressEvent(QMouseEvent * event)
 {
     if(event->button() == Qt::LeftButton) {
+        m_leftMouseIsDown = true;
         QPoint docPos(docGraphicalPosition(event->pos()));
         if(event->modifiers() == Qt::ShiftModifier) {
             m_document->moveSelect(docPos);
         } else if (event->modifiers() == 0) {
             m_document->startSelect(docPos);
         }
+        viewport()->update();
     }
-    viewport()->update();
 }
 
 void TailView::mouseReleaseEvent(QMouseEvent * event)
 {
-    mouseMoveEvent(event);
-    onCopy(true);
+    if(event->button() == Qt::LeftButton) {
+        m_leftMouseIsDown = false;
+        mouseMoveEvent(event);
+        onCopy(true);
+    }
 }
 
+#include <QtDebug>
 void TailView::mouseMoveEvent(QMouseEvent * event)
 {
-    QPoint docPos(docGraphicalPosition(event->pos()));
-    m_document->moveSelect(docPos);
-    viewport()->update();
+    if(m_leftMouseIsDown) {
+        QPoint docPos(docGraphicalPosition(event->pos()));
+        m_document->moveSelect(docPos);
+        viewport()->update();
+    }
 }
 
 void TailView::mouseDoubleClickEvent(QMouseEvent * /*event*/)

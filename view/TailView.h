@@ -98,6 +98,7 @@ private:
     YObjectPointer<YFileSystemWatcherThread> m_watcher;
 
     bool m_isActive;
+    bool m_leftMouseIsDown;
     QString m_currentFileError;
 
     LayoutType m_layoutType;
