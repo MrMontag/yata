@@ -35,6 +35,7 @@
 #include <QTextStream>
 
 const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
+const qint64 MAX_SAFE_SELECTION_LENGTH = 1024 * 1024 * 5;
 
 TailView::TailView(QWidget * parent)
     : QAbstractScrollArea(parent)
@@ -62,6 +63,7 @@ TailView::TailView(QWidget * parent)
 
     QAction * selectAll = new QAction(tr("Select &All"), this);
     selectAll->setShortcut(QKeySequence(QKeySequence::SelectAll));
+    connect(selectAll, SIGNAL(triggered()), SLOT(onSelectAll()));
     addAction(selectAll);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 }
@@ -223,11 +225,33 @@ void TailView::onCopy(bool x11Selection)
         startAddress -= length;
     }
 
+    if(length > MAX_SAFE_SELECTION_LENGTH) {
+        if(x11Selection) { return; } // Quietly avoid copying more than 5 MB to the X11 selection
+        QMessageBox::StandardButton button = QMessageBox::warning(
+            this,
+            tr("Warning: copying huge selection"),
+            tr("You are about to copy more than 5 MB to the clipboard. Doing so will consume a lot"
+               "of memory, and could even render your computer unresponsive.\n\n"
+               "Are you sure you want to do this?"),
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No);
+        if(button == QMessageBox::No) {
+            return;
+        }
+    }
+
     FileBlockReader reader(m_filename);
     QString data;
     if(reader.readChunk(&data, startAddress, length)) {
         QApplication::clipboard()->setText(data, x11Selection ? QClipboard::Selection: QClipboard::Clipboard);
     }
+}
+
+void TailView::onSelectAll()
+{
+    QFileInfo info(m_filename);
+    m_document->select(YFileCursor(0, 0, info.size()));
+    viewport()->update();
 }
 
 void TailView::setActive(bool active)

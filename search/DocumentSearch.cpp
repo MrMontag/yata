@@ -33,7 +33,7 @@ void DocumentSearch::resetSearchCursor(bool isTop)
 {
     const BlockDataVector<qint64> & lineAddresses = m_document->lineAddresses();
     if(isTop) {
-        *m_textCursor = YFileCursor(lineAddresses.front(), 0, 0);
+        *m_textCursor = YFileCursor(lineAddresses.front());
     } else {
         m_textCursor->setLineAddress(lineAddresses.back());
         m_textCursor->setCharPos(m_document->lastBlock().length() - 1);

@@ -32,7 +32,7 @@ bool FileSearch::searchFile(bool isForward, bool wrapAround)
     }
 
     if(m_fileCursor.isNull()) {
-        m_fileCursor = YFileCursor(0,0,0);
+        m_fileCursor = YFileCursor(0);
     }
 
     qint64 initialLinePosition = m_fileCursor.lineAddress();

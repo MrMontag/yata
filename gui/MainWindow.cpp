@@ -24,6 +24,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QStyle>
 #include <QTextStream>
 #include <QUrl>
 
@@ -45,6 +46,7 @@ MainWindow::MainWindow(): ui(new Ui::MainWindow())
 
     ui->menuFile->insertActions(ui->actionExit, m_tabWidget->contextMenu()->actions());
     ui->menuFile->insertSeparator(ui->actionExit);
+    ui->actionOpen->setIcon(qApp->style()->standardIcon(QStyle::SP_DialogOpenButton));
 
     setupDebugMenu();
     setAcceptDrops(true);

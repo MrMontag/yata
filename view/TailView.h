@@ -73,6 +73,7 @@ public slots:
     void searchBackward();
     void onFileChanged();
     void onCopy(bool x11Selection = false);
+    void onSelectAll();
 
 protected:
     void mousePressEvent(QMouseEvent * event);

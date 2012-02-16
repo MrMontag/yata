@@ -12,7 +12,7 @@
 #include <QTextDocument>
 #include <algorithm>
 
-YFileCursor::YFileCursor(qint64 linePosition /*= NULL_VALUE*/, int lineOffset /*= NULL_VALUE*/, int length /*= NULL_VALUE*/)
+YFileCursor::YFileCursor(qint64 linePosition /*=NULL_VALUE*/, int lineOffset /*=0*/, int length /*=0*/)
     : m_lineAddress(linePosition)
     , m_charPos(lineOffset)
     , m_length(length)

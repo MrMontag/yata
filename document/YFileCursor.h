@@ -18,7 +18,7 @@ class YFileCursor {
 public:
     static const int NULL_VALUE = -1;
 
-    YFileCursor(qint64 linePosition = NULL_VALUE, int lineOffset = NULL_VALUE, int length = NULL_VALUE);
+    YFileCursor(qint64 linePosition = NULL_VALUE, int lineOffset = 0, int length = 0);
     bool isNull() const;
     void makeNull();
     QTextCursor qTextCursor(const YTextDocument *document) const;
