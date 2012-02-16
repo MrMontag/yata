@@ -230,7 +230,7 @@ void TailView::onCopy(bool x11Selection)
         QMessageBox::StandardButton button = QMessageBox::warning(
             this,
             tr("Warning: copying huge selection"),
-            tr("You are about to copy more than 5 MB to the clipboard. Doing so will consume a lot"
+            tr("You are about to copy more than 5 MB to the clipboard. Doing so will consume a lot "
                "of memory, and could even render your computer unresponsive.\n\n"
                "Are you sure you want to do this?"),
             QMessageBox::Yes | QMessageBox::No,
