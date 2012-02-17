@@ -273,11 +273,12 @@ void TailView::setActive(bool active)
 void TailView::onFileChanged()
 {
     bool fullLayout = false;
+    QFileInfo info(m_filename);
     switch(m_layoutType) {
     case DebugFullLayout: fullLayout = true; break;
     case DebugPartialLayout: fullLayout = false; break;
     case AutomaticLayout:
-        fullLayout = (QFileInfo(m_filename).size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+        fullLayout = (info.size() <= MAX_FULL_LAYOUT_FILE_SIZE);
         break;
     }
 
@@ -285,6 +286,12 @@ void TailView::onFileChanged()
         m_layoutStrategy = m_fullLayoutStrategy.data();
     } else {
         m_layoutStrategy = m_partialLayoutStrategy.data();
+    }
+
+    const YFileCursor & fileCursor = m_document->fileCursor();
+    if(fileCursor.charAddress() > info.size() ||
+       fileCursor.selectionEnd() > info.size()) {
+        m_document->select(YFileCursor());
     }
 
     QString error;
