@@ -168,7 +168,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
     if(!m_document->fileCursor().isNull()) {
         m_documentSearch->setCursor(m_document->fileCursor());
     } else {
-        const int topLine = verticalScrollBar()->value();
+        const int topLine = m_layoutStrategy->topScreenLine();
         int layoutLine = 0;
         QTextBlock block = m_document->blockLayoutLines().findContainingBlock(topLine, &layoutLine);
         if(block.isValid()) {
