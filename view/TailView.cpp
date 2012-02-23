@@ -1,6 +1,6 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
- * Copyright 2010-2011 James Smith
+ * Copyright 2010-2012 James Smith
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
@@ -354,6 +354,7 @@ void TailView::mouseMoveEvent(QMouseEvent * event)
 
 void TailView::mouseDoubleClickEvent(QMouseEvent * /*event*/)
 {
+    // TODO: implement double click selection
 }
 
 void TailView::paintEvent(QPaintEvent * event)
