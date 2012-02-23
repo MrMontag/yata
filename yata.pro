@@ -3,7 +3,8 @@
 # 
 # Licensed under the GNU General Public License.  See license.txt for details.
 
-VERSION = 0.1.0
+include(resource/appversion)
+
 DEFINES += 'APPVERSION=\\"$$VERSION\\"'
 
 TEMPLATE = app

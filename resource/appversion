@@ -1,0 +1,8 @@
+# This file is part of yata -- Yet Another Tail Application
+# Copyright 2010-2012 James Smith
+# 
+# Licensed under the GNU General Public License.  See license.txt for details.
+
+# This is the version of the application. This file is primarily used by yata.pro,
+# but could be used for other purposes (i.e., bash build scripts).
+VERSION=0.2.0
