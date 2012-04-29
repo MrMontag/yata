@@ -52,7 +52,6 @@ HEADERS += \
     session/SessionCommon.h \
     session/SessionIO.h \
     session/SessionLoader.h \
-    view/FullLayout.h \
     view/LayoutStrategy.h \
     view/PartialLayout.h \
     view/TailView.h \
@@ -93,7 +92,6 @@ SOURCES += \
     session/SearchSession.cpp \
     session/SessionIO.cpp \
     session/SessionLoader.cpp \
-    view/FullLayout.cpp \
     view/LayoutStrategy.cpp \
     view/PartialLayout.cpp \
     view/TailView.cpp \

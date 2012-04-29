@@ -10,7 +10,6 @@
 #include "DocumentSearch.h"
 #include "FileBlockReader.h"
 #include "FileSearch.h"
-#include "FullLayout.h"
 #include "PartialLayout.h"
 #include "preferences/Preferences.h"
 #include "preferences/TextColor.h"
@@ -43,7 +42,6 @@ TailView::TailView(QWidget * parent)
     , m_isActive(false)
     , m_leftMouseIsDown(false)
     , m_layoutType(AutomaticLayout)
-    , m_fullLayoutStrategy(new FullLayout(this))
     , m_partialLayoutStrategy(new PartialLayout(this))
     , m_layoutStrategy(m_partialLayoutStrategy.data())
     , m_followTail(true)
@@ -282,11 +280,7 @@ void TailView::onFileChanged()
         break;
     }
 
-    if(fullLayout) {
-        m_layoutStrategy = m_fullLayoutStrategy.data();
-    } else {
-        m_layoutStrategy = m_partialLayoutStrategy.data();
-    }
+    m_layoutStrategy = m_partialLayoutStrategy.data();
 
     const YFileCursor & fileCursor = m_document->fileCursor();
     if(fileCursor.charAddress() > info.size() ||
