@@ -18,10 +18,10 @@
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 
-PartialLayout::PartialLayout(TailView * tailView)
-    : LayoutStrategy(tailView)
-    , m_topScreenLine(0)
-    , m_bottomDocument(new YTextDocument())
+PartialLayout::PartialLayout(TailView * tailView):
+    m_topScreenLine(0),
+    m_bottomDocument(new YTextDocument()),
+    m_view(tailView)
 {
 }
 
@@ -43,6 +43,11 @@ bool PartialLayout::onFileChanged(QString * error)
         return false;
     }
     return true;
+}
+
+void PartialLayout::performLayout()
+{
+    document()->layout(view()->viewport()->width());
 }
 
 void PartialLayout::resizeEvent()
@@ -305,4 +310,24 @@ qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
     }
 
     return line_address;
+}
+
+TailView * PartialLayout::view()
+{
+    return m_view;
+}
+
+TailView * PartialLayout::view() const
+{
+    return m_view;
+}
+
+YTextDocument * PartialLayout::document()
+{
+    return m_view->document();
+}
+
+YTextDocument * PartialLayout::document() const
+{
+    return m_view->document();
 }

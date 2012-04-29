@@ -42,8 +42,7 @@ TailView::TailView(QWidget * parent)
     , m_isActive(false)
     , m_leftMouseIsDown(false)
     , m_layoutType(AutomaticLayout)
-    , m_partialLayoutStrategy(new PartialLayout(this))
-    , m_layoutStrategy(m_partialLayoutStrategy.data())
+    , m_layoutStrategy(new PartialLayout(this))
     , m_followTail(true)
     , m_documentSearch(new DocumentSearch(m_document.data()))
 {
@@ -270,17 +269,15 @@ void TailView::setActive(bool active)
 
 void TailView::onFileChanged()
 {
-    bool fullLayout = false;
     QFileInfo info(m_filename);
-    switch(m_layoutType) {
-    case DebugFullLayout: fullLayout = true; break;
-    case DebugPartialLayout: fullLayout = false; break;
-    case AutomaticLayout:
-        fullLayout = (info.size() <= MAX_FULL_LAYOUT_FILE_SIZE);
-        break;
-    }
-
-    m_layoutStrategy = m_partialLayoutStrategy.data();
+//    bool fullLayout = false;
+//    switch(m_layoutType) {
+//    case DebugFullLayout: fullLayout = true; break;
+//    case DebugPartialLayout: fullLayout = false; break;
+//    case AutomaticLayout:
+//        fullLayout = (info.size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+//        break;
+//    }
 
     const YFileCursor & fileCursor = m_document->fileCursor();
     if(fileCursor.charAddress() > info.size() ||

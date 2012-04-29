@@ -13,7 +13,6 @@
 #include "app/YObjectPointer.h"
 
 class DocumentSearch;
-class LayoutStrategy;
 class PartialLayout;
 class QString;
 class QTextBlock;
@@ -102,8 +101,7 @@ private:
     QString m_currentFileError;
 
     LayoutType m_layoutType;
-    QScopedPointer<PartialLayout> m_partialLayoutStrategy;
-    LayoutStrategy * m_layoutStrategy;
+    QScopedPointer<PartialLayout> m_layoutStrategy;
 
     bool m_followTail;
 

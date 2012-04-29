@@ -52,7 +52,6 @@ HEADERS += \
     session/SessionCommon.h \
     session/SessionIO.h \
     session/SessionLoader.h \
-    view/LayoutStrategy.h \
     view/PartialLayout.h \
     view/TailView.h \
     watcher/YFileSystemWatcher.h \
@@ -92,7 +91,6 @@ SOURCES += \
     session/SearchSession.cpp \
     session/SessionIO.cpp \
     session/SessionLoader.cpp \
-    view/LayoutStrategy.cpp \
     view/PartialLayout.cpp \
     view/TailView.cpp \
     watcher/YFileSystemWatcher.cpp \

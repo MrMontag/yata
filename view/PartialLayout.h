@@ -8,28 +8,29 @@
 #ifndef PARTIALLAYOUT_H
 #define PARTIALLAYOUT_H
 
-#include "LayoutStrategy.h"
 #include <QScopedPointer>
 #include <QtGlobal>
 
-class YTextDocument;
 class FileBlockReader;
+class TailView;
+class YTextDocument;
+
 class QTextBlock;
 
-class PartialLayout: public LayoutStrategy {
+class PartialLayout {
 public:
     PartialLayout(TailView * tailView);
 
-    virtual bool onFileChanged(QString * error);
-    virtual void resizeEvent();
-    virtual int topScreenLine() const;
-    virtual void scrollTo(int newTopLine);
-    virtual bool scrollBy(int line_change);
-    virtual void updateAfterKeyPress();
-    virtual void vScrollBarAction(int action);
-protected:
-    virtual bool searchFile(bool isForward);
-    virtual bool wrapAroundForDocumentSearch() const;
+    bool onFileChanged(QString * error);
+    void performLayout();
+    void resizeEvent();
+    int topScreenLine() const;
+    void scrollTo(int newTopLine);
+    bool scrollBy(int line_change);
+    void updateAfterKeyPress();
+    void vScrollBarAction(int action);
+    bool searchFile(bool isForward);
+    bool wrapAroundForDocumentSearch() const;
 private:
     void updateScrollBars();
     bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
@@ -41,10 +42,16 @@ private:
 
     void updateBottomDocument();
     qint64 bottomScreenPosition(int * blockLine = 0) const;
+
+    TailView * view();
+    TailView * view() const;
+    YTextDocument * document();
+    YTextDocument * document() const;
 private:
     int m_topScreenLine;
     QScopedPointer<YTextDocument> m_bottomDocument;
     QScopedPointer<FileBlockReader> m_blockReader;
+    TailView * m_view;
 };
 
 #endif // PARTIALLAYOUT_H
