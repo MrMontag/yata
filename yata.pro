@@ -103,6 +103,8 @@ SOURCES += \
 RESOURCES += \
     resource/resources.qrc
 
+QT += widgets
+
 win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
     INCLUDEPATH += $$YAMLCPP/include

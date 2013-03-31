@@ -26,7 +26,7 @@ YStatusBar::~YStatusBar()
 void YStatusBar::errorMessage(const QString & msg)
 {
     QString format = QString("<p style=\"background-color:yellow\">") %
-        Qt::escape(msg) % "</p>";
+        msg.toHtmlEscaped() % "</p>";
     m_leftLabel->setText(format);
 }
 

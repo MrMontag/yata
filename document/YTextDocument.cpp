@@ -104,7 +104,7 @@ qreal YTextDocument::layoutBlock(QTextBlock * textBlock)
 
     layout->beginLayout();
     while(true) {
-        QTextLine line = layout->createLine();
+        QTextLine line(layout->createLine());
         if(!line.isValid()) { break; }
         line.setLineWidth(m_width);
         height += fontMetrics.leading();
