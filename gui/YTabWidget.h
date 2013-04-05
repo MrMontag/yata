@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010-2012 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #ifndef YTABWIDGET_H
@@ -13,14 +13,17 @@
 class YTabMenuButton;
 class QActionGroup;
 class QMenu;
+class TailView;
 
 class YTabWidget : public QTabWidget {
     Q_OBJECT
 public:
     explicit YTabWidget(QWidget *parent = 0);
     ~YTabWidget();
-    void openTab(QWidget * child, const QString & fullName, const QString & shortName);
+    void openTab(TailView * child);
     QMenu * contextMenu();
+    void setActive(bool active);
+
 signals:
     void currentChanged(int oldIndex, int newIndex);
 
@@ -33,6 +36,7 @@ private slots:
     void copyFullPathToClipboard();
     void onTabMoved(int from, int to);
     void on_currentChanged(int index);
+    void onTabChanged();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *);

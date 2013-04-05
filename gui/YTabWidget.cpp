@@ -77,11 +77,21 @@ QMenu * YTabWidget::contextMenu()
     return m_menuTab.data();
 }
 
-void YTabWidget::openTab(QWidget * child, const QString & fullName, const QString & shortName)
+void YTabWidget::setActive(bool active)
 {
+    TailView * view = dynamic_cast<TailView*>(currentWidget());
+    view->setActive(active);
+    setTabText(currentIndex(), view->displayTitle());
+}
+
+void YTabWidget::openTab(TailView * child)
+{
+    QString fullName = child->longDisplayTitle();
+    QString shortName = child->displayTitle();
     int index = addTab(child, shortName);
     child->setFocus();
     setTabToolTip(index, fullName);
+    connect(child, &TailView::fileChanged, this, &YTabWidget::onTabChanged);
 
     QAction * action = new QAction(fullName, this);
     action->setCheckable(true);
@@ -151,6 +161,17 @@ void YTabWidget::on_currentChanged(int index)
     emit currentChanged(oldIndex, m_currentIndex);
 }
 
+void YTabWidget::onTabChanged()
+{
+    TailView * view = dynamic_cast<TailView*>(sender());
+    int index = indexOf(view);
+    if (index < 0) { return; }
+
+    if (index == currentIndex() && isActiveWindow()) { return; }
+
+    setTabText(index, view->displayTitle());
+}
+
 void YTabWidget::on_tabChooseMenuTriggered()
 {
     QAction * action = dynamic_cast<QAction*>(sender());
@@ -208,5 +229,6 @@ void YTabWidget::setViewActive(int index, bool active)
 {
     if(TailView * view = dynamic_cast<TailView*>(widget(index))) {
         view->setActive(active);
+        setTabText(index, view->displayTitle());
     }
 }

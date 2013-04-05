@@ -189,6 +189,7 @@ int YTextDocument::qdocPosition(const QPoint point) const
     int lineSpacing = QFontMetrics(block.layout()->font()).lineSpacing();
     int block_y = point.y() - blockTop;
     QTextLine line = block.layout()->lineAt(block_y / lineSpacing);
+    if(!line.isValid()) { return 0; }
     int blockPos = line.xToCursor(point.x());
     return block.position() + blockPos;
 }

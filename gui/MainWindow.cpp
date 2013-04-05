@@ -62,11 +62,9 @@ void MainWindow::addFile(const QString & filename)
 {
     QFileInfo info(filename);
     QString absolute(info.absoluteFilePath());
-    QString displayFilename = QDir::toNativeSeparators(absolute);
-    QString displayBase = info.fileName();
     TailView * tailView = new TailView(this);
     tailView->setFile(absolute);
-    m_tabWidget->openTab(tailView, displayFilename, displayBase);
+    m_tabWidget->openTab(tailView);
 }
 
 void MainWindow::fileSessions(std::vector<FileSession> * sessions) const
@@ -141,6 +139,13 @@ void MainWindow::dropEvent(QDropEvent * event)
         event->accept();
     } else {
         event->ignore();
+    }
+}
+
+void MainWindow::changeEvent(QEvent * e)
+{
+    if (e->type() == QEvent::ActivationChange) {
+        m_tabWidget->setActive(isActiveWindow());
     }
 }
 

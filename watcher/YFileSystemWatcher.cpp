@@ -1,7 +1,7 @@
 /*
  * This file is part of yata -- Yet Another Tail Application
  * Copyright 2010 James Smith
- * 
+ *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "YFileSystemWatcher.h"
@@ -10,6 +10,8 @@
 #include <QFileSystemWatcher>
 #include <QStringList>
 #include <QTimer>
+
+#include <QtDebug>
 
 YFileSystemWatcher::YFileSystemWatcher(const QString & filename)
     : m_watcher(new QFileSystemWatcher(this))
@@ -25,6 +27,7 @@ YFileSystemWatcher::YFileSystemWatcher(const QString & filename)
 
     QFileInfo info(m_filename);
     m_lastModification = info.lastModified();
+    m_lastSize = info.size();
 
     m_timer->start(250);
 }
