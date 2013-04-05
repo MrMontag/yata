@@ -36,7 +36,7 @@ YTabWidget::YTabWidget(QWidget *parent)
 
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(on_tabCloseRequested(int)));
     connect(tabBar(), SIGNAL(tabMoved(int,int)), SLOT(onTabMoved(int,int)));
-    connect(this, SIGNAL(currentChanged(int)), SLOT(on_currentChanged(int)));
+    connect(this, &QTabWidget::currentChanged, this, &YTabWidget::on_currentTabChanged);
 
     m_actionCloseTab.reset(m_menuTab->addAction(
         tr("&Close tab"),
@@ -79,9 +79,11 @@ QMenu * YTabWidget::contextMenu()
 
 void YTabWidget::setActive(bool active)
 {
-    TailView * view = dynamic_cast<TailView*>(currentWidget());
-    view->setActive(active);
-    setTabText(currentIndex(), view->displayTitle());
+    if (TailView * view = dynamic_cast<TailView*>(currentWidget())) {
+        view->setActive(active);
+        setTabText(currentIndex(), view->displayTitle());
+        emit currentFileDisplayChanged();
+    }
 }
 
 void YTabWidget::openTab(TailView * child)
@@ -91,7 +93,7 @@ void YTabWidget::openTab(TailView * child)
     int index = addTab(child, shortName);
     child->setFocus();
     setTabToolTip(index, fullName);
-    connect(child, &TailView::fileChanged, this, &YTabWidget::onTabChanged);
+    connect(child, &TailView::fileChanged, this, &YTabWidget::onFileChanged);
 
     QAction * action = new QAction(fullName, this);
     action->setCheckable(true);
@@ -148,7 +150,7 @@ void YTabWidget::onTabMoved(int from, int to)
     m_currentIndex = currentIndex();
 }
 
-void YTabWidget::on_currentChanged(int index)
+void YTabWidget::on_currentTabChanged(int index)
 {
     if(m_currentIndex > -1) {
         setViewActive(m_currentIndex, false);
@@ -158,10 +160,10 @@ void YTabWidget::on_currentChanged(int index)
     m_currentIndex = index;
 
     updateCurrentForMenuChooseTab();
-    emit currentChanged(oldIndex, m_currentIndex);
+    emit currentTabChanged(oldIndex, m_currentIndex);
 }
 
-void YTabWidget::onTabChanged()
+void YTabWidget::onFileChanged()
 {
     TailView * view = dynamic_cast<TailView*>(sender());
     int index = indexOf(view);
@@ -170,6 +172,9 @@ void YTabWidget::onTabChanged()
     if (index == currentIndex() && isActiveWindow()) { return; }
 
     setTabText(index, view->displayTitle());
+    if (index == currentIndex()) {
+        emit currentFileDisplayChanged();
+    }
 }
 
 void YTabWidget::on_tabChooseMenuTriggered()

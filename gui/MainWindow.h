@@ -64,7 +64,8 @@ private slots:
     void on_actionDebugWindow_triggered();
 
     void debugWindowClosed();
-    void onCurrentTabChanged(int oldIndex, int newIndex);
+    void onCurrentTabChanged(int oldIndex, int);
+    void updateWindowTitle();
 
 private:
     TailView * getCurrentView();

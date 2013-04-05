@@ -25,7 +25,8 @@ public:
     void setActive(bool active);
 
 signals:
-    void currentChanged(int oldIndex, int newIndex);
+    void currentTabChanged(int oldIndex, int newIndex);
+    void currentFileDisplayChanged();
 
 private slots:
     void on_tabChooseMenuTriggered();
@@ -35,8 +36,8 @@ private slots:
     void closeAllTabs();
     void copyFullPathToClipboard();
     void onTabMoved(int from, int to);
-    void on_currentChanged(int index);
-    void onTabChanged();
+    void on_currentTabChanged(int index);
+    void onFileChanged();
 
 protected:
     void contextMenuEvent(QContextMenuEvent *);

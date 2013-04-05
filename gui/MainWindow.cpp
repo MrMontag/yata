@@ -42,7 +42,8 @@ MainWindow::MainWindow(): ui(new Ui::MainWindow())
     aboutYataText.replace("$APPNAME$", YApplication::displayAppName());
     ui->actionAboutYata->setText(aboutYataText);
 
-    connect(m_tabWidget.data(), SIGNAL(currentChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
+    connect(m_tabWidget.data(), SIGNAL(currentTabChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
+    connect(m_tabWidget.data(), &YTabWidget::currentFileDisplayChanged, this, &MainWindow::updateWindowTitle);
 
     ui->menuFile->insertActions(ui->actionExit, m_tabWidget->contextMenu()->actions());
     ui->menuFile->insertSeparator(ui->actionExit);
@@ -229,7 +230,7 @@ TailView * MainWindow::getCurrentView()
     return dynamic_cast<TailView*>(m_tabWidget->currentWidget());
 }
 
-void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
+void MainWindow::onCurrentTabChanged(int oldIndex, int /*newIndex*/)
 {
     m_statusBar->clearErrorMessage();
     updateMenus();
@@ -241,13 +242,8 @@ void MainWindow::onCurrentTabChanged(int oldIndex, int newIndex)
         }
     }
 
-    if(newIndex == -1) { // No tabs are open
-        setWindowTitle(YApplication::displayAppName());
-        return;
-    }
+    updateWindowTitle();
 
-    QString filename = m_tabWidget->tabText(newIndex);
-    setWindowTitle(filename + " - " + YApplication::displayAppName());
     if(TailView * tailView = getCurrentView()) {
         // Set debugging menu
         QAction * toBeChecked = 0;
@@ -313,6 +309,17 @@ void MainWindow::rebuildEditMenu()
     ui->menuEdit->addAction(ui->actionFindPrevious);
     ui->menuEdit->addSeparator();
     ui->menuEdit->addAction(ui->actionPreferences);
+}
+
+void MainWindow::updateWindowTitle()
+{
+    int index = m_tabWidget->currentIndex();
+    if(index < 0) { // No tabs are open
+        setWindowTitle(YApplication::displayAppName());
+    } else {
+        QString filename = m_tabWidget->tabText(index);
+        setWindowTitle(filename + " - " + YApplication::displayAppName());
+    }
 }
 
 void MainWindow::on_actionFollowTail_triggered(bool checked)
