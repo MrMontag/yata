@@ -3,10 +3,6 @@
 ;
 ; Licensed under the GNU General Public License.  See license.txt for details.
 
-;NSIS Modern User Interface
-;Welcome/Finish Page Example Script
-;Written by Joost Verburg
-
 !define APPNAME "Yata"
 !ifndef VERSION
     !define VERSION "x.x"
@@ -14,13 +10,13 @@
 !define FULLAPPNAME "${APPNAME} ${VERSION}"
 !define REGISTRYKEY "Software\${APPNAME}"
 !ifndef EXESRCDIR
-    !define EXESRCDIR "..\release"
+    !define EXESRCDIR "..\build\release"
 !endif
 !ifndef OUTDIR
     !define OUTDIR "."
 !endif
-!define QTDIR "C:\Qt\4.8.0"
-!define MINGWDIR "C:\QtSDK\mingw\bin"
+!define QTDIR "C:\Qt\Qt5.0.1\5.0.1\mingw47_32"
+!define MINGWDIR "C:\Qt\Qt5.0.1\Tools\MinGW\bin"
 !define QTBINDIR "${QTDIR}\bin"
 
 ;--------------------------------
@@ -81,11 +77,19 @@ SectionEnd
 ShowInstDetails show
 Section
     SetOutPath "$INSTDIR"
-    File "${MINGWDIR}\mingwm10.dll"
-    File "${MINGWDIR}\libgcc_s_dw2-1.dll"
 
-    File "${QTBINDIR}\QtCore4.dll"
-    File "${QTBINDIR}\QtGui4.dll"
+    File "${QTBINDIR}\D3DCompiler_43.dll"
+    File "${QTBINDIR}\icudt49.dll"
+    File "${QTBINDIR}\icuin49.dll"
+    File "${QTBINDIR}\icuuc49.dll"
+    File "${QTBINDIR}\libEGL.dll"
+    File "${QTBINDIR}\libgcc_s_sjlj-1.dll"
+    File "${QTBINDIR}\libGLESv2.dll"
+    File "${QTBINDIR}\libstdc++-6.dll"
+    File "${QTBINDIR}\libwinpthread-1.dll"
+    File "${QTBINDIR}\Qt5Core.dll"
+    File "${QTBINDIR}\Qt5Gui.dll"
+    File "${QTBINDIR}\Qt5Widgets.dll"
 
     File "${EXESRCDIR}\${APPNAME}.exe"
 
@@ -120,11 +124,18 @@ SectionEnd
 
 Section "Uninstall"
 
-    Delete "$INSTDIR\mingwm10.dll"
-    Delete "$INSTDIR\libgcc_s_dw2-1.dll"
-
-    Delete "$INSTDIR\QtCore4.dll"
-    Delete "$INSTDIR\QtGui4.dll"
+    Delete "$INSTDIR\D3DCompiler_43.dll"
+    Delete "$INSTDIR\icudt49.dll"
+    Delete "$INSTDIR\icuin49.dll"
+    Delete "$INSTDIR\icuuc49.dll"
+    Delete "$INSTDIR\libEGL.dll"
+    Delete "$INSTDIR\libgcc_s_sjlj-1.dll"
+    Delete "$INSTDIR\libGLESv2.dll"
+    Delete "$INSTDIR\libstdc++-6.dll"
+    Delete "$INSTDIR\libwinpthread-1.dll"
+    Delete "$INSTDIR\Qt5Core.dll"
+    Delete "$INSTDIR\Qt5Gui.dll"
+    Delete "$INSTDIR\Qt5Widgets.dll"
 
     Delete "$INSTDIR\Yata.exe"
 
