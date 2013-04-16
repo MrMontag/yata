@@ -1,7 +1,7 @@
 #ifndef YOBJECTPOINTER_H
 #define YOBJECTPOINTER_H
 
-#include <QWeakPointer>
+#include <QPointer>
 
 // Note: T must be a QObject or a subclass of QObject.
 template <typename T> class YObjectPointer {
@@ -21,7 +21,7 @@ private:
     YObjectPointer<T> & operator=(YObjectPointer<T> &);
 
 private:
-    QWeakPointer<T> m_ptr;
+    QPointer<T> m_ptr;
 };
 
 template <typename T> YObjectPointer<T>::YObjectPointer(T * t):

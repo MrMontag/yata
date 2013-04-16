@@ -104,7 +104,7 @@ qreal YTextDocument::layoutBlock(QTextBlock * textBlock)
 
     layout->beginLayout();
     while(true) {
-        QTextLine line = layout->createLine();
+        QTextLine line(layout->createLine());
         if(!line.isValid()) { break; }
         line.setLineWidth(m_width);
         height += fontMetrics.leading();
@@ -189,6 +189,7 @@ int YTextDocument::qdocPosition(const QPoint point) const
     int lineSpacing = QFontMetrics(block.layout()->font()).lineSpacing();
     int block_y = point.y() - blockTop;
     QTextLine line = block.layout()->lineAt(block_y / lineSpacing);
+    if(!line.isValid()) { return 0; }
     int blockPos = line.xToCursor(point.x());
     return block.position() + blockPos;
 }

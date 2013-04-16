@@ -56,6 +56,8 @@ public:
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
     const QString & filename() const { return m_filename; }
+    QString longDisplayTitle() const;
+    QString displayTitle() const;
     bool searchDocument(bool isForward, bool wrapAround = true);
     void scrollToIfNecessary(const YFileCursor & ycursor);
 
@@ -64,6 +66,7 @@ public:
 signals:
     void fileError(const QString &);
     void fileErrorCleared();
+    void fileChanged();
 
 public slots:
     void newSearch();
@@ -98,6 +101,7 @@ private:
 
     bool m_isActive;
     bool m_leftMouseIsDown;
+    bool m_hasUnviewedChanges;
     QString m_currentFileError;
 
     LayoutType m_layoutType;

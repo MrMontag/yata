@@ -108,15 +108,22 @@ bool FileBlockReader::read(QString * data, std::vector<qint64> * filePositions,
     filePositions->push_back(start_pos);
 
     qint64 line_count = 0;
-    char ch = 0;
+
+    // There is a bug in QString::append() that prevents it from interpreting
+    // non-ASCII text values correctly when passed a char argument. The result is a
+    // crash that occurs in YTextDocument::layoutBlock() when it calls
+    // QTextLine::setLineWidth(). The crash does not occur when QString::append() is
+    // called with a char * argument. Hence, even though we need a single character,
+    // the following variable is declared as a char *.
+    char ch[] = "\0";
     qint64 pos = start_pos;
     while(true) {
-        BufferedFile::Status status = m_file.getChar(pos, &ch);
+        BufferedFile::Status status = m_file.getChar(pos, ch);
         if(status == BufferedFile::Error) { return false; }
         if(status == BufferedFile::Eof) { break; }
         data->append(ch);
         pos++;
-        if(ch == '\n') {
+        if(ch[0] == '\n') {
             line_count++;
             if(line_count >= num_lines) {
                 break;

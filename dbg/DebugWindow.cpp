@@ -11,8 +11,8 @@ DebugWindow::DebugWindow(YTabWidget* tabWidget, QWidget *parent):
     m_tabWidget(tabWidget)
 {
     ui->setupUi(this);
-    connect(m_tabWidget.data(), SIGNAL(currentChanged(int)), SLOT(currentDocumentChanged(int)));
-    currentDocumentChanged(m_tabWidget.data()->currentIndex());
+    connect(m_tabWidget, SIGNAL(currentChanged(int)), SLOT(currentDocumentChanged(int)));
+    currentDocumentChanged(m_tabWidget->currentIndex());
 }
 
 DebugWindow::~DebugWindow()
@@ -22,7 +22,7 @@ DebugWindow::~DebugWindow()
 void DebugWindow::currentDocumentChanged(int)
 {
     disconnect(this, SLOT(documentContentsChanged()));
-    if(TailView * view = dynamic_cast<TailView*>(m_tabWidget.data()->currentWidget())) {
+    if(TailView * view = dynamic_cast<TailView*>(m_tabWidget->currentWidget())) {
         connect(view->document(), SIGNAL(contentsChanged()), SLOT(documentContentsChanged()));
         documentContentsChanged();
     }
@@ -30,7 +30,7 @@ void DebugWindow::currentDocumentChanged(int)
 
 void DebugWindow::documentContentsChanged()
 {
-    if(TailView * view = dynamic_cast<TailView*>(m_tabWidget.data()->currentWidget())) {
+    if(TailView * view = dynamic_cast<TailView*>(m_tabWidget->currentWidget())) {
         const YTextDocument * doc = view->document();
         QString text;
         for(QTextBlock block = doc->begin(); block != doc->end(); block = block.next()) {

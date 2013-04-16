@@ -5,7 +5,7 @@
 
 #include <QWidget>
 #include <QScopedPointer>
-#include <QWeakPointer>
+#include <QPointer>
 
 namespace Ui {
     class DebugWindow;
@@ -25,7 +25,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::DebugWindow> ui;
-    QWeakPointer<YTabWidget> m_tabWidget;
+    QPointer<YTabWidget> m_tabWidget;
 };
 
 #endif // DEBUGWINDOW_H

@@ -32,19 +32,21 @@
 #include <QStringBuilder>
 #include <QTextLayout>
 #include <QTextStream>
+#include <QtDebug>
 
 const qint64 MAX_FULL_LAYOUT_FILE_SIZE = 1024 * 64;
 const qint64 MAX_SAFE_SELECTION_LENGTH = 1024 * 1024 * 5;
 
-TailView::TailView(QWidget * parent)
-    : QAbstractScrollArea(parent)
-    , m_document(new YTextDocument)
-    , m_isActive(false)
-    , m_leftMouseIsDown(false)
-    , m_layoutType(AutomaticLayout)
-    , m_layoutStrategy(new PartialLayout(this))
-    , m_followTail(true)
-    , m_documentSearch(new DocumentSearch(m_document.data()))
+TailView::TailView(QWidget * parent):
+    QAbstractScrollArea(parent),
+    m_document(new YTextDocument),
+    m_isActive(false),
+    m_leftMouseIsDown(false),
+    m_hasUnviewedChanges(false),
+    m_layoutType(AutomaticLayout),
+    m_layoutStrategy(new PartialLayout(this)),
+    m_followTail(true),
+    m_documentSearch(new DocumentSearch(m_document.data()))
 {
     connect(verticalScrollBar(), SIGNAL(actionTriggered(int)), SLOT(vScrollBarAction(int)));
     connect(Preferences::instance(), SIGNAL(preferencesChanged()), SLOT(onPreferencesChanged()));
@@ -72,6 +74,7 @@ TailView::~TailView()
 void TailView::setFile(const QString & filename)
 {
     m_filename = filename;
+    setWindowFilePath(m_filename);
 
     if(!filename.isEmpty()) {
         m_watcher.reset(new YFileSystemWatcherThread(filename, this));
@@ -158,6 +161,16 @@ QPoint TailView::docGraphicalPosition(const QPoint & viewPoint)
     double docTop = m_layoutStrategy->topScreenLine() * lineSpacing;
     double doc_y = viewPoint.y() + docTop;
     return QPoint(viewPoint.x(), doc_y);
+}
+
+QString TailView::longDisplayTitle() const
+{
+    return QDir::toNativeSeparators(m_filename);
+}
+
+QString TailView::displayTitle() const
+{
+    return (m_hasUnviewedChanges ? QString("*") : QString()) % QFileInfo(m_filename).baseName();
 }
 
 bool TailView::searchDocument(bool isForward, bool wrapAround)
@@ -257,6 +270,7 @@ void TailView::setActive(bool active)
     if (active == m_isActive) { return; }
 
     m_isActive = active;
+    m_hasUnviewedChanges = m_isActive ? false : m_hasUnviewedChanges;
 
     SearchInfo & si = SearchInfo::instance();
 
@@ -297,6 +311,8 @@ void TailView::onFileChanged()
     }
 
     viewport()->update();
+    m_hasUnviewedChanges = !m_isActive;
+    emit fileChanged();
 }
 
 void TailView::setFollowTail(bool enabled)

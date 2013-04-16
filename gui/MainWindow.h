@@ -42,6 +42,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *);
     void dragMoveEvent(QDragMoveEvent *);
     void dropEvent(QDropEvent *);
+    void changeEvent(QEvent *);
 
     void closeEvent(QCloseEvent *);
 private slots:
@@ -63,7 +64,8 @@ private slots:
     void on_actionDebugWindow_triggered();
 
     void debugWindowClosed();
-    void onCurrentTabChanged(int oldIndex, int newIndex);
+    void onCurrentTabChanged(int oldIndex, int);
+    void updateWindowTitle();
 
 private:
     TailView * getCurrentView();
