@@ -17,6 +17,13 @@ class YTextDocument;
 
 class QTextBlock;
 
+struct ScreenPosition {
+    qint64 address = 0;
+    int blockLine = 0;
+
+    ScreenPosition(qint64 a=0, int bl=0): address(a), blockLine(bl) {}
+};
+
 class PartialLayout {
 public:
     PartialLayout(TailView * tailView);
@@ -33,15 +40,15 @@ public:
     bool wrapAroundForDocumentSearch() const;
 private:
     void updateScrollBars();
-    bool updateView(qint64 new_line_address = -1, bool * at_bottom = 0);
+    bool updateView(ScreenPosition new_line_address = ScreenPosition(-1, -1), bool * at_bottom = 0);
     bool scrollUp(int line_change);
     bool scrollDown(int line_change);
     qint64 keepToLowerBound(const QTextBlock & block, int * blockLine);
     bool updateDocument(qint64 start_pos, qint64 lines_after_start);
-    qint64 topOfScreen() const;
+    ScreenPosition topOfScreen() const;
 
     void updateBottomDocument();
-    qint64 bottomScreenPosition(int * blockLine = 0) const;
+    ScreenPosition bottomScreenPosition() const;
 
     TailView * view();
     TailView * view() const;

@@ -33,7 +33,6 @@ bool PartialLayout::onFileChanged(QString * error)
     if(view()->followTail()) {
         QScrollBar * vScrollBar = view()->verticalScrollBar();
         vScrollBar->setSliderPosition(vScrollBar->maximum());
-        // TODO: scrollbar didn't move, but updateView() assumes it did with default arguments.
         success = updateView();
     } else {
         success = updateView(topOfScreen());
@@ -83,7 +82,8 @@ bool PartialLayout::searchFile(bool isForward)
         document()->select(cursor);
 
         bool at_bottom = false;
-        updateView(document()->fileCursor().lineAddress(), &at_bottom);
+        ScreenPosition newPos(document()->fileCursor().lineAddress(), 0);
+        updateView(newPos, &at_bottom);
         if(!at_bottom) {
             int line_change = -(view()->numLinesOnScreen()/2);
             scrollBy(line_change);
@@ -134,26 +134,25 @@ void PartialLayout::vScrollBarAction(int action)
 
 void PartialLayout::updateScrollBars()
 {
-    const qint64 bottom_screen_pos = bottomScreenPosition();
-    const int approx_lines = static_cast<int>(bottom_screen_pos / APPROXIMATE_CHARS_PER_LINE);
+    const ScreenPosition bottom_screen_pos = bottomScreenPosition();
+    const int approx_lines = static_cast<int>(bottom_screen_pos.address / APPROXIMATE_CHARS_PER_LINE);
     view()->updateScrollBars(approx_lines);
 }
 
-bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom /*=0*/)
+bool PartialLayout::updateView(ScreenPosition new_line_address /*=ScreenPosition(-1,-1)*/, bool * at_bottom /*=0*/)
 {
-    int bottomScreenTopBlockLine = 0;
-    const qint64 bottom_screen_pos = bottomScreenPosition(&bottomScreenTopBlockLine);
+    const ScreenPosition bottom_screen_pos = bottomScreenPosition();
 
     QScrollBar * verticalScrollBar = view()->verticalScrollBar();
     qint64 file_pos = 0;
-    if(new_line_address != -1) {
+    if(new_line_address.address != -1) {
         // Scroll bar did not move
-        file_pos = new_line_address;
+        file_pos = new_line_address.address;
     } else {
         // Scroll bar moved
         m_topScreenLine = 0;
         if(verticalScrollBar->sliderPosition() >= verticalScrollBar->maximum()) {
-            file_pos = bottom_screen_pos;
+            file_pos = bottom_screen_pos.address;
         } else {
             file_pos = static_cast<qint64>(verticalScrollBar->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
         }
@@ -162,9 +161,9 @@ bool PartialLayout::updateView(qint64 new_line_address /*=-1*/, bool * at_bottom
     file_pos = m_blockReader->getStartPosition(file_pos, 0);
 
     // Don't change the line further if we're at the bottom
-    if(file_pos >= bottom_screen_pos) {
-        file_pos = bottom_screen_pos;
-        m_topScreenLine = bottomScreenTopBlockLine;
+    if(file_pos >= bottom_screen_pos.address) {
+        file_pos = bottom_screen_pos.address;
+        m_topScreenLine = bottom_screen_pos.blockLine;
         if(at_bottom) { *at_bottom = true; }
         verticalScrollBar->setSliderPosition(verticalScrollBar->maximum());
     } else {
@@ -187,7 +186,7 @@ bool PartialLayout::scrollBy(int line_change)
         } else {
             if (!scrollDown(line_change)) { return false; }
         }
-        verticalScrollBar->setSliderPosition(topOfScreen() / APPROXIMATE_CHARS_PER_LINE + m_topScreenLine);
+        verticalScrollBar->setSliderPosition(topOfScreen().address / APPROXIMATE_CHARS_PER_LINE + m_topScreenLine);
     }
 
     view()->viewport()->update();
@@ -202,7 +201,7 @@ bool PartialLayout::scrollUp(int line_change)
     }
 
     line_change -= m_topScreenLine;
-    if(!updateDocument(topOfScreen(), -line_change)) {
+    if(!updateDocument(topOfScreen().address, -line_change)) {
         m_topScreenLine = 0;
         return false;
     }
@@ -239,13 +238,12 @@ qint64 PartialLayout::keepToLowerBound(const QTextBlock & block, int * blockLine
 {
     qint64 file_pos = document()->blockAddress(block);
 
-    int bottomScreenTopBlockLine = 0;
-    const qint64 bottom_screen_pos = bottomScreenPosition(&bottomScreenTopBlockLine);
+    const ScreenPosition bottom_screen_pos = bottomScreenPosition();
 
-    if(file_pos >= bottom_screen_pos) {
-        file_pos = bottom_screen_pos;
-        if(*blockLine > bottomScreenTopBlockLine) {
-            *blockLine = bottomScreenTopBlockLine;
+    if(file_pos >= bottom_screen_pos.address) {
+        file_pos = bottom_screen_pos.address;
+        if(*blockLine > bottom_screen_pos.blockLine) {
+            *blockLine = bottom_screen_pos.blockLine;
         }
     }
 
@@ -263,10 +261,11 @@ bool PartialLayout::updateDocument(qint64 start_pos, qint64 lines_after_start)
     return success;
 }
 
-qint64 PartialLayout::topOfScreen() const
+ScreenPosition PartialLayout::topOfScreen() const
 {
     const BlockDataVector<qint64> & lineAddresses = document()->lineAddresses();
-    return lineAddresses.empty() ? 0 : lineAddresses.at(0);
+    qint64 address = lineAddresses.empty() ? 0 : lineAddresses.at(0);
+    return ScreenPosition(address, m_topScreenLine);
 }
 
 void PartialLayout::updateBottomDocument()
@@ -283,7 +282,7 @@ void PartialLayout::updateBottomDocument()
     updateScrollBars();
 }
 
-qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
+ScreenPosition PartialLayout::bottomScreenPosition() const
 {
     int lines = 0;
     qint64 line_address = 0;
@@ -299,9 +298,6 @@ qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
         block = block.previous();
     }
 
-    if(blockLine) {
-        *blockLine = lines - linesOnScreen;
-    }
 
     // In case YTextDocument::blockAddress() returns -1 (this could happen if resizing the TailView widget hasn't
     // occurred yet), just return the last character's address so follow tail on start up can happen correctly.
@@ -309,7 +305,9 @@ qint64 PartialLayout::bottomScreenPosition(int * blockLine /*=0*/) const
         line_address = m_blockReader->size();
     }
 
-    return line_address;
+    int blockLine = lines - linesOnScreen;
+    ScreenPosition screenPos(line_address, blockLine);
+    return screenPos;
 }
 
 TailView * PartialLayout::view()

@@ -1,6 +1,6 @@
 # This file is part of yata -- Yet Another Tail Application
 # Copyright 2010-2012 James Smith
-# 
+#
 # Licensed under the GNU General Public License.  See license.txt for details.
 
 include(resource/appversion)
@@ -9,7 +9,7 @@ DEFINES += 'APPVERSION=\\"$$VERSION\\"'
 
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
-QMAKE_CXXFLAGS += -pedantic -Wno-long-long
+QMAKE_CXXFLAGS += -std=c++11 -pedantic
 build_pass:CONFIG(release, debug|release) {
     TARGET = yata
 } else {
@@ -56,6 +56,9 @@ HEADERS += \
     view/TailView.h \
     watcher/YFileSystemWatcher.h \
     watcher/YFileSystemWatcherThread.h \
+    view/ScrollBarStrategy.h \
+    view/ExactScrollBarController.h \
+    view/ApproximateScrollBarController.h
 
 FORMS += \
     dbg/DebugWindow.ui \
@@ -95,6 +98,8 @@ SOURCES += \
     view/TailView.cpp \
     watcher/YFileSystemWatcher.cpp \
     watcher/YFileSystemWatcherThread.cpp \
+    view/ExactScrollBarController.cpp \
+    view/ApproximateScrollBarController.cpp
 
 RESOURCES += \
     resource/resources.qrc
