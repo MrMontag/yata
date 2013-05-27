@@ -105,6 +105,23 @@ void PartialLayout::updateAfterKeyPress()
 
 void PartialLayout::vScrollBarAction(int action)
 {
+    QScrollBar * vsb = view()->verticalScrollBar();
+
+    if(action == QAbstractSlider::SliderMove && !vsb->isSliderDown()) {
+        // The slider moved, but wasn't by a keystroke (since isSliderDown() returned false),
+        // so assume a wheel event triggered this action (which gets handled by wheelEvent()),
+        // and simply return.
+        return;
+    }
+
+    if(vsb->sliderPosition() > vsb->maximum()) {
+        vsb->setSliderPosition(vsb->maximum());
+    }
+
+    if(vsb->sliderPosition() < vsb->minimum()) {
+        vsb->setSliderPosition(vsb->minimum());
+    }
+
     int line_change = 0;
     int page_step = view()->numLinesOnScreen() - PAGE_STEP_OVERLAP;
 
@@ -121,7 +138,11 @@ void PartialLayout::vScrollBarAction(int action)
     case QAbstractSlider::SliderPageStepSub:
         line_change = -page_step;
         break;
+    case QAbstractSlider::SliderToMaximum:
+    case QAbstractSlider::SliderToMinimum:
+    case QAbstractSlider::SliderMove:
     default:
+        line_change = 0;
         break;
     }
 
@@ -136,7 +157,12 @@ void PartialLayout::updateScrollBars()
 {
     const ScreenPosition bottom_screen_pos = bottomScreenPosition();
     const int approx_lines = static_cast<int>(bottom_screen_pos.address / APPROXIMATE_CHARS_PER_LINE);
-    view()->updateScrollBars(approx_lines);
+    QScrollBar * vsb = view()->verticalScrollBar();
+    if(vsb->maximum() != approx_lines) {
+        vsb->setRange(0, approx_lines);
+        vsb->setPageStep(view()->numLinesOnScreen() - PAGE_STEP_OVERLAP);
+        vsb->setSingleStep(1);
+    }
 }
 
 bool PartialLayout::updateView(ScreenPosition new_line_address /*=ScreenPosition(-1,-1)*/, bool * at_bottom /*=0*/)
@@ -148,6 +174,7 @@ bool PartialLayout::updateView(ScreenPosition new_line_address /*=ScreenPosition
     if(new_line_address.address != -1) {
         // Scroll bar did not move
         file_pos = new_line_address.address;
+        m_topScreenLine = new_line_address.blockLine;
     } else {
         // Scroll bar moved
         m_topScreenLine = 0;

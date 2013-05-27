@@ -1,5 +1,7 @@
 #include "ApproximateScrollBarController.h"
+#include "TailView.h"
+#include "PartialLayout.h"
 
-ApproximateScrollBarController::ApproximateScrollBarController()
+void ApproximateScrollBarController::onFileChanged()
 {
 }

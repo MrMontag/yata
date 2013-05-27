@@ -20,6 +20,9 @@ class SearchCriteria;
 class YFileCursor;
 class YFileSystemWatcherThread;
 class YTextDocument;
+class ScrollBarStrategy;
+class ExactScrollBarController;
+class ApproximateScrollBarController;
 
 const int PAGE_STEP_OVERLAP = 2;
 
@@ -52,7 +55,6 @@ public:
 
     // Functions used by the LayoutStrategy class and subclasses
     YTextDocument * document() { return m_document.data(); }
-    void updateScrollBars(int newMax);
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
     const QString & filename() const { return m_filename; }
@@ -77,14 +79,14 @@ public slots:
     void onSelectAll();
 
 protected:
-    void mousePressEvent(QMouseEvent * event);
-    void mouseReleaseEvent(QMouseEvent * event);
-    void mouseMoveEvent(QMouseEvent * event);
-    void mouseDoubleClickEvent(QMouseEvent * event);
-    void paintEvent(QPaintEvent * event);
-    void resizeEvent(QResizeEvent *);
-    void keyPressEvent(QKeyEvent * event);
-    void wheelEvent(QWheelEvent * event);
+    void mousePressEvent(QMouseEvent * event) override;
+    void mouseReleaseEvent(QMouseEvent * event) override;
+    void mouseMoveEvent(QMouseEvent * event) override;
+    void mouseDoubleClickEvent(QMouseEvent * event) override;
+    void paintEvent(QPaintEvent * event) override;
+    void resizeEvent(QResizeEvent *) override;
+    void keyPressEvent(QKeyEvent * event) override;
+    void wheelEvent(QWheelEvent * event) override;
 
 private slots:
     void vScrollBarAction(int action);
@@ -106,6 +108,10 @@ private:
 
     LayoutType m_layoutType;
     QScopedPointer<PartialLayout> m_layoutStrategy;
+
+    QScopedPointer<ExactScrollBarController> m_exactScrollBarController;
+    QScopedPointer<ApproximateScrollBarController> m_approximateScrollBarController;
+    ScrollBarStrategy * m_scrollBarStrategy;
 
     bool m_followTail;
 

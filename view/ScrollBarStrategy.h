@@ -8,9 +8,27 @@
 #ifndef SCROLLBARSTRATEGY_H
 #define SCROLLBARSTRATEGY_H
 
-class ScrollBarStrategy {
+#include <QObject>
+
+class QScrollBar;
+class TailView;
+
+
+class ScrollBarStrategy : public QObject {
+    Q_OBJECT
 public:
-    virtual ~ScrollBarStrategy() {}
+    ScrollBarStrategy(TailView *tailView);
+    virtual ~ScrollBarStrategy();
+
+    virtual void onFileChanged() = 0;
+
+protected:
+    QScrollBar * scrollBar();
+    TailView * view();
+
+private:
+    QScrollBar * m_scrollBar;
+    TailView * m_view;
 };
 
 #endif // SCROLLBARSTRATEGY_H

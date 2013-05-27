@@ -99,7 +99,8 @@ SOURCES += \
     watcher/YFileSystemWatcher.cpp \
     watcher/YFileSystemWatcherThread.cpp \
     view/ExactScrollBarController.cpp \
-    view/ApproximateScrollBarController.cpp
+    view/ApproximateScrollBarController.cpp \
+    view/ScrollBarStrategy.cpp
 
 RESOURCES += \
     resource/resources.qrc

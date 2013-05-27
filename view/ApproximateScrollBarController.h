@@ -5,7 +5,9 @@
 
 class ApproximateScrollBarController : public ScrollBarStrategy {
 public:
-    ApproximateScrollBarController();
+    using ScrollBarStrategy::ScrollBarStrategy;
+
+    void onFileChanged();
 };
 
 #endif // APPROXIMATESCROLLBARCONTROLLER_H

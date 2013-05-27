@@ -7,6 +7,8 @@
 
 #include "TailView.h"
 
+#include "ApproximateScrollBarController.h"
+#include "ExactScrollBarController.h"
 #include "DocumentSearch.h"
 #include "FileBlockReader.h"
 #include "FileSearch.h"
@@ -45,6 +47,9 @@ TailView::TailView(QWidget * parent):
     m_hasUnviewedChanges(false),
     m_layoutType(AutomaticLayout),
     m_layoutStrategy(new PartialLayout(this)),
+    m_exactScrollBarController(new ExactScrollBarController(this)),
+    m_approximateScrollBarController(new ApproximateScrollBarController(this)),
+    m_scrollBarStrategy(m_approximateScrollBarController.data()),
     m_followTail(true),
     m_documentSearch(new DocumentSearch(m_document.data()))
 {
@@ -284,14 +289,20 @@ void TailView::setActive(bool active)
 void TailView::onFileChanged()
 {
     QFileInfo info(m_filename);
-//    bool fullLayout = false;
-//    switch(m_layoutType) {
-//    case DebugFullLayout: fullLayout = true; break;
-//    case DebugPartialLayout: fullLayout = false; break;
-//    case AutomaticLayout:
-//        fullLayout = (info.size() <= MAX_FULL_LAYOUT_FILE_SIZE);
-//        break;
-//    }
+    bool fullLayout = false;
+    switch(m_layoutType) {
+    case DebugFullLayout: fullLayout = true; break;
+    case DebugPartialLayout: fullLayout = false; break;
+    case AutomaticLayout:
+        fullLayout = (info.size() <= MAX_FULL_LAYOUT_FILE_SIZE);
+        break;
+    }
+
+    if (fullLayout) {
+        m_scrollBarStrategy = m_exactScrollBarController.data();
+    } else {
+        m_scrollBarStrategy = m_approximateScrollBarController.data();
+    }
 
     const YFileCursor & fileCursor = m_document->fileCursor();
     if(fileCursor.charAddress() > info.size() ||
@@ -429,35 +440,8 @@ void TailView::wheelEvent(QWheelEvent * event)
     event->accept();
 }
 
-void TailView::updateScrollBars(int newMax)
-{
-    if(verticalScrollBar()->maximum() != newMax) {
-        QScrollBar * vsb = verticalScrollBar();
-        vsb->setRange(0, newMax);
-        vsb->setPageStep(numLinesOnScreen() - PAGE_STEP_OVERLAP);
-        vsb->setSingleStep(1);
-    }
-}
-
 void TailView::vScrollBarAction(int action)
 {
-    QScrollBar * vsb = verticalScrollBar();
-
-    if(action == QAbstractSlider::SliderMove && !vsb->isSliderDown()) {
-        // The slider moved, but wasn't by a keystroke (since isSliderDown() returned false),
-        // so assume a wheel event triggered this action (which gets handled by wheelEvent()),
-        // and simply return.
-        return;
-    }
-
-    if(vsb->sliderPosition() > vsb->maximum()) {
-        vsb->setSliderPosition(vsb->maximum());
-    }
-
-    if(vsb->sliderPosition() < vsb->minimum()) {
-        vsb->setSliderPosition(vsb->minimum());
-    }
-
     m_layoutStrategy->vScrollBarAction(action);
 }
 
