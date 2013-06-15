@@ -226,6 +226,11 @@ void TailView::scrollToIfNecessary(const YFileCursor & ycursor)
     m_layoutStrategy->scrollTo(newTopLine);
 }
 
+ScrollBarStrategy * TailView::scrollBarStrategy()
+{
+    return m_scrollBarStrategy;
+}
+
 void TailView::onCopy(bool x11Selection)
 {
     const YFileCursor & cursor = m_document->fileCursor();
@@ -303,6 +308,7 @@ void TailView::onFileChanged()
     } else {
         m_scrollBarStrategy = m_approximateScrollBarController.data();
     }
+    m_scrollBarStrategy->onFileChanged();
 
     const YFileCursor & fileCursor = m_document->fileCursor();
     if(fileCursor.charAddress() > info.size() ||
@@ -360,7 +366,6 @@ void TailView::mouseReleaseEvent(QMouseEvent * event)
     }
 }
 
-#include <QtDebug>
 void TailView::mouseMoveEvent(QMouseEvent * event)
 {
     if(m_leftMouseIsDown) {
@@ -383,13 +388,13 @@ void TailView::paintEvent(QPaintEvent * event)
     QRectF viewrect(event->rect());
     painter.fillRect(viewrect, Preferences::instance()->normalTextColor().background());
 
+    int scrollValue = m_layoutStrategy->topScreenLine();
     for(QTextBlock block = m_document->begin(); block != m_document->end(); block = block.next()) {
         const QTextLayout * layout = block.layout();
         QFontMetrics fontMetrics(layout->font());
 
         qreal dy = m_document->blockGraphicalPositions().at(block.blockNumber());
 
-        int scrollValue = m_layoutStrategy->topScreenLine();
         QPoint start(0, dy - scrollValue * fontMetrics.lineSpacing());
         QRectF layoutRect(layout->boundingRect());
         layoutRect.moveTo(start);
@@ -438,6 +443,16 @@ void TailView::wheelEvent(QWheelEvent * event)
     int linesToScroll = -(scrollSteps * qApp->wheelScrollLines());
     m_layoutStrategy->scrollBy(linesToScroll);
     event->accept();
+}
+
+void TailView::updateScrollBars(int newMax)
+{
+    if(verticalScrollBar()->maximum() != newMax) {
+        QScrollBar * vsb = verticalScrollBar();
+        vsb->setRange(0, newMax);
+        vsb->setPageStep(numLinesOnScreen() - PAGE_STEP_OVERLAP);
+        vsb->setSingleStep(1);
+    }
 }
 
 void TailView::vScrollBarAction(int action)

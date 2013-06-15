@@ -12,17 +12,14 @@
 #include <QtGlobal>
 
 class FileBlockReader;
+struct ScreenPosition;
 class TailView;
 class YTextDocument;
 
 class QTextBlock;
 
-struct ScreenPosition {
-    qint64 address = 0;
-    int blockLine = 0;
-
-    ScreenPosition(qint64 a=0, int bl=0): address(a), blockLine(bl) {}
-};
+// TODO: remove the following line
+#include "ScreenPosition.h"
 
 class PartialLayout {
 public:
@@ -39,8 +36,7 @@ public:
     bool searchFile(bool isForward);
     bool wrapAroundForDocumentSearch() const;
 private:
-    void updateScrollBars();
-    bool updateView(ScreenPosition new_line_address = ScreenPosition(-1, -1), bool * at_bottom = 0);
+    bool updateView(ScreenPosition new_line_address, bool * at_bottom = 0);
     bool scrollUp(int line_change);
     bool scrollDown(int line_change);
     qint64 keepToLowerBound(const QTextBlock & block, int * blockLine);

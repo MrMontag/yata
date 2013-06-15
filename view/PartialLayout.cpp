@@ -5,6 +5,7 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 #include "PartialLayout.h"
+#include "ScrollBarStrategy.h"
 
 #include "DocumentSearch.h"
 #include "FileSearch.h"
@@ -33,7 +34,7 @@ bool PartialLayout::onFileChanged(QString * error)
     if(view()->followTail()) {
         QScrollBar * vScrollBar = view()->verticalScrollBar();
         vScrollBar->setSliderPosition(vScrollBar->maximum());
-        success = updateView();
+        success = updateView(view()->scrollBarStrategy()->position());
     } else {
         success = updateView(topOfScreen());
     }
@@ -100,7 +101,7 @@ bool PartialLayout::wrapAroundForDocumentSearch() const
 
 void PartialLayout::updateAfterKeyPress()
 {
-    updateView();
+    updateView(view()->scrollBarStrategy()->position());
 }
 
 void PartialLayout::vScrollBarAction(int action)
@@ -149,40 +150,20 @@ void PartialLayout::vScrollBarAction(int action)
     if(line_change) {
         scrollBy(line_change);
     } else {
-        updateView();
+        updateView(view()->scrollBarStrategy()->position());
     }
 }
 
-void PartialLayout::updateScrollBars()
-{
-    const ScreenPosition bottom_screen_pos = bottomScreenPosition();
-    const int approx_lines = static_cast<int>(bottom_screen_pos.address / APPROXIMATE_CHARS_PER_LINE);
-    QScrollBar * vsb = view()->verticalScrollBar();
-    if(vsb->maximum() != approx_lines) {
-        vsb->setRange(0, approx_lines);
-        vsb->setPageStep(view()->numLinesOnScreen() - PAGE_STEP_OVERLAP);
-        vsb->setSingleStep(1);
-    }
-}
-
-bool PartialLayout::updateView(ScreenPosition new_line_address /*=ScreenPosition(-1,-1)*/, bool * at_bottom /*=0*/)
+bool PartialLayout::updateView(ScreenPosition new_line_address, bool * at_bottom /*=0*/)
 {
     const ScreenPosition bottom_screen_pos = bottomScreenPosition();
 
     QScrollBar * verticalScrollBar = view()->verticalScrollBar();
     qint64 file_pos = 0;
-    if(new_line_address.address != -1) {
-        // Scroll bar did not move
-        file_pos = new_line_address.address;
-        m_topScreenLine = new_line_address.blockLine;
+    if (new_line_address == ScreenPosition::MAX) {
+        file_pos = bottom_screen_pos.address;
     } else {
-        // Scroll bar moved
-        m_topScreenLine = 0;
-        if(verticalScrollBar->sliderPosition() >= verticalScrollBar->maximum()) {
-            file_pos = bottom_screen_pos.address;
-        } else {
-            file_pos = static_cast<qint64>(verticalScrollBar->sliderPosition()) * APPROXIMATE_CHARS_PER_LINE;
-        }
+        file_pos = new_line_address.address;
     }
 
     file_pos = m_blockReader->getStartPosition(file_pos, 0);
@@ -306,7 +287,10 @@ void PartialLayout::updateBottomDocument()
     m_bottomDocument->setText(data, lineAddresses);
     m_bottomDocument->markDirty();
     m_bottomDocument->layout(view()->viewport()->width());
-    updateScrollBars();
+
+    const ScreenPosition bottom_screen_pos = bottomScreenPosition();
+    const int approx_lines = static_cast<int>(bottom_screen_pos.address / APPROXIMATE_CHARS_PER_LINE);
+    view()->updateScrollBars(approx_lines);
 }
 
 ScreenPosition PartialLayout::bottomScreenPosition() const

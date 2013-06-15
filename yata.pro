@@ -58,7 +58,8 @@ HEADERS += \
     watcher/YFileSystemWatcherThread.h \
     view/ScrollBarStrategy.h \
     view/ExactScrollBarController.h \
-    view/ApproximateScrollBarController.h
+    view/ApproximateScrollBarController.h \
+    view/ScreenPosition.h
 
 FORMS += \
     dbg/DebugWindow.ui \
@@ -100,7 +101,8 @@ SOURCES += \
     watcher/YFileSystemWatcherThread.cpp \
     view/ExactScrollBarController.cpp \
     view/ApproximateScrollBarController.cpp \
-    view/ScrollBarStrategy.cpp
+    view/ScrollBarStrategy.cpp \
+    view/ScreenPosition.cpp
 
 RESOURCES += \
     resource/resources.qrc

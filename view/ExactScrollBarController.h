@@ -2,15 +2,21 @@
 #define EXACTSCROLLBARCONTROLLER_H
 
 #include "ScrollBarStrategy.h"
+#include <vector>
+#include <QScopedPointer>
 
 class QScrollBar;
+class YTextDocument;
 
 class ExactScrollBarController : public ScrollBarStrategy
 {
 public:
-    using ScrollBarStrategy::ScrollBarStrategy;
+    ExactScrollBarController(TailView *tailView);
 
-    void onFileChanged();
+    void onFileChanged() override;
+    ScreenPosition position() override;
+private:
+    QScopedPointer<YTextDocument> m_document;
 };
 
 #endif // EXACTSCROLLBARCONTROLLER_H

@@ -55,6 +55,7 @@ public:
 
     // Functions used by the LayoutStrategy class and subclasses
     YTextDocument * document() { return m_document.data(); }
+    void updateScrollBars(int newMax);
     int numLinesOnScreen() const;
     DocumentSearch * documentSearch() { return m_documentSearch.data(); }
     const QString & filename() const { return m_filename; }
@@ -62,6 +63,7 @@ public:
     QString displayTitle() const;
     bool searchDocument(bool isForward, bool wrapAround = true);
     void scrollToIfNecessary(const YFileCursor & ycursor);
+    ScrollBarStrategy * scrollBarStrategy();
 
     const QString & currentFileError() const { return m_currentFileError; }
 
