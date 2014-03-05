@@ -13,6 +13,7 @@
 #include "TailView.h"
 #include "document/YTextDocument.h"
 
+#include <QtDebug>
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QTextLayout>
@@ -293,6 +294,9 @@ void PartialLayout::updateBottomDocument()
     view()->updateScrollBars(approx_lines);
 }
 
+/** Returns the screen position if the file were scrolled all the way to
+  * the bottom.
+  */
 ScreenPosition PartialLayout::bottomScreenPosition() const
 {
     int lines = 0;
@@ -317,6 +321,9 @@ ScreenPosition PartialLayout::bottomScreenPosition() const
     }
 
     int blockLine = lines - linesOnScreen;
+    if (blockLine < 0) {
+        blockLine = 0;
+    }
     ScreenPosition screenPos(line_address, blockLine);
     return screenPos;
 }

@@ -116,6 +116,7 @@ qreal YTextDocument::layoutBlock(QTextBlock * textBlock)
     return height;
 }
 
+/** Returns the address in the file of the first character in the specified block. */
 qint64 YTextDocument::blockAddress(QTextBlock block) const
 {
     int blockNumber = block.blockNumber();

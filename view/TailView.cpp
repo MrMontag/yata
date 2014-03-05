@@ -160,6 +160,9 @@ void TailView::searchFile(bool isForward)
     viewport()->update();
 }
 
+/** Converts the specified QPoint from a real screen point to a logical graphical point
+  * where y is the distance from the top of the document.
+  */
 QPoint TailView::docGraphicalPosition(const QPoint & viewPoint)
 {
     int lineSpacing = QFontMetrics(m_document->font()).lineSpacing();
