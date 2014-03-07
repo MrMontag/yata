@@ -29,19 +29,7 @@ const YFileCursor & DocumentSearch::cursor() const
     return *m_textCursor;
 }
 
-void DocumentSearch::resetSearchCursor(bool isTop)
-{
-    const BlockDataVector<qint64> & lineAddresses = m_document->lineAddresses();
-    if(isTop) {
-        *m_textCursor = YFileCursor(lineAddresses.front());
-    } else {
-        m_textCursor->setLineAddress(lineAddresses.back());
-        m_textCursor->setCharPos(m_document->lastBlock().length() - 1);
-        m_textCursor->setLength(0);
-    }
-}
-
-bool DocumentSearch::searchDocument(bool isForward, bool wrapAround)
+bool DocumentSearch::searchDocument(bool isForward)
 {
     if(m_textCursor->isNull()) {
         *m_textCursor = YFileCursor();
@@ -50,11 +38,6 @@ bool DocumentSearch::searchDocument(bool isForward, bool wrapAround)
     QRegExp regex(getRegex());
 
     YFileCursor match = m_document->find(regex, *m_textCursor, isForward);
-
-    if(wrapAround && match.isNull()) {
-        resetSearchCursor(isForward);
-        match = m_document->find(regex, *m_textCursor, isForward);
-    }
 
     *m_textCursor = match;
     return !match.isNull();

@@ -95,11 +95,6 @@ bool PartialLayout::searchFile(bool isForward)
     return matchFound;
 }
 
-bool PartialLayout::wrapAroundForDocumentSearch() const
-{
-    return false;
-}
-
 void PartialLayout::updateAfterKeyPress()
 {
     updateView(view()->scrollBarStrategy()->position());

@@ -20,13 +20,11 @@ public:
 
     ~DocumentSearch();
 
-    bool searchDocument(bool isForward, bool wrapAround = true);
+    bool searchDocument(bool isForward);
 
     void setCursor(const YFileCursor & cursor);
     const YFileCursor & cursor() const;
 
-private:
-    void resetSearchCursor(bool isTop);
 private:
     YTextDocument * m_document;
 

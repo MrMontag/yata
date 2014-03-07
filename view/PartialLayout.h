@@ -34,7 +34,6 @@ public:
     void updateAfterKeyPress();
     void vScrollBarAction(int action);
     bool searchFile(bool isForward);
-    bool wrapAroundForDocumentSearch() const;
 private:
     bool updateView(ScreenPosition new_line_address, bool * at_bottom = 0);
     bool scrollUp(int line_change);

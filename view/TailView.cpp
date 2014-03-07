@@ -139,8 +139,7 @@ void TailView::searchFile(bool isForward)
 {
     const SearchCriteria & sc = SearchInfo::instance().search();
     m_documentSearch->setSearchCriteria(sc.expression, sc.isRegex, sc.isCaseSensitive);
-    bool wrapAround = m_layoutStrategy->wrapAroundForDocumentSearch();
-    bool matchFound = searchDocument(isForward, wrapAround);
+    bool matchFound = searchDocument(isForward);
     if(matchFound) {
         scrollToIfNecessary(documentSearch()->cursor());
     } else {
@@ -181,7 +180,7 @@ QString TailView::displayTitle() const
     return (m_hasUnviewedChanges ? QString("*") : QString()) % QFileInfo(m_filename).baseName();
 }
 
-bool TailView::searchDocument(bool isForward, bool wrapAround)
+bool TailView::searchDocument(bool isForward)
 {
     if(!m_document->fileCursor().isNull()) {
         m_documentSearch->setCursor(m_document->fileCursor());
@@ -200,7 +199,7 @@ bool TailView::searchDocument(bool isForward, bool wrapAround)
         }
     }
 
-    bool foundMatch = m_documentSearch->searchDocument(isForward, wrapAround);
+    bool foundMatch = m_documentSearch->searchDocument(isForward);
 
     if(foundMatch) {
         const YFileCursor & searchCursor = m_documentSearch->cursor();

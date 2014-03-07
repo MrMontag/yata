@@ -61,7 +61,7 @@ public:
     const QString & filename() const { return m_filename; }
     QString longDisplayTitle() const;
     QString displayTitle() const;
-    bool searchDocument(bool isForward, bool wrapAround = true);
+    bool searchDocument(bool isForward);
     void scrollToIfNecessary(const YFileCursor & ycursor);
     ScrollBarStrategy * scrollBarStrategy();
 
