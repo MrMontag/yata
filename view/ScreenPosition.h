@@ -4,8 +4,8 @@
 #include <QtGlobal>
 
 struct ScreenPosition {
-    qint64 address = 0;
-    int blockLine = 0;
+    qint64 address;
+    int blockLine;
 
     ScreenPosition(qint64 a=0, int bl=0);
     bool operator==(const ScreenPosition & other) const;

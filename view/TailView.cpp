@@ -32,6 +32,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QStringBuilder>
+#include <QTextCursor>
 #include <QTextLayout>
 #include <QTextStream>
 #include <QtDebug>

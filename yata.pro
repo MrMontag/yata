@@ -9,7 +9,7 @@ DEFINES += 'APPVERSION=\\"$$VERSION\\"'
 
 TEMPLATE = app
 CONFIG += debug_and_release warn_on
-QMAKE_CXXFLAGS += -std=c++11 -pedantic
+QMAKE_CXXFLAGS += -pedantic
 build_pass:CONFIG(release, debug|release) {
     TARGET = yata
 } else {
@@ -107,7 +107,7 @@ SOURCES += \
 RESOURCES += \
     resource/resources.qrc
 
-QT += widgets
+#QT += widgets
 
 win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp

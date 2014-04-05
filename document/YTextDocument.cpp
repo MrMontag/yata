@@ -201,7 +201,8 @@ YFileCursor YTextDocument::yFileCursor(int docPos) const
     cursor.setPosition(docPos);
     QTextBlock block = cursor.block();
     qint64 linePos = m_lineAddresses.at(block.blockNumber());
-    return YFileCursor(linePos, cursor.positionInBlock());
+    int positionInBlock = cursor.position() - cursor.block().position();
+    return YFileCursor(linePos, positionInBlock);
 }
 
 void YTextDocument::startSelect(const QPoint & point)

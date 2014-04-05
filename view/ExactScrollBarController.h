@@ -13,8 +13,8 @@ class ExactScrollBarController : public ScrollBarStrategy
 public:
     ExactScrollBarController(TailView *tailView);
 
-    void onFileChanged() override;
-    ScreenPosition position() override;
+    void onFileChanged();
+    ScreenPosition position();
 private:
     QScopedPointer<YTextDocument> m_document;
 };

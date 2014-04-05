@@ -36,7 +36,7 @@ YTabWidget::YTabWidget(QWidget *parent)
 
     connect(this, SIGNAL(tabCloseRequested(int)), SLOT(on_tabCloseRequested(int)));
     connect(tabBar(), SIGNAL(tabMoved(int,int)), SLOT(onTabMoved(int,int)));
-    connect(this, &QTabWidget::currentChanged, this, &YTabWidget::on_currentTabChanged);
+    connect(this, SIGNAL(currentChanged(int)), SLOT(on_currentTabChanged(int)));
 
     m_actionCloseTab.reset(m_menuTab->addAction(
         tr("&Close tab"),
@@ -93,7 +93,7 @@ void YTabWidget::openTab(TailView * child)
     int index = addTab(child, shortName);
     child->setFocus();
     setTabToolTip(index, fullName);
-    connect(child, &TailView::fileChanged, this, &YTabWidget::onFileChanged);
+    connect(child, SIGNAL(fileChanged()), SLOT(onFileChanged()));
 
     QAction * action = new QAction(fullName, this);
     action->setCheckable(true);

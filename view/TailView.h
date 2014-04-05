@@ -81,14 +81,14 @@ public slots:
     void onSelectAll();
 
 protected:
-    void mousePressEvent(QMouseEvent * event) override;
-    void mouseReleaseEvent(QMouseEvent * event) override;
-    void mouseMoveEvent(QMouseEvent * event) override;
-    void mouseDoubleClickEvent(QMouseEvent * event) override;
-    void paintEvent(QPaintEvent * event) override;
-    void resizeEvent(QResizeEvent *) override;
-    void keyPressEvent(QKeyEvent * event) override;
-    void wheelEvent(QWheelEvent * event) override;
+    void mousePressEvent(QMouseEvent * event);
+    void mouseReleaseEvent(QMouseEvent * event);
+    void mouseMoveEvent(QMouseEvent * event);
+    void mouseDoubleClickEvent(QMouseEvent * event);
+    void paintEvent(QPaintEvent * event);
+    void resizeEvent(QResizeEvent *);
+    void keyPressEvent(QKeyEvent * event);
+    void wheelEvent(QWheelEvent * event);
 
 private slots:
     void vScrollBarAction(int action);

@@ -6,12 +6,12 @@
 
 class ApproximateScrollBarController : public ScrollBarStrategy {
 public:
-    using ScrollBarStrategy::ScrollBarStrategy;
+    ApproximateScrollBarController(TailView * view);
 
-    void onFileChanged() override;
-    ScreenPosition position() override;
+    void onFileChanged();
+    ScreenPosition position();
 private:
-    int m_lastSBPosition = -1;
+    int m_lastSBPosition;
     ScreenPosition m_currentScreenPos;
 };
 

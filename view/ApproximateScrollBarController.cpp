@@ -6,6 +6,12 @@
 
 const qint64 APPROXIMATE_CHARS_PER_LINE = 20;
 
+ApproximateScrollBarController::ApproximateScrollBarController(TailView * view):
+	ScrollBarStrategy(view),
+	m_lastSBPosition(-1)
+{
+}
+    
 void ApproximateScrollBarController::onFileChanged()
 {
 }

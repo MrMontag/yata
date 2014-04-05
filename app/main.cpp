@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QScopedPointer>
+#include <QIcon>
 #include "MainWindow.h"
 #include "SessionLoader.h"
 #include "YApplication.h"

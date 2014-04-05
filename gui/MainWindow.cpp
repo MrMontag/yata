@@ -43,7 +43,7 @@ MainWindow::MainWindow(): ui(new Ui::MainWindow())
     ui->actionAboutYata->setText(aboutYataText);
 
     connect(m_tabWidget.data(), SIGNAL(currentTabChanged(int,int)), SLOT(onCurrentTabChanged(int,int)));
-    connect(m_tabWidget.data(), &YTabWidget::currentFileDisplayChanged, this, &MainWindow::updateWindowTitle);
+    connect(m_tabWidget.data(), SIGNAL(currentFileDisplayChanged()), SLOT(updateWindowTitle()));
 
     ui->menuFile->insertActions(ui->actionExit, m_tabWidget->contextMenu()->actions());
     ui->menuFile->insertSeparator(ui->actionExit);
