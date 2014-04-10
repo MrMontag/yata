@@ -1,6 +1,6 @@
 #include "SearchSession.h"
 #include "SessionCommon.h"
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 
 
 const std::string SearchSession::EXPRESSION_KEY = "expression";

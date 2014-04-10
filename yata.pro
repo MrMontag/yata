@@ -107,8 +107,6 @@ SOURCES += \
 RESOURCES += \
     resource/resources.qrc
 
-#QT += widgets
-
 win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
     INCLUDEPATH += $$YAMLCPP/include
@@ -120,12 +118,37 @@ win32 {
             /DVERSION=$$VERSION $$PWD\\win\\installer.nsi
         INSTALLS += target
     }
+	LIBS += -lyaml-cpp
+}
+
+defineReplace(findFile) {
+	baseDirs=$$1
+	components=$$2
+	for(baseDir, baseDirs) {
+		for(component, components) {
+			path=$$baseDir/$$component
+			exists($$path) {
+				return($$path)
+			}
+		}
+	}
 }
 
 unix {
+	isEmpty(YAMLCPPINC) {
+
+		includeDirs=/usr/local/include /usr/include
+		prospectives=yaml-cpp03 yaml-cpp
+
+		YAMLCPPINC=$$findFile($$includeDirs, $$prospectives)
+
+		isEmpty(YAMLCPPINC): error(Could not find yaml-cpp include path)
+	}
+	message(YAMLCPPINC: $$YAMLCPPINC)
+	INCLUDEPATH += $$YAMLCPPINC
     isEmpty(INSTALLDIR): INSTALLDIR = /usr/local/bin
     target.path = $$INSTALLDIR
     INSTALLS += target
-}
 
-LIBS += -lyaml-cpp
+	LIBS += -l:libyaml-cpp.so.0.3
+}

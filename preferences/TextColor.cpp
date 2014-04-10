@@ -9,7 +9,7 @@
 #include "session/SessionCommon.h"
 #include <QApplication>
 #include <QColor>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 
 const std::string FOREGROUND_KEY = "foreground";
 const std::string BACKGROUND_KEY = "background";

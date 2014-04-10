@@ -14,7 +14,7 @@
 #include <QFont>
 #include <QPalette>
 #include <QtGlobal>
-#include <yaml-cpp/yaml.h>
+#include <yaml.h>
 #include <fstream>
 
 // TODO: implement versioning for preference files
