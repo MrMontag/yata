@@ -8,13 +8,9 @@
 #include "Preferences.h"
 #include "YApplication.h"
 #include "TextColor.h"
-#include "session/SessionCommon.h"
-#include <QApplication>
-#include <QColor>
+#include "YAMLConverters.h"
+
 #include <QFont>
-#include <QPalette>
-#include <QtGlobal>
-#include <yaml-cpp/yaml.h>
 #include <fstream>
 
 // TODO: implement versioning for preference files

@@ -6,8 +6,9 @@
  */
 
 #include "TextColor.h"
+#include "YAMLConverters.h"
+
 #include <QApplication>
-#include <yaml-cpp/yaml.h>
 
 const std::string FOREGROUND_KEY = "foreground";
 const std::string BACKGROUND_KEY = "background";

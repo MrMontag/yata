@@ -64,7 +64,8 @@ HEADERS += \
     view/ScrollBarStrategy.h \
     view/ExactScrollBarController.h \
     view/ApproximateScrollBarController.h \
-    view/ScreenPosition.h
+    view/ScreenPosition.h \
+    preferences/YAMLConverters.h
 
 FORMS += \
     dbg/DebugWindow.ui \
