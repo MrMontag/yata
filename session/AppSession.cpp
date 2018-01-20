@@ -9,7 +9,7 @@
 #include "FileSession.h"
 #include "SearchSession.h"
 #include "SessionCommon.h"
-#include <yaml.h>
+#include <yaml-cpp/yaml.h>
 #include <fstream>
 
 const std::string AppSession::GEOMETRY_KEY = "geometry";

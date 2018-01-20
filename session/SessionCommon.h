@@ -3,7 +3,7 @@
 
 // TODO: move this to a yaml subdirectory, since it's being used by preferences serialization, not just session.
 
-#include <yaml.h>
+#include <yaml-cpp/yaml.h>
 #include <string>
 
 template <typename T> T getValue(const YAML::Node & in, const std::string & key)

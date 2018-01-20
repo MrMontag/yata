@@ -1,6 +1,6 @@
 #include "FileSession.h"
 #include "SessionCommon.h"
-#include <yaml.h>
+#include <yaml-cpp/yaml.h>
 
 const std::string FileSession::PATH_KEY = "path";
 const std::string FileSession::ADDRESS_KEY = "address";

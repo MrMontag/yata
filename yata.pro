@@ -5,10 +5,15 @@
 
 include(resource/appversion)
 
+QT += core gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
 DEFINES += 'APPVERSION=\\"$$VERSION\\"'
 
 TEMPLATE = app
-CONFIG += debug_and_release warn_on
+CONFIG += c++14 debug_and_release warn_on
+
 QMAKE_CXXFLAGS += -pedantic
 build_pass:CONFIG(release, debug|release) {
     TARGET = yata
@@ -135,20 +140,24 @@ defineReplace(findFile) {
 }
 
 unix {
-	isEmpty(YAMLCPPINC) {
-
-		includeDirs=/usr/local/include /usr/include
-		prospectives=yaml-cpp03 yaml-cpp
-
-		YAMLCPPINC=$$findFile($$includeDirs, $$prospectives)
-
-		isEmpty(YAMLCPPINC): error(Could not find yaml-cpp include path)
-	}
-	message(YAMLCPPINC: $$YAMLCPPINC)
-	INCLUDEPATH += $$YAMLCPPINC
-    isEmpty(INSTALLDIR): INSTALLDIR = /usr/local/bin
-    target.path = $$INSTALLDIR
-    INSTALLS += target
-
-	LIBS += -l:libyaml-cpp.so.0.3
+    INCLUDEPATH += yaml-cpp/include
+    LIBS += -l:libyaml-cpp
 }
+
+#unix {
+#	isEmpty(YAMLCPPINC) {
+#		includeDirs=/usr/local/include /usr/include
+#		prospectives=yaml-cpp03 yaml-cpp
+
+#		YAMLCPPINC=$$findFile($$includeDirs, $$prospectives)
+
+#		isEmpty(YAMLCPPINC): error(Could not find yaml-cpp include path)
+#	}
+#	message(YAMLCPPINC: $$YAMLCPPINC)
+#	INCLUDEPATH += $$YAMLCPPINC
+#    isEmpty(INSTALLDIR): INSTALLDIR = /usr/local/bin
+#    target.path = $$INSTALLDIR
+#    INSTALLS += target
+
+#    LIBS += -l:libyaml-cpp.so.0.3
+#}
