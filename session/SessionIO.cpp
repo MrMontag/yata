@@ -21,9 +21,8 @@ ParsingStatus::Enum SessionIO::readSession(AppSession * session, const std::stri
 ParsingStatus::Enum SessionIO::readSession(AppSession * session, std::istream & in)
 {
     try {
-        YAML::Parser parser(in);
-        YAML::Node document;
-        if (parser.GetNextDocument(document)) {
+        YAML::Node document = YAML::Load(in);
+        if (document.IsDefined()) {
             document >> *session;
         }
     } catch(YAML::Exception & ex) {

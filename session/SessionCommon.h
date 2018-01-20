@@ -6,17 +6,6 @@
 #include <yaml-cpp/yaml.h>
 #include <string>
 
-template <typename T> T getValue(const YAML::Node & in, const std::string & key)
-{
-    if(const YAML::Node *node = in.FindValue(key)) {
-        T t;
-        *node >> t;
-        return t;
-    } else {
-        return T();
-    }
-}
-
 namespace ParsingStatus {
     enum Enum {
         OK,

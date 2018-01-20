@@ -6,9 +6,7 @@
  */
 
 #include "TextColor.h"
-#include "session/SessionCommon.h"
 #include <QApplication>
-#include <QColor>
 #include <yaml-cpp/yaml.h>
 
 const std::string FOREGROUND_KEY = "foreground";
@@ -134,10 +132,8 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const QColor & color)
 
 void operator>>(const YAML::Node & in, QColor & color)
 {
-    std::vector<int> rgb;
-    in >> rgb;
-    if(rgb.size() == 3) {
-        color.setRgb(rgb[0], rgb[1], rgb[2]);
+    if(in.size() == 3) {
+        color.setRgb(in[0].as<int>(), in[1].as<int>(), in[2].as<int>());
         if(color.isValid()) { return; }
     }
 
@@ -160,7 +156,7 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const TextColor & textColor)
 void operator>>(const YAML::Node & in, TextColor & textColor)
 {
     if(in.Type() == YAML::NodeType::Map) {
-        textColor.setForeground(getValue<QColor>(in, FOREGROUND_KEY));
-        textColor.setBackground(getValue<QColor>(in, BACKGROUND_KEY));
+        textColor.setForeground(in[FOREGROUND_KEY].as<QColor>());
+        textColor.setBackground(in[BACKGROUND_KEY].as<QColor>());
     }
 }

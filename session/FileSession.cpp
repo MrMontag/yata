@@ -18,7 +18,7 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const FileSession & session)
 
 void operator>>(const YAML::Node & in, FileSession & session)
 {
-    session.path = getValue<std::string>(in, FileSession::PATH_KEY);
-    session.address = getValue<long long>(in, FileSession::ADDRESS_KEY);
-    session.followTail = getValue<bool>(in, FileSession::FOLLOW_TAIL_KEY);
+    session.path = in[FileSession::PATH_KEY].as<std::string>();
+    session.address = in[FileSession::ADDRESS_KEY].as<long long>();
+    session.followTail = in[FileSession::FOLLOW_TAIL_KEY].as<bool>();
 }

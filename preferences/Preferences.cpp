@@ -60,21 +60,22 @@ void Preferences::write()
 
 void Preferences::read()
 {
+    // TODO review
     try {
         std::ifstream in(YApplication::preferencesFilePath().toStdString().c_str());
-        YAML::Parser parser(in);
-        YAML::Node document;
-        if (parser.GetNextDocument(document)) {
-            if (const YAML::Node * text = document.FindValue(TEXT_KEY)) {
-                std::string fontStr = getValue<std::string>(*text, FONT_KEY);
+        YAML::Node document = YAML::Load(in);
+        if (document.IsDefined()) {
+            auto text = document[TEXT_KEY];
+            if (text.IsDefined()) {
+                std::string fontStr = text[FONT_KEY].as<std::string>();
                 m_font->fromString(fontStr.c_str());
 
-                readColor(m_normalTextColor.data(), *text, NORMAL_KEY);
-                readColor(m_selectedTextColor.data(), *text, SELECTED_KEY);
+                readColor(m_normalTextColor.data(), text, NORMAL_KEY);
+                readColor(m_selectedTextColor.data(), text, SELECTED_KEY);
             }
-            if (const YAML::Node * debugMenuNode = document.FindValue(DEBUG_MENU_KEY)) {
-                bool debugMenu;
-                *debugMenuNode >> debugMenu;
+            auto debugMenuNode = document[DEBUG_MENU_KEY];
+            if (debugMenuNode.IsDefined()) {
+                bool debugMenu = debugMenuNode.as<bool>();
                 m_debugMenu.reset(new bool(debugMenu));
             }
         }
@@ -137,7 +138,7 @@ Preferences::~Preferences()
 
 void Preferences::readColor(TextColor * dest, const YAML::Node & src, const std::string & key)
 {
-    TextColor color = getValue<TextColor>(src, key);
+    TextColor color = src[key].as<TextColor>();
     if(color.isValid()) {
         dest->setForeground(color.foreground());
         dest->setBackground(color.background());

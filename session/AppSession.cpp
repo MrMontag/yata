@@ -111,49 +111,79 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const AppSession & appSession)
 
 ParsingStatus::Enum readVersion(const YAML::Node & in)
 {
-    std::vector<int> versionVec;
-    if (const YAML::Node * version = in.FindValue(AppSession::VERSION_KEY)) {
-        try {
-            *version >> versionVec;
-            if (versionVec.size() != 2) {
-                return ParsingStatus::IncompatibleVersion;
-            } else if (versionVec[0] > AppSession::VERSION_MAJOR) {
-                return ParsingStatus::IncompatibleVersion;
-            } else if (versionVec[1] > AppSession::VERSION_MINOR) {
-                return ParsingStatus::PossibleDataLoss;
-            } else {
-                return ParsingStatus::OK;
-            }
-        } catch(YAML::InvalidScalar &) {
+    // TODO review
+    std::vector<int> version = in[AppSession::VERSION_KEY].as<std::vector<int>>();
+    try {
+        if (version.size() == 0) {
+            return ParsingStatus::PossibleDataLoss;
+        } else if (version.size() != 2) {
             return ParsingStatus::IncompatibleVersion;
+        } else if (version[0] > AppSession::VERSION_MAJOR) {
+            return ParsingStatus::IncompatibleVersion;
+        } else if (version[1] > AppSession::VERSION_MINOR) {
+            return ParsingStatus::PossibleDataLoss;
+        } else {
+            return ParsingStatus::OK;
         }
-    } else {
-        return ParsingStatus::PossibleDataLoss;
+    } catch(YAML::InvalidScalar &) {
+        return ParsingStatus::IncompatibleVersion;
     }
+//    std::vector<int> versionVec;
+//    if (const YAML::Node * version = in.FindValue(AppSession::VERSION_KEY)) {
+//        try {
+//            *version >> versionVec;
+//            if (versionVec.size() != 2) {
+//                return ParsingStatus::IncompatibleVersion;
+//            } else if (versionVec[0] > AppSession::VERSION_MAJOR) {
+//                return ParsingStatus::IncompatibleVersion;
+//            } else if (versionVec[1] > AppSession::VERSION_MINOR) {
+//                return ParsingStatus::PossibleDataLoss;
+//            } else {
+//                return ParsingStatus::OK;
+//            }
+//        } catch(YAML::InvalidScalar &) {
+//            return ParsingStatus::IncompatibleVersion;
+//        }
+//    } else {
+//        return ParsingStatus::PossibleDataLoss;
+//    }
 }
 
 void operator>>(const YAML::Node & in, AppSession & appSession)
 {
+    // TODO review
     appSession.setStatus(readVersion(in));
     if (appSession.status() == ParsingStatus::IncompatibleVersion) { return; }
 
-    if(const YAML::Node * searches = in.FindValue(AppSession::SEARCH_KEY)) {
-        for(YAML::Iterator itr = searches->begin(); itr != searches->end(); ++itr) {
-            SearchSession search;
-            *itr >> search;
-            appSession.addSearch(search);
-        }
+    auto searches = in[AppSession::SEARCH_KEY];
+    for(YAML::iterator itr = searches.begin(); itr != searches.end(); ++itr) {
+        SearchSession search;
+        *itr >> search;
+        appSession.addSearch(search);
     }
+//    if(const YAML::Node * searches = in.FindValue(AppSession::SEARCH_KEY)) {
+//        for(YAML::Iterator itr = searches->begin(); itr != searches->end(); ++itr) {
+//            SearchSession search;
+//            *itr >> search;
+//            appSession.addSearch(search);
+//        }
+//    }
 
-    appSession.setCurrentIndex(getValue<int>(in, AppSession::FILE_INDEX_KEY));
-    if(const YAML::Node * files = in.FindValue(AppSession::FILE_KEY)) {
-        for(YAML::Iterator itr = files->begin(); itr != files->end(); ++itr) {
-            FileSession file;
-            *itr >> file;
-            appSession.addFile(file);
-        }
+    appSession.setCurrentIndex(in[AppSession::FILE_INDEX_KEY].as<int>());
+    auto files = in[AppSession::FILE_KEY];
+    for(YAML::iterator itr = files.begin(); itr != files.end(); ++itr) {
+        FileSession file;
+        *itr >> file;
+        appSession.addFile(file);
     }
+//    if(const YAML::Node * files = in.FindValue(AppSession::FILE_KEY)) {
+//        for(YAML::Iterator itr = files->begin(); itr != files->end(); ++itr) {
+//            FileSession file;
+//            *itr >> file;
+//            appSession.addFile(file);
+//        }
+//    }
 
-    appSession.setLastOpenDirectory(getValue<std::string>(in, AppSession::LAST_OPEN_DIR_KEY));
-    appSession.setGeometry(getValue<AppSession::GContainer>(in, AppSession::GEOMETRY_KEY));
+    appSession.setLastOpenDirectory(in[AppSession::LAST_OPEN_DIR_KEY].as<std::string>());
+    appSession.setGeometry(in[AppSession::GEOMETRY_KEY].as<AppSession::GContainer>());
 }

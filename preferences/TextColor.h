@@ -11,7 +11,6 @@
 #include <QScopedPointer>
 #include <QPalette>
 
-class QColor;
 namespace YAML {
     class Emitter;
     class Node;

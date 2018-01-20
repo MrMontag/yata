@@ -19,7 +19,7 @@ YAML::Emitter & operator<<(YAML::Emitter & out, const SearchSession & session)
 
 void operator>>(const YAML::Node & in, SearchSession & session)
 {
-    session.expression = getValue<std::string>(in, SearchSession::EXPRESSION_KEY);
-    session.isRegex = getValue<bool>(in, SearchSession::IS_REGEX_KEY); 
-    session.isCaseSensitive = getValue<bool>(in, SearchSession::IS_CASE_SENSITIVE_KEY); 
+    session.expression = in[SearchSession::EXPRESSION_KEY].as<std::string>();
+    session.isRegex = in[SearchSession::IS_REGEX_KEY].as<bool>();
+    session.isCaseSensitive = in[SearchSession::IS_CASE_SENSITIVE_KEY].as<bool>();
 }
