@@ -3,7 +3,7 @@
 #
 # Licensed under the GNU General Public License.  See license.txt for details.
 
-include(resource/appversion)
+include(res/appversion)
 
 QT += core gui
 
@@ -21,7 +21,6 @@ build_pass:CONFIG(release, debug|release) {
     TARGET = yatad
 }
 
-# Input
 HEADERS += \
     app/YApplication.h \
     app/YObjectPointer.h \
@@ -106,7 +105,7 @@ SOURCES += \
     view/ScreenPosition.cpp
 
 RESOURCES += \
-    resource/resources.qrc
+    res/resources.qrc
 
 win32 {
     isEmpty(YAMLCPP): YAMLCPP = $$PWD/../yaml-cpp
