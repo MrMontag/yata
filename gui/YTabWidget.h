@@ -7,8 +7,9 @@
 #ifndef YTABWIDGET_H
 #define YTABWIDGET_H
 
-#include <QTabWidget>
 #include "app/YObjectPointer.h"
+
+#include <QTabWidget>
 
 class YTabMenuButton;
 class QActionGroup;

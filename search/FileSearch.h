@@ -7,8 +7,8 @@
 #ifndef FILESEARCH_H
 #define FILESEARCH_H
 
-#include "BaseSearch.h"
-#include "YFileCursor.h"
+#include "search/BaseSearch.h"
+#include "document/YFileCursor.h"
 
 class FileBlockReader;
 

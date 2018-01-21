@@ -4,9 +4,9 @@
  *
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
-#include "YTabWidget.h"
-#include "YTabMenuButton.h"
-#include "TailView.h"
+#include "gui/YTabWidget.h"
+#include "gui/YTabMenuButton.h"
+#include "view/TailView.h"
 
 #include <QActionGroup>
 #include <QApplication>

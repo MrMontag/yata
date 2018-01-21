@@ -5,8 +5,8 @@
  * Licensed under the GNU General Public License.  See license.txt for details.
  */
 
-#include "Preferences.h"
-#include "YApplication.h"
+#include "preferences/Preferences.h"
+#include "app/YApplication.h"
 #include "TextColor.h"
 #include "YAMLConverters.h"
 

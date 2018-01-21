@@ -8,9 +8,9 @@
 #include <QDir>
 #include <QScopedPointer>
 #include <QIcon>
-#include "MainWindow.h"
-#include "SessionLoader.h"
-#include "YApplication.h"
+#include "gui/MainWindow.h"
+#include "session/SessionLoader.h"
+#include "app/YApplication.h"
 #include "preferences/Preferences.h"
 
 int main(int argc, char **argv)

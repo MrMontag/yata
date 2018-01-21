@@ -6,11 +6,10 @@
  */
 #include "PartialLayout.h"
 #include "ScrollBarStrategy.h"
-
-#include "DocumentSearch.h"
-#include "FileSearch.h"
-#include "FileBlockReader.h"
-#include "TailView.h"
+#include "search/DocumentSearch.h"
+#include "search/FileSearch.h"
+#include "fileio/FileBlockReader.h"
+#include "view/TailView.h"
 #include "document/YTextDocument.h"
 
 #include <QtDebug>

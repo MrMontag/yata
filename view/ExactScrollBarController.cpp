@@ -1,8 +1,9 @@
 #include "ExactScrollBarController.h"
-#include "FileBlockReader.h"
-#include "PartialLayout.h"
-#include "TailView.h"
-#include "YTextDocument.h"
+#include "fileio/FileBlockReader.h"
+#include "view/PartialLayout.h"
+#include "view/TailView.h"
+#include "document/YTextDocument.h"
+
 #include <QScrollBar>
 
 ExactScrollBarController::ExactScrollBarController(TailView *tailView):
