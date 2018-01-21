@@ -6,16 +6,16 @@
  */
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
-#include "preferences/Preferences.h"
+#include "../preferences/Preferences.h"
 #include "PreferencesDialog.h"
-#include "view/TailView.h"
+#include "../view/TailView.h"
 #include "SearchWidget.h"
-#include "session/SessionLoader.h"
-#include "app/YApplication.h"
+#include "../session/SessionLoader.h"
+#include "../YApplication.h"
 #include "YStatusBar.h"
 #include "YTabWidget.h"
-#include "session/FileSession.h"
-#include "dbg/DebugWindow.h"
+#include "../session/FileSession.h"
+#include "../dbg/DebugWindow.h"
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>

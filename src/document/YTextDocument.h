@@ -8,7 +8,7 @@
 #define YTEXTDOCUMENT_H
 
 #include "BlockDataVector.h"
-#include "app/YObjectPointer.h"
+#include "../YObjectPointer.h"
 
 #include <QScopedPointer>
 #include <vector>

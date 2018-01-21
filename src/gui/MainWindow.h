@@ -7,7 +7,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "app/YObjectPointer.h"
+#include "../YObjectPointer.h"
 #include <QMainWindow>
 
 namespace Ui {

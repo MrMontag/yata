@@ -7,7 +7,7 @@
 #include "SearchWidget.h"
 #include "ui_SearchWidget.h"
 #include "search/SearchInfo.h"
-#include "app/YApplication.h"
+#include "YApplication.h"
 
 #include <QCompleter>
 #include <QLineEdit>

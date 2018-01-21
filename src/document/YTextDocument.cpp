@@ -6,8 +6,8 @@
  */
 #include "YTextDocument.h"
 #include "YFileCursor.h"
-#include "preferences/TextColor.h"
-#include "preferences/Preferences.h"
+#include "../preferences/TextColor.h"
+#include "../preferences/Preferences.h"
 
 #include <QApplication>
 #include <QFontMetrics>

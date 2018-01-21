@@ -1,7 +1,7 @@
 #ifndef DEBUGWINDOW_H
 #define DEBUGWINDOW_H
 
-#include "gui/YTabWidget.h"
+#include "../gui/YTabWidget.h"
 
 #include <QWidget>
 #include <QScopedPointer>

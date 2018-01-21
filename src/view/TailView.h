@@ -10,7 +10,7 @@
 #include <QAbstractScrollArea>
 #include <QScopedPointer>
 #include <vector>
-#include "app/YObjectPointer.h"
+#include "../YObjectPointer.h"
 
 class DocumentSearch;
 class PartialLayout;

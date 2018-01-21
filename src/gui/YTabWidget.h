@@ -7,7 +7,7 @@
 #ifndef YTABWIDGET_H
 #define YTABWIDGET_H
 
-#include "app/YObjectPointer.h"
+#include "../YObjectPointer.h"
 
 #include <QTabWidget>
 

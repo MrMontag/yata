@@ -6,7 +6,7 @@
  */
 
 #include "preferences/Preferences.h"
-#include "app/YApplication.h"
+#include "YApplication.h"
 #include "TextColor.h"
 #include "YAMLConverters.h"
 

@@ -9,7 +9,7 @@
 #define YSTATUSBAR_H
 
 #include <QStatusBar>
-#include "app/YObjectPointer.h"
+#include "../YObjectPointer.h"
 
 class QLabel;
 

@@ -7,7 +7,7 @@
 #include "gui/MainWindow.h"
 #include "search/SearchInfo.h"
 #include "session/SessionLoader.h"
-#include "app/YApplication.h"
+#include "YApplication.h"
 #include "session/AppSession.h"
 #include "session/FileSession.h"
 #include "session/SearchSession.h"

@@ -1,7 +1,7 @@
 #include "DebugWindow.h"
 #include "ui_DebugWindow.h"
-#include "view/TailView.h"
-#include "document/YTextDocument.h"
+#include "../view/TailView.h"
+#include "../document/YTextDocument.h"
 
 #include <QTextBlock>
 

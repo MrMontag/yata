@@ -10,7 +10,7 @@
 #include <QIcon>
 #include "gui/MainWindow.h"
 #include "session/SessionLoader.h"
-#include "app/YApplication.h"
+#include "YApplication.h"
 #include "preferences/Preferences.h"
 
 int main(int argc, char **argv)
