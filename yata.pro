@@ -142,7 +142,7 @@ defineReplace(findFile) {
 
 unix {
     INCLUDEPATH += yaml-cpp/include
-    LIBS += -l:libyaml-cpp
+    LIBS += -L$$PWD/yaml-cpp/build -lyaml-cpp
 }
 
 #unix {
