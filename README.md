@@ -1,12 +1,23 @@
-Yata -- Yet Another Tail Application
+# Yata -- Yet Another Tail Application
 
-Building requirements:
-- Qt 4.7 or later
-- yaml-cpp 0.2.6 (see http://code.google.com/p/yaml-cpp for downloads and
-  instructions)
-- C++ compiler capable of building Qt (GNU gcc is recommended)
+Yata is a simple platform independent tail application, which is based on
+[Qt](https://www.qt.io/) and [yaml-cpp](https://github.com/jbeder/yaml-cpp).
 
-To build on Unix:
+Currently Yata requires Qt 5.10.0 (or greater) and yaml-cpp 0.5.x.
+
+## Contribute
+
+:tada::tada: Thank you very much for any contribution to Yata!
+
+You will find all information needed to get started within the
+[README.md](README.md) (this file) and the [CONTRIBUTING.md](CONTRIBUTING.md).
+Additionally this project adheres to the Contributor Covenant [Code of Conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code. Please report
+unacceptable behavior to the e-mail address listed in [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## How to Build
+
+### Build on Unix (t.b.d. - outdated)
 
 - Ensure yaml-cpp is built and installed in a standard place (i.e., /usr/lib or
   /usr/local/lib). Instructions for building yaml-cpp are in its source package.
@@ -25,7 +36,7 @@ the desired directory with INSTALLDIR as an argument to qmake. For example, to
 install to /usr/bin, use:
     qmake INSTALLDIR=/usr/bin
 
-To build on Windows:
+### Build on Windows (t.b.d. - outdated)
 
 The easiest way to build on Windows is to obtain the open source Qt SDK from
 http://qt.nokia.com. (This will give you the Qt toolkit, plus MinGW, a version
@@ -52,11 +63,3 @@ code.google.com/p/yaml-cpp.) Here are the steps:
 Note that you may need to add the directories in which qmake and mingw32-make
 are located to your %PATH% environment variable in order for the commands to
 succeed.
-
-To run from the command line:
-yata [file[s]]
-
-Please be aware that this software is *alpha* quality software, and is not
-intended for general use yet.
-
-Have fun!
