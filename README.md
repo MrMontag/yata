@@ -1,9 +1,11 @@
 # Yata -- Yet Another Tail Application
 
-Yata is a simple platform independent tail application, which is based on
-[Qt](https://www.qt.io/) and [yaml-cpp](https://github.com/jbeder/yaml-cpp).
+Yata is a general purpose log viewer and file monitor with a nice pretty GUI.  "Yata" is an acronym for "Yet Another Tail Application", so named because of its focus on viewing logs in real time (similar to what one might use "tail -f" on the unix command line for). Another possible rendering of "yata" is "Yata Ain't TAil!", for yata does not just replicate the functionality of the unix tail command in a GUI. For instance, here is a short list of current features:
+  * Ability to open large files quickly, and fast scrolling to anywhere in the file
+  * Searching and highlighting by regular expression
+  * Viewing real-time changes to a file, with or without highlighting
 
-Currently Yata requires Qt 5.10.0 (or greater) and yaml-cpp 0.5.x.
+Yata is based on [Qt](https://www.qt.io/) 5.10.0 (or greater) and [yaml-cpp](https://github.com/jbeder/yaml-cpp) 0.5.x. Currently targeted platforms are Linux and Windows.
 
 ## Contribute
 
