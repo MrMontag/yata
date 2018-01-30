@@ -56,7 +56,7 @@ void YFileSystemWatcher::on_timer_timeout()
     // On windows, it's possible to have a file with a creation
     // timestamp that is *after* its modification timestamp.
     // As a result, both things need to be checked.
-    QDateTime lastRealModification = std::max(info.lastModified(), info.created());
+    QDateTime lastRealModification = std::max(info.lastModified(), info.birthTime());
 
     // Using QFileSystemWatcher to monitor file changes is not
     // very reliable, particularly on Windows.  Even on linux,

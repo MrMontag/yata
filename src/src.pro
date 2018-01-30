@@ -23,6 +23,7 @@ QT += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 DEFINES += 'APPVERSION=\\"$$VERSION\\"'
+DEFINES += QT_DEPRECATED_WARNINGS
 
 TEMPLATE = app
 CONFIG += c++14 debug_and_release warn_on
