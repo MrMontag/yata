@@ -226,8 +226,9 @@ void MainWindow::on_actionAboutYata_triggered()
         tr("(Yet Another Tail Application)<br>") <<
         tr("A universal log viewer<br>") <<
         tr("Version ") << YApplication::appVersion() <<
-        tr("<br><br>Copyright (c) 2010-2012 James Smith<br><br>"
-           "http://code.google.com/p/yata");
+        tr("<br><br>Copyright (c) 2010-2012 James Smith"
+           "<br>Copyright (c) 2018 Alexander Fust<br><br>"
+           "<a href=\"https://github.com/MrMontag/yata\">Visit Yata on GitHub</a>");
     QMessageBox::about(this, title, message);
 }
 
