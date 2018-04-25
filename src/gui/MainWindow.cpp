@@ -172,16 +172,16 @@ void MainWindow::closeEvent(QCloseEvent * e)
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QStringList filenames = QFileDialog::getOpenFileNames(
-        this,
-        tr("Choose File"),
-        m_currentOpenDir);
-    if(!filenames.isEmpty()) {
-        QString filename;
-        foreach(filename, filenames) {
-            addFile(filename);
-            m_currentOpenDir = QFileInfo(filename).path();
-        }
+    QFileDialog dialog(this,
+                       tr("Choose File"),
+                       m_currentOpenDir);
+
+    QStringList fileNames;
+    if (dialog.exec())
+        fileNames = dialog.selectedFiles();
+    for (auto fileName : fileNames) {
+        addFile(fileName);
+        m_currentOpenDir = QFileInfo(fileName).path();
     }
 }
 
